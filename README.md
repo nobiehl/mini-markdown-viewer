@@ -1,87 +1,87 @@
 # MarkdownViewer - Lightweight Windows Desktop Markdown Viewer
 
-Schlanker Windows Desktop-Viewer für Markdown-Dateien mit voller Windows Explorer Integration.
+Lightweight Windows desktop viewer for Markdown files with full Windows Explorer integration.
 
-![Version](https://img.shields.io/badge/version-1.0.0-blue)
+![Version](https://img.shields.io/badge/version-1.0.1-blue)
 ![.NET](https://img.shields.io/badge/.NET-8.0-purple)
 ![Size](https://img.shields.io/badge/size-1.6_MB-green)
 
 ## Features
 
 ### Core Features
-- ✅ **Markdown-Rendering** mit vollem CommonMark-Support
-- ✅ **Syntax-Highlighting** für Code-Blöcke (via Highlight.js)
-- ✅ **Mermaid Diagramme** (Flowcharts, Sequence, Class, State, Gantt, ER, etc.)
-- ✅ **PlantUML Diagramme** (Class, Sequence, Use Case, Activity, Component, etc.)
-- ✅ **Bilder** (inkl. Base64-embedded)
-- ✅ **Tabellen, Listen, Blockquotes** (via Markdig Extensions)
-- ✅ **Live-Reload** bei Dateiänderungen (FileSystemWatcher)
-- ✅ **Copy-Buttons** für Code-Blöcke
-- ✅ **Links**: MD-Dateien im Viewer, externe im Browser
+- ✅ **Markdown Rendering** with full CommonMark support
+- ✅ **Syntax Highlighting** for code blocks (via Highlight.js)
+- ✅ **Mermaid Diagrams** (flowcharts, sequence, class, state, gantt, ER, etc.)
+- ✅ **PlantUML Diagrams** (class, sequence, use case, activity, component, etc.)
+- ✅ **Images** (including base64-embedded)
+- ✅ **Tables, Lists, Blockquotes** (via Markdig extensions)
+- ✅ **Live Reload** on file changes (FileSystemWatcher)
+- ✅ **Copy Buttons** for code blocks
+- ✅ **Link Handling**: MD files open in viewer, external links in browser
 
 ### Windows Integration
-- ✅ **Doppelklick** auf .md-Dateien → öffnet im Viewer
-- ✅ **Rechtsklick-Kontextmenü** ("Open with Markdown Viewer")
-- ✅ **"Open With"-Dialog** Integration
-- ✅ **"Send To"-Menü** Integration
-- ✅ **File Open Dialog** wenn ohne Parameter gestartet
+- ✅ **Double-click** .md files → opens in viewer
+- ✅ **Right-click context menu** ("Open with Markdown Viewer")
+- ✅ **"Open With" dialog** integration
+- ✅ **"Send To" menu** integration
+- ✅ **File open dialog** when started without arguments
 
-### Eigenschaften
-- 🚀 **Schnell**: 1.6 MB Single-File EXE
-- 📦 **Portable**: Keine Installation erforderlich
-- 🔒 **Keine Admin-Rechte**: Registry in HKCU
-- 🧹 **Sauber deinstallierbar**: `--uninstall` entfernt alles
+### Properties
+- 🚀 **Fast**: 1.6 MB single-file executable
+- 📦 **Portable**: No installation required
+- 🔒 **No admin rights**: Registry entries in HKCU only
+- 🧹 **Clean uninstall**: `--uninstall` removes everything
 
-## Schnellstart
+## Quick Start
 
 ### Option 1: File Open Dialog
 ```bash
 .\bin-single\MarkdownViewer.exe
-# Öffnet Dialog zum Auswählen einer .md-Datei
+# Opens dialog to select a .md file
 ```
 
-### Option 2: Datei direkt öffnen
+### Option 2: Open File Directly
 ```bash
 .\bin-single\MarkdownViewer.exe test-diagrams.md
 ```
 
 ### Option 3: Windows Explorer Integration
 ```bash
-# Alle Integrationspunkte installieren
+# Install all integration points
 .\bin-single\MarkdownViewer.exe --install
 
-# Danach: Doppelklick auf .md-Dateien im Explorer
-# Oder: Rechtsklick → "Open with Markdown Viewer"
-# Oder: Rechtsklick → "Senden an" → "Markdown Viewer"
+# Then: Double-click .md files in Explorer
+# Or: Right-click → "Open with Markdown Viewer"
+# Or: Right-click → "Send to" → "Markdown Viewer"
 ```
 
-## Installation & Deinstallation
+## Installation & Uninstallation
 
-### Installieren (empfohlen)
+### Install (recommended)
 ```bash
 .\bin-single\MarkdownViewer.exe --install
 ```
 
-**Was wird installiert:**
-- Standard-Programm für .md-Dateien (Doppelklick)
-- Kontextmenü-Eintrag "Open with Markdown Viewer"
-- Eintrag in "Öffnen mit..."-Liste
-- Verknüpfung im "Senden an"-Menü
+**What gets installed:**
+- Default program for .md files (double-click)
+- Context menu entry "Open with Markdown Viewer"
+- Entry in "Open With" dialog
+- Shortcut in "Send To" menu
 
-**Keine Admin-Rechte erforderlich!** Alle Einträge in `HKEY_CURRENT_USER`
+**No admin rights required!** All entries in `HKEY_CURRENT_USER`
 
-### Deinstallieren
+### Uninstall
 ```bash
 .\bin-single\MarkdownViewer.exe --uninstall
 ```
 
-Entfernt alle Registry-Einträge und Verknüpfungen. Die EXE selbst bleibt erhalten und kann manuell gelöscht werden.
+Removes all registry entries and shortcuts. The executable remains and can be deleted manually.
 
-## Diagramm-Support
+## Diagram Support
 
-### Mermaid Diagramme
+### Mermaid Diagrams
 
-Unterstützt alle Mermaid-Diagrammtypen:
+Supports all Mermaid diagram types:
 
 ````markdown
 ```mermaid
@@ -92,19 +92,19 @@ graph TD
 ```
 ````
 
-**Verfügbare Typen:**
-- `graph` / `flowchart` - Flussdiagramme
-- `sequenceDiagram` - Sequenzdiagramme
-- `classDiagram` - Klassendiagramme
-- `stateDiagram` - Zustandsdiagramme
-- `erDiagram` - Entity-Relationship-Diagramme
-- `gantt` - Gantt-Charts
-- `pie` - Tortendiagramme
-- `gitGraph` - Git-Graphen
+**Available types:**
+- `graph` / `flowchart` - Flow diagrams
+- `sequenceDiagram` - Sequence diagrams
+- `classDiagram` - Class diagrams
+- `stateDiagram` - State diagrams
+- `erDiagram` - Entity-relationship diagrams
+- `gantt` - Gantt charts
+- `pie` - Pie charts
+- `gitGraph` - Git graphs
 
-### PlantUML Diagramme
+### PlantUML Diagrams
 
-Nutzt den öffentlichen PlantUML-Server für Rendering:
+Uses public PlantUML server for rendering:
 
 ````markdown
 ```plantuml
@@ -115,7 +115,7 @@ Bob --> Alice: Hi!
 ```
 ````
 
-**Verfügbare Typen:**
+**Available types:**
 - Class Diagrams
 - Sequence Diagrams
 - Use Case Diagrams
@@ -125,67 +125,64 @@ Bob --> Alice: Hi!
 - Object Diagrams
 - Deployment Diagrams
 
-**Siehe `test-diagrams.md` für Beispiele!**
+**See `test-diagrams.md` for examples!**
 
-## Command-Line Optionen
+## Command-Line Options
 
 ```bash
-# Datei öffnen
+# Open file
 MarkdownViewer.exe <file.md>
 
-# Windows Explorer Integration installieren
+# Install Windows Explorer integration
 MarkdownViewer.exe --install
 
-# Windows Explorer Integration deinstallieren
+# Uninstall Windows Explorer integration
 MarkdownViewer.exe --uninstall
 
-# Version anzeigen
+# Show version
 MarkdownViewer.exe --version
 
-# Hilfe anzeigen
+# Show help
 MarkdownViewer.exe --help
 ```
 
-## Technologie-Stack
+## Technology Stack
 
-- **Sprache**: C# 12 (.NET 8 Managed Code)
+- **Language**: C# 12 (.NET 8 Managed Code)
 - **UI Framework**: Windows Forms (WinForms)
 - **Rendering**: WebView2 (Edge Chromium)
 - **Markdown Parser**: Markdig 0.37.0
 - **Syntax Highlighting**: Highlight.js 11.9.0 (CDN)
-- **Diagramme**:
+- **Diagrams**:
   - Mermaid.js 10 (CDN)
   - PlantUML Server (plantuml.com)
-- **Build**: Single-File Deployment (.NET 8 Runtime required)
+- **Build**: Single-file deployment (.NET 8 Runtime required)
 
-## Projektstruktur
+## Project Structure
 
 ```
-misc/
+mini-markdown-viewer/
 ├── markdown-viewer/
 │   └── MarkdownViewer/
-│       ├── Program.cs              # Entry Point, CLI-Handling, Registry
-│       ├── MainForm.cs             # Main Window, WebView2, Markdown-Rendering
-│       └── MarkdownViewer.csproj   # Projekt-Konfiguration
-├── bin-single/
-│   ├── MarkdownViewer.exe          # Single-File Executable (1.6 MB)
-│   └── .cache/                     # WebView2 Cache (auto-generiert)
-├── test-diagrams.md                # Test-Datei mit Mermaid & PlantUML
-└── README.md                       # Diese Datei
+│       ├── Program.cs              # Entry point, CLI handling, registry
+│       ├── MainForm.cs             # Main window, WebView2, rendering
+│       └── MarkdownViewer.csproj   # Project configuration
+├── test-diagrams.md                # Test file with Mermaid & PlantUML
+└── README.md                       # This file
 ```
 
-## Build von Source
+## Build from Source
 
-### Voraussetzungen
+### Prerequisites
 - .NET 8 SDK
 - Windows 10/11
-- WebView2 Runtime (auf Win10/11 vorinstalliert)
+- WebView2 Runtime (preinstalled on Win10/11)
 
-### Build-Befehl
+### Build Command
 ```bash
 cd markdown-viewer/MarkdownViewer
 
-# Single-File EXE erstellen
+# Create single-file executable
 dotnet publish -c Release -r win-x64 --self-contained false -p:PublishSingleFile=true -o ../../bin-single
 
 # Output: ../../bin-single/MarkdownViewer.exe
@@ -197,26 +194,26 @@ dotnet build -c Debug
 dotnet run -- test-diagrams.md
 ```
 
-## Architektur
+## Architecture
 
 ### Program.cs
-- **Entry Point**: `Main(string[] args)`
-- **CLI-Argument-Handling**: `--install`, `--uninstall`, `--help`, `--version`
-- **Registry-Integration**: `InstallFileAssociation()`, `UninstallFileAssociation()`
-- **Shortcut-Erstellung**: `CreateShortcut()` für "Send To"-Menü
+- **Entry point**: `Main(string[] args)`
+- **CLI argument handling**: `--install`, `--uninstall`, `--help`, `--version`
+- **Registry integration**: `InstallFileAssociation()`, `UninstallFileAssociation()`
+- **Shortcut creation**: `CreateShortcut()` for "Send To" menu
 
 ### MainForm.cs
-- **WebView2-Initialisierung**: Custom Cache-Ordner (`.cache`)
-- **Markdown-zu-HTML-Konvertierung**: `ConvertMarkdownToHtml()`
-- **HTML-Template**: Eingebettetes CSS, Highlight.js, Mermaid.js, PlantUML-Rendering
-- **Live-Reload**: `FileSystemWatcher` überwacht Dateiänderungen
-- **Link-Handling**: Externe Links im Browser, interne im Viewer
+- **WebView2 initialization**: Custom cache folder (`.cache`)
+- **Markdown-to-HTML conversion**: `ConvertMarkdownToHtml()`
+- **HTML template**: Embedded CSS, Highlight.js, Mermaid.js, PlantUML rendering
+- **Live reload**: `FileSystemWatcher` monitors file changes
+- **Link handling**: External links in browser, internal in viewer
 
-### Markdown-Rendering Pipeline
+### Markdown Rendering Pipeline
 ```
 .md File
   ↓
-Markdig (mit Advanced Extensions)
+Markdig (with advanced extensions)
   ↓
 HTML String
   ↓
@@ -224,16 +221,16 @@ Embedded CSS + Scripts (Highlight.js, Mermaid.js)
   ↓
 WebView2.NavigateToString()
   ↓
-Client-Side Processing:
-  - Mermaid: Rendert direkt im Browser
-  - PlantUML: Ersetzt Code-Block durch <img> vom Server
-  - Highlight.js: Syntax-Highlighting für Code
-  - Copy-Buttons: Dynamisch für Code-Blöcke hinzugefügt
+Client-side processing:
+  - Mermaid: Renders directly in browser
+  - PlantUML: Replaces code block with <img> from server
+  - Highlight.js: Syntax highlighting for code
+  - Copy buttons: Dynamically added to code blocks
 ```
 
-## Registry-Einträge (nach --install)
+## Registry Entries (after --install)
 
-Alle Einträge in `HKEY_CURRENT_USER` (keine Admin-Rechte):
+All entries in `HKEY_CURRENT_USER` (no admin rights required):
 
 ```
 HKCU\Software\Classes\.md
@@ -263,37 +260,37 @@ HKCU\Software\Classes\Applications\MarkdownViewer.exe\shell\open\command
   (Default) = "C:\path\to\MarkdownViewer.exe" "%1"
 ```
 
-Plus Verknüpfung in: `%APPDATA%\Microsoft\Windows\SendTo\Markdown Viewer.lnk`
+Plus shortcut in: `%APPDATA%\Microsoft\Windows\SendTo\Markdown Viewer.lnk`
 
 ## FAQ
 
-**Q: Brauche ich .NET installiert?**
-A: Ja, .NET 8 Runtime muss installiert sein. Auf den meisten modernen Windows-Systemen bereits vorhanden.
+**Q: Do I need .NET installed?**
+A: Yes, .NET 8 Runtime is required. Pre-installed on most modern Windows systems.
 
-**Q: Funktionieren Diagramme offline?**
-A: Mermaid funktioniert offline (nach erstem CDN-Load). PlantUML benötigt Internet-Verbindung zum Server.
+**Q: Do diagrams work offline?**
+A: Mermaid works offline (after first CDN load). PlantUML requires internet connection to server.
 
-**Q: Kann ich eigene Styles hinzufügen?**
-A: Ja, im Code in `MainForm.cs` → `ConvertMarkdownToHtml()` → `<style>` Sektion.
+**Q: Can I add custom styles?**
+A: Yes, in `MainForm.cs` → `ConvertMarkdownToHtml()` → `<style>` section.
 
-**Q: Warum WebView2?**
-A: WebView2 nutzt Edge Chromium Engine, ist auf Windows 10/11 vorinstalliert, und bietet perfektes HTML/CSS/JS-Rendering.
+**Q: Why WebView2?**
+A: WebView2 uses Edge Chromium engine, is preinstalled on Windows 10/11, and provides perfect HTML/CSS/JS rendering.
 
-**Q: Kann ich die EXE umbenennen?**
-A: Ja, aber führe danach `--install` erneut aus, damit die Registry die richtige EXE-Path hat.
+**Q: Can I rename the executable?**
+A: Yes, but run `--install` again afterwards so registry entries reference the correct path.
 
-## Lizenz
+## License
 
-Dieses Projekt wurde als einfaches Tool entwickelt. Nutze es wie du willst!
+MIT License - see LICENSE file for details.
 
 ## Links
 
-- [Markdig](https://github.com/xoofx/markdig) - Markdown Parser
-- [Mermaid.js](https://mermaid.js.org/) - Diagramm-Bibliothek
-- [PlantUML](https://plantuml.com/) - UML-Diagramme
-- [Highlight.js](https://highlightjs.org/) - Syntax-Highlighting
-- [WebView2](https://developer.microsoft.com/en-us/microsoft-edge/webview2/) - Edge Chromium Rendering
+- [Markdig](https://github.com/xoofx/markdig) - Markdown parser
+- [Mermaid.js](https://mermaid.js.org/) - Diagram library
+- [PlantUML](https://plantuml.com/) - UML diagrams
+- [Highlight.js](https://highlightjs.org/) - Syntax highlighting
+- [WebView2](https://developer.microsoft.com/en-us/microsoft-edge/webview2/) - Edge Chromium rendering
 
 ---
 
-**Entwickelt mit Claude Code** 🤖
+**Built with Claude Code** 🤖

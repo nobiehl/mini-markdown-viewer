@@ -280,12 +280,12 @@ namespace MarkdownViewer
             pre.replaceWith(img);
         }});
 
-        // PlantUML encoding (deflate + base64)
+        // PlantUML encoding (text format for server)
         function encodePlantUML(text) {{
-            // Simple encoding using the PlantUML text format
-            // For full compression we'd need pako.js, but text format works fine
-            const utf8 = unescape(encodeURIComponent(text));
-            return btoa(utf8).replace(/\\+/g, '-').replace(/\\//g, '_');
+            // PlantUML server supports text format with URL encoding
+            // We use the simple text format: encode and prefix with ~1
+            const encoded = encodeURIComponent(text);
+            return '~1' + encoded;
         }}
 
         // Add copy buttons to code blocks (except mermaid and plantuml)

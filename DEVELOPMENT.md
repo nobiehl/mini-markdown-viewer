@@ -1,132 +1,132 @@
 # MarkdownViewer - Developer Documentation
 
-Technische Dokumentation für Entwickler, die am MarkdownViewer arbeiten oder ihn erweitern möchten.
+Technical documentation for developers working on or extending MarkdownViewer.
 
-## Codebase-Übersicht
+## Codebase Overview
 
-### Dateistruktur
+### File Structure
 
 ```
 markdown-viewer/MarkdownViewer/
-├── Program.cs              # Entry Point & CLI
-├── MainForm.cs             # Main Window & Rendering
-└── MarkdownViewer.csproj   # Projekt-Konfiguration
+├── Program.cs              # Entry point & CLI
+├── MainForm.cs             # Main window & rendering
+└── MarkdownViewer.csproj   # Project configuration
 ```
 
 ### Program.cs - Entry Point & CLI
 
-**Verantwortlichkeiten:**
-- Kommandozeilen-Argument-Parsing
-- Windows Explorer Integration (Registry)
-- Application Lifetime Management
+**Responsibilities:**
+- Command-line argument parsing
+- Windows Explorer integration (registry)
+- Application lifetime management
 
-**Wichtige Methoden:**
+**Key Methods:**
 
 ```csharp
 static void Main(string[] args)
 ```
-- Entry Point der Anwendung
-- Parsed CLI-Argumente (`--install`, `--uninstall`, `--help`, `--version`, oder Dateipfad)
-- Öffnet FileOpenDialog wenn keine Argumente
+- Application entry point
+- Parses CLI arguments (`--install`, `--uninstall`, `--help`, `--version`, or file path)
+- Opens FileOpenDialog when no arguments provided
 
 ```csharp
 void InstallFileAssociation()
 ```
-- Erstellt Registry-Einträge in `HKEY_CURRENT_USER`
-- Keine Admin-Rechte erforderlich
-- Registriert 4 Integrationspunkte:
-  1. Standard-Dateiassoziation (`.md` → MarkdownViewer)
-  2. Kontextmenü ("Open with Markdown Viewer")
-  3. "Open With"-Dialog-Eintrag
-  4. "Send To"-Menü-Verknüpfung
+- Creates registry entries in `HKEY_CURRENT_USER`
+- No admin rights required
+- Registers 4 integration points:
+  1. Default file association (`.md` → MarkdownViewer)
+  2. Context menu ("Open with Markdown Viewer")
+  3. "Open With" dialog entry
+  4. "Send To" menu shortcut
 
 ```csharp
 void UninstallFileAssociation()
 ```
-- Entfernt alle Registry-Einträge
-- Löscht "Send To"-Verknüpfung
+- Removes all registry entries
+- Deletes "Send To" shortcut
 - Safe to call (throwOnMissingSubKey: false)
 
 ```csharp
 void CreateShortcut(string targetPath, string shortcutPath)
 ```
-- Erstellt .lnk-Datei via WScript.Shell COM-Objekt
-- Für "Send To"-Menü
+- Creates .lnk file via WScript.Shell COM object
+- Used for "Send To" menu
 
 ### MainForm.cs - Main Window & Rendering
 
-**Verantwortlichkeiten:**
-- WebView2-Initialisierung und -Management
-- Markdown-zu-HTML-Konvertierung
-- Live-Reload via FileSystemWatcher
-- HTML-Template mit CSS und JavaScript
+**Responsibilities:**
+- WebView2 initialization and management
+- Markdown-to-HTML conversion
+- Live reload via FileSystemWatcher
+- HTML template with CSS and JavaScript
 
-**Wichtige Methoden:**
+**Key Methods:**
 
 ```csharp
 MainForm(string filePath)
 ```
-- Konstruktor: Initialisiert Form, lädt Datei, startet File Watcher
+- Constructor: initializes form, loads file, starts file watcher
 
 ```csharp
 void InitializeComponents()
 ```
-- Erstellt WebView2-Control
-- Konfiguriert Custom Cache-Ordner (`.cache` neben EXE)
-- Setzt Navigation-Handler (externe Links → Browser)
+- Creates WebView2 control
+- Configures custom cache folder (`.cache` next to EXE)
+- Sets navigation handler (external links → browser)
 
 ```csharp
 void LoadMarkdownFile(string filePath)
 ```
-- Liest .md-Datei
-- Konvertiert zu HTML
-- Rendert in WebView2
-- Behandelt Async WebView2-Initialisierung
+- Reads .md file
+- Converts to HTML
+- Renders in WebView2
+- Handles async WebView2 initialization
 
 ```csharp
 string ConvertMarkdownToHtml(string markdown)
 ```
-- **Kern der Rendering-Engine**
-- Nutzt Markdig mit `UseAdvancedExtensions()`
-- Generiert vollständiges HTML-Dokument mit:
-  - Embedded CSS (GitHub-Style)
-  - Highlight.js (Syntax-Highlighting)
-  - Mermaid.js (Diagramme)
-  - PlantUML-Server-Integration
-  - Copy-Buttons für Code-Blöcke
+- Core rendering engine
+- Uses Markdig with `UseAdvancedExtensions()`
+- Generates complete HTML document with:
+  - Embedded CSS (GitHub style)
+  - Highlight.js (syntax highlighting)
+  - Mermaid.js (diagrams)
+  - PlantUML server integration
+  - Copy buttons for code blocks
 
 ```csharp
 void SetupFileWatcher(string filePath)
 ```
-- FileSystemWatcher für Live-Reload
-- Beobachtet `LastWrite` und `Size` Changes
-- 100ms Delay gegen Multiple-Trigger
+- FileSystemWatcher for live reload
+- Monitors `LastWrite` and `Size` changes
+- 100ms delay to prevent multiple triggers
 
-## Architektur-Entscheidungen
+## Architecture Decisions
 
-### Warum WebView2?
-- **HTML/CSS/JS-Rendering** via Edge Chromium Engine
-- Auf Windows 10/11 **vorinstalliert**
-- Perfektes Rendering komplexer Markdown-Inhalte
-- Ermöglicht JavaScript-basierte Features (Mermaid, Highlight.js)
+### Why WebView2?
+- HTML/CSS/JS rendering via Edge Chromium engine
+- Preinstalled on Windows 10/11
+- Perfect rendering of complex Markdown content
+- Enables JavaScript-based features (Mermaid, Highlight.js)
 
-### Warum Markdig?
-- **Schnellster** C# Markdown-Parser
-- CommonMark-konform
-- Erweiterbar via Pipeline (Advanced Extensions)
-- Unterstützt Tabellen, Task Lists, Auto-Links, etc.
+### Why Markdig?
+- Fastest C# Markdown parser
+- CommonMark compliant
+- Extensible via pipeline (advanced extensions)
+- Supports tables, task lists, auto-links, etc.
 
-### Warum Single-File Deployment?
-- **Einfache Verteilung** (1 Datei)
-- Portable (kann überall hin kopiert werden)
-- Keine Installer-Komplexität
-- Trade-off: .NET Runtime muss installiert sein
+### Why Single-File Deployment?
+- Simple distribution (one file)
+- Portable (can be copied anywhere)
+- No installer complexity
+- Trade-off: .NET Runtime must be installed
 
-### Warum HKCU statt HKLM?
-- **Keine Admin-Rechte** erforderlich
-- Pro-User-Installation
-- Einfacher zu deinstallieren
-- Windows Best Practice für User-Tools
+### Why HKCU instead of HKLM?
+- No admin rights required
+- Per-user installation
+- Easier to uninstall
+- Windows best practice for user tools
 
 ## Rendering Pipeline
 
@@ -143,7 +143,7 @@ void SetupFileWatcher(string filePath)
          ↓
 ┌─────────────────────────────────┐
 │  Markdig.ToHtml()               │
-│  (mit Advanced Extensions)      │
+│  (with advanced extensions)     │
 └────────┬────────────────────────┘
          │
          ↓
@@ -152,8 +152,8 @@ void SetupFileWatcher(string filePath)
 │  + Embedded CSS                 │
 │  + Highlight.js CDN             │
 │  + Mermaid.js CDN               │
-│  + PlantUML Script              │
-│  + Copy-Button Script           │
+│  + PlantUML script              │
+│  + Copy button script           │
 └────────┬────────────────────────┘
          │
          ↓
@@ -163,15 +163,15 @@ void SetupFileWatcher(string filePath)
          │
          ↓
 ┌─────────────────────────────────┐
-│  Client-Side Processing:        │
-│  • Highlight.js: Code-Blocks    │
-│  • Mermaid: Diagramme           │
-│  • PlantUML: Server-Fetch       │
-│  • Copy-Buttons: Dynamisch      │
+│  Client-side processing:        │
+│  • Highlight.js: Code blocks    │
+│  • Mermaid: Diagrams            │
+│  • PlantUML: Server fetch       │
+│  • Copy buttons: Dynamic        │
 └─────────────────────────────────┘
 ```
 
-## Diagramm-Integration
+## Diagram Integration
 
 ### Mermaid (Client-Side)
 ```javascript
@@ -179,9 +179,9 @@ import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.mi
 mermaid.initialize({ startOnLoad: true, theme: 'default' });
 ```
 
-- **Rendert direkt im Browser**
-- Code-Blöcke mit `language-mermaid` werden automatisch erkannt
-- Keine Server-Kommunikation nötig
+- Renders directly in browser
+- Code blocks with `language-mermaid` are automatically detected
+- No server communication needed
 
 ### PlantUML (Server-Side)
 ```javascript
@@ -193,22 +193,22 @@ document.querySelectorAll('code.language-plantuml').forEach((block) => {
 });
 ```
 
-- **Server-basiert** (plantuml.com)
-- Code wird base64-encodiert
-- Server generiert SVG
-- Ersetzt Code-Block durch `<img>`
+- Server-based (plantuml.com)
+- Code is base64-encoded
+- Server generates SVG
+- Replaces code block with `<img>`
 
-## Registry-Struktur
+## Registry Structure
 
-Nach `--install` werden folgende Registry-Keys erstellt:
+After `--install`, the following registry keys are created:
 
-### 1. Dateiassoziation (.md)
+### 1. File Association (.md)
 ```
 HKCU\Software\Classes\.md
   (Default) = "MarkdownViewer.Document"
 ```
 
-### 2. Dokument-Klasse
+### 2. Document Class
 ```
 HKCU\Software\Classes\MarkdownViewer.Document
   (Default) = "Markdown Document"
@@ -217,7 +217,7 @@ HKCU\Software\Classes\MarkdownViewer.Document\shell\open\command
   (Default) = "C:\path\to\MarkdownViewer.exe" "%1"
 ```
 
-### 3. Kontextmenü (funktioniert auch wenn anderes Programm Standard ist)
+### 3. Context Menu (works even if another program is default)
 ```
 HKCU\Software\Classes\SystemFileAssociations\.md\shell\MarkdownViewer
   (Default) = "Open with Markdown Viewer"
@@ -227,7 +227,7 @@ HKCU\Software\Classes\SystemFileAssociations\.md\shell\MarkdownViewer\command
   (Default) = "C:\path\to\MarkdownViewer.exe" "%1"
 ```
 
-### 4. "Open With"-Dialog
+### 4. "Open With" Dialog
 ```
 HKCU\Software\Classes\Applications\MarkdownViewer.exe
   FriendlyAppName = "Markdown Viewer"
@@ -240,22 +240,22 @@ HKCU\Software\Classes\Applications\MarkdownViewer.exe\shell\open\command
   (Default) = "C:\path\to\MarkdownViewer.exe" "%1"
 ```
 
-### 5. "Send To"-Menü
-Verknüpfung in: `%APPDATA%\Microsoft\Windows\SendTo\Markdown Viewer.lnk`
+### 5. "Send To" Menu
+Shortcut in: `%APPDATA%\Microsoft\Windows\SendTo\Markdown Viewer.lnk`
 
-## Build-Konfiguration
+## Build Configuration
 
 ### MarkdownViewer.csproj
 
 ```xml
 <PropertyGroup>
-  <OutputType>WinExe</OutputType>               <!-- Windows GUI App (keine Console) -->
+  <OutputType>WinExe</OutputType>               <!-- Windows GUI app (no console) -->
   <TargetFramework>net8.0-windows</TargetFramework>
-  <Nullable>enable</Nullable>                   <!-- Nullable Reference Types -->
-  <UseWindowsForms>true</UseWindowsForms>       <!-- WinForms Support -->
-  <ImplicitUsings>enable</ImplicitUsings>       <!-- Implizite Usings -->
-  <PublishSingleFile>true</PublishSingleFile>   <!-- Single-File Deployment -->
-  <SelfContained>false</SelfContained>          <!-- .NET Runtime erforderlich -->
+  <Nullable>enable</Nullable>                   <!-- Nullable reference types -->
+  <UseWindowsForms>true</UseWindowsForms>       <!-- WinForms support -->
+  <ImplicitUsings>enable</ImplicitUsings>       <!-- Implicit usings -->
+  <PublishSingleFile>true</PublishSingleFile>   <!-- Single-file deployment -->
+  <SelfContained>false</SelfContained>          <!-- .NET Runtime required -->
   <IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
 </PropertyGroup>
 
@@ -265,48 +265,48 @@ Verknüpfung in: `%APPDATA%\Microsoft\Windows\SendTo\Markdown Viewer.lnk`
 </ItemGroup>
 ```
 
-### Build-Commands
+### Build Commands
 
 ```bash
-# Debug Build
+# Debug build
 dotnet build -c Debug
 
-# Release Build (normal)
+# Release build (standard)
 dotnet build -c Release
 
-# Single-File Publish (empfohlen)
+# Single-file publish (recommended)
 dotnet publish -c Release -r win-x64 --self-contained false -p:PublishSingleFile=true -o ../../bin-single
 
-# Development Run
+# Development run
 dotnet run -- test-diagrams.md
 ```
 
-## Erweiterungsmöglichkeiten
+## Extension Possibilities
 
-### 1. Neue Markdig-Extensions hinzufügen
+### 1. Add New Markdig Extensions
 
 In `MainForm.cs`:
 ```csharp
 var pipeline = new MarkdownPipelineBuilder()
     .UseAdvancedExtensions()
-    .UseYourCustomExtension()  // <-- Hier
+    .UseYourCustomExtension()  // <-- Here
     .Build();
 ```
 
-### 2. Custom CSS-Theme hinzufügen
+### 2. Add Custom CSS Theme
 
-In `MainForm.cs` → `ConvertMarkdownToHtml()` → `<style>` Block anpassen
+In `MainForm.cs` → `ConvertMarkdownToHtml()` → modify `<style>` block
 
-### 3. Weitere Diagramm-Typen
+### 3. Add More Diagram Types
 
-In `ConvertMarkdownToHtml()` → `<script>` Block:
+In `ConvertMarkdownToHtml()` → `<script>` block:
 ```javascript
 document.querySelectorAll('code.language-yourdiagram').forEach((block) => {
     // Custom rendering logic
 });
 ```
 
-### 4. Weitere CLI-Parameter
+### 4. Add More CLI Parameters
 
 In `Program.cs` → `Main()`:
 ```csharp
@@ -319,117 +319,117 @@ if (firstArg == "--your-param")
 
 ### 5. Dark Mode
 
-Option A: CSS Media Query (automatisch)
+Option A: CSS media query (automatic)
 ```css
 @media (prefers-color-scheme: dark) {
     body { background: #1e1e1e; color: #d4d4d4; }
 }
 ```
 
-Option B: Toggle-Button mit JavaScript
+Option B: Toggle button with JavaScript
 
 ## Testing
 
-### Manuelle Tests
+### Manual Tests
 ```bash
-# Test File Open Dialog
+# Test file open dialog
 .\bin-single\MarkdownViewer.exe
 
-# Test Datei öffnen
+# Test file opening
 .\bin-single\MarkdownViewer.exe test-diagrams.md
 
-# Test Install/Uninstall
+# Test install/uninstall
 .\bin-single\MarkdownViewer.exe --install
 .\bin-single\MarkdownViewer.exe --uninstall
 
-# Test Version/Help
+# Test version/help
 .\bin-single\MarkdownViewer.exe --version
 .\bin-single\MarkdownViewer.exe --help
 ```
 
-### Test-Cases
-- [ ] Markdown mit allen Features (Tabellen, Listen, Code, etc.)
-- [ ] Mermaid Flowchart, Sequence, Class Diagram
-- [ ] PlantUML Class, Sequence Diagram
-- [ ] Base64-embedded Images
-- [ ] External Links (öffnen im Browser)
-- [ ] Live-Reload (Datei ändern während offen)
-- [ ] Registry Installation/Deinstallation
-- [ ] Kontextmenü im Explorer
-- [ ] "Open With" Dialog
-- [ ] "Send To" Menü
+### Test Cases
+- [ ] Markdown with all features (tables, lists, code, etc.)
+- [ ] Mermaid flowchart, sequence, class diagram
+- [ ] PlantUML class, sequence diagram
+- [ ] Base64-embedded images
+- [ ] External links (open in browser)
+- [ ] Live reload (change file while open)
+- [ ] Registry installation/uninstallation
+- [ ] Context menu in Explorer
+- [ ] "Open With" dialog
+- [ ] "Send To" menu
 
-## Bekannte Einschränkungen
+## Known Limitations
 
-1. **PlantUML benötigt Internet**: Server-basiert (plantuml.com)
-   - Lösung: Lokalen PlantUML-Server einbinden (benötigt Java)
+1. **PlantUML requires internet**: Server-based (plantuml.com)
+   - Solution: Integrate local PlantUML server (requires Java)
 
-2. **Nullable Warnings**: Code nutzt nullable types, einige Warnings bleiben
-   - Nicht kritisch, könnte aber bereinigt werden
+2. **Nullable warnings**: Code uses nullable types, some warnings remain
+   - Not critical, but could be cleaned up
 
-3. **Keine Multi-Tab-Unterstützung**: Nur eine Datei pro Fenster
-   - Feature-Request für zukünftige Version
+3. **No multi-tab support**: Only one file per window
+   - Feature request for future version
 
-4. **WebView2 Cache wächst**: `.cache` Ordner kann groß werden
-   - Könnte automatisches Cleanup implementieren
+4. **WebView2 cache grows**: `.cache` folder can become large
+   - Could implement automatic cleanup
 
-5. **Live-Reload-Delay**: 100ms hardcoded
-   - Könnte konfigurierbar gemacht werden
+5. **Live reload delay**: 100ms hardcoded
+   - Could be made configurable
 
 ## Performance
 
-### Startup-Zeit
-- Cold Start: ~500-800ms (WebView2 Init)
-- Warm Start: ~200-300ms
+### Startup Time
+- Cold start: ~500-800ms (WebView2 init)
+- Warm start: ~200-300ms
 
 ### Memory Usage
 - Base: ~50-80 MB (WebView2)
-- Pro Datei: +2-10 MB (abhängig von Bildern)
+- Per file: +2-10 MB (depending on images)
 
 ### File Size Limits
-- Praktisches Limit: ~10 MB Markdown
-- Größere Dateien: WebView2 kann langsam werden
-- Empfehlung: Große Dateien splitten
+- Practical limit: ~10 MB Markdown
+- Larger files: WebView2 can become slow
+- Recommendation: Split large files
 
 ## Debugging
 
-### WebView2 DevTools aktivieren
+### Enable WebView2 DevTools
 
 In `MainForm.cs`:
 ```csharp
-webView.CoreWebView2.Settings.AreDevToolsEnabled = true;  // Auf true setzen
+webView.CoreWebView2.Settings.AreDevToolsEnabled = true;  // Set to true
 ```
 
-Dann: `F12` im laufenden Viewer
+Then: Press `F12` in running viewer
 
-### Logging hinzufügen
+### Add Logging
 
 ```csharp
-Console.WriteLine("Debug Info");  // Erscheint in VS Output
-Debug.WriteLine("Debug Info");     // Erscheint in Debug Output
+Console.WriteLine("Debug info");  // Appears in VS Output
+Debug.WriteLine("Debug info");     // Appears in Debug Output
 ```
 
-### Registry-Einträge prüfen
+### Check Registry Entries
 
 ```powershell
-# Registry durchsuchen
+# Search registry
 reg query HKCU\Software\Classes\.md
 reg query HKCU\Software\Classes\MarkdownViewer.Document
 ```
 
 ## Contributing
 
-Wenn du beitragen möchtest:
+When contributing:
 
-1. Code-Style: Standard C# Conventions
-2. Kommentare: XML-Docs für öffentliche Methoden
-3. Testing: Manuell testen vor Commit
-4. Dokumentation: README.md und DEVELOPMENT.md aktualisieren
+1. Code style: Standard C# conventions
+2. Comments: XML docs for public methods
+3. Testing: Manual testing before commit
+4. Documentation: Update README.md and DEVELOPMENT.md
 
-## Lizenz
+## License
 
-Open Source - nutze es wie du willst!
+MIT License - see LICENSE file for details.
 
 ---
 
-**Weitere Fragen?** Schau in den Code - er ist gut dokumentiert! 📖
+**Questions?** Check the code - it's well documented! 📖

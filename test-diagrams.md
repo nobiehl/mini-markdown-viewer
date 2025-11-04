@@ -1,6 +1,6 @@
-# Diagram Test für MarkdownViewer
+# Diagram Test for MarkdownViewer
 
-Dieser Markdown-Test zeigt Mermaid und PlantUML Diagramme.
+This test file demonstrates Mermaid and PlantUML diagram support.
 
 ## Mermaid Flowchart
 
@@ -65,7 +65,7 @@ WebView2 --> User: Display rendered content
 @enduml
 ```
 
-## Code mit Syntax Highlighting
+## Code with Syntax Highlighting
 
 ```csharp
 public class Example
@@ -77,4 +77,4 @@ public class Example
 }
 ```
 
-**Ende des Tests**
+**End of test**

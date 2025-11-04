@@ -1,0 +1,16 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(source ~/.bashrc)",
+      "Bash(\"C:\\Program Files\\GitHub CLI\\gh.exe\" release create v1.0.0 )",
+      "Bash(bin-single/MarkdownViewer.exe)",
+      "Bash(\"C:\\Program Files\\GitHub CLI\\gh.exe\" repo edit --description \"Lightweight Windows Desktop Markdown viewer with Mermaid & PlantUML support\")",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(git push:*)",
+      "Bash(GIT_ASKPASS= \"C:\\Program Files\\GitHub CLI\\gh.exe\" auth setup-git)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}
