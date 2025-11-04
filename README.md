@@ -1,6 +1,6 @@
-# MarkdownViewer - Native Windows Markdown Viewer
+# MarkdownViewer - Lightweight Windows Desktop Markdown Viewer
 
-Schlanker, nativer Windows Desktop-Viewer für Markdown-Dateien mit voller Windows Explorer Integration.
+Schlanker Windows Desktop-Viewer für Markdown-Dateien mit voller Windows Explorer Integration.
 
 ![Version](https://img.shields.io/badge/version-1.0.0-blue)
 ![.NET](https://img.shields.io/badge/.NET-8.0-purple)
@@ -148,8 +148,8 @@ MarkdownViewer.exe --help
 
 ## Technologie-Stack
 
-- **Sprache**: C# 12 (.NET 8)
-- **UI Framework**: Windows Forms
+- **Sprache**: C# 12 (.NET 8 Managed Code)
+- **UI Framework**: Windows Forms (WinForms)
 - **Rendering**: WebView2 (Edge Chromium)
 - **Markdown Parser**: Markdig 0.37.0
 - **Syntax Highlighting**: Highlight.js 11.9.0 (CDN)

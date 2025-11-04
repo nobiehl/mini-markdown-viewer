@@ -105,7 +105,7 @@ void SetupFileWatcher(string filePath)
 ## Architektur-Entscheidungen
 
 ### Warum WebView2?
-- **Native HTML/CSS/JS-Rendering** via Edge Chromium
+- **HTML/CSS/JS-Rendering** via Edge Chromium Engine
 - Auf Windows 10/11 **vorinstalliert**
 - Perfektes Rendering komplexer Markdown-Inhalte
 - Ermöglicht JavaScript-basierte Features (Mermaid, Highlight.js)
