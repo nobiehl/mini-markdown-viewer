@@ -2,7 +2,7 @@
 
 Lightweight Windows desktop viewer for Markdown files with full Windows Explorer integration.
 
-![Version](https://img.shields.io/badge/version-1.0.1-blue)
+![Version](https://img.shields.io/badge/version-1.0.2-blue)
 ![.NET](https://img.shields.io/badge/.NET-8.0-purple)
 ![Size](https://img.shields.io/badge/size-1.6_MB-green)
 

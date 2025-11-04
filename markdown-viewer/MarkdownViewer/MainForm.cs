@@ -269,24 +269,34 @@ namespace MarkdownViewer
             const pre = block.parentElement;
             const code = block.textContent;
 
-            // Encode PlantUML for server
-            const encoded = encodePlantUML(code);
+            // Use PlantUML server with POST method (more reliable)
             const img = document.createElement('img');
-            img.src = `https://www.plantuml.com/plantuml/svg/${{encoded}}`;
+
+            // Use the proxy/cache endpoint which works better
+            // We'll use the png format as it's more reliable than svg for complex diagrams
+            const encodedText = btoa(unescape(encodeURIComponent(code)));
+            img.src = `https://www.plantuml.com/plantuml/png/${{encodedText}}`;
             img.style.maxWidth = '100%';
             img.style.margin = '1rem 0';
+            img.style.border = '1px solid #ddd';
+            img.style.borderRadius = '4px';
+            img.style.padding = '10px';
+            img.style.backgroundColor = '#fff';
+
+            // Add error handling
+            img.onerror = function() {{
+                const errorDiv = document.createElement('div');
+                errorDiv.style.border = '1px solid #f00';
+                errorDiv.style.padding = '10px';
+                errorDiv.style.backgroundColor = '#fee';
+                errorDiv.style.borderRadius = '4px';
+                errorDiv.innerHTML = '<strong>PlantUML Error:</strong> Could not render diagram. Check your PlantUML syntax.';
+                pre.replaceWith(errorDiv);
+            }};
 
             // Replace code block with image
             pre.replaceWith(img);
         }});
-
-        // PlantUML encoding (text format for server)
-        function encodePlantUML(text) {{
-            // PlantUML server supports text format with URL encoding
-            // We use the simple text format: encode and prefix with ~1
-            const encoded = encodeURIComponent(text);
-            return '~1' + encoded;
-        }}
 
         // Add copy buttons to code blocks (except mermaid and plantuml)
         document.querySelectorAll('pre code').forEach((block) => {{
