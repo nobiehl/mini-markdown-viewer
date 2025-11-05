@@ -2,6 +2,7 @@ using System;
 using System.IO;
 using System.Windows.Forms;
 using Microsoft.Win32;
+using Serilog.Events;
 
 namespace MarkdownViewer
 {
@@ -12,7 +13,7 @@ namespace MarkdownViewer
     static class Program
     {
         private const string AppName = "MarkdownViewer";
-        private const string Version = "1.0.3";
+        private const string Version = "1.0.4";
 
         /// <summary>
         /// Main entry point for the application.
@@ -23,11 +24,26 @@ namespace MarkdownViewer
         /// - --uninstall: Removes Windows Explorer integration
         /// - --version: Shows version information
         /// - --help: Shows usage information
+        /// - --log-level [Debug|Information|Warning|Error]: Sets logging verbosity
         /// </summary>
         /// <param name="args">Command-line arguments</param>
         [STAThread]
         static void Main(string[] args)
         {
+            // Parse log level from command line (default: Information)
+            LogEventLevel logLevel = LogEventLevel.Information;
+            for (int i = 0; i < args.Length - 1; i++)
+            {
+                if (args[i].Equals("--log-level", StringComparison.OrdinalIgnoreCase))
+                {
+                    if (Enum.TryParse<LogEventLevel>(args[i + 1], true, out LogEventLevel parsedLevel))
+                    {
+                        logLevel = parsedLevel;
+                    }
+                    break;
+                }
+            }
+
             // Handle command-line arguments
             if (args.Length > 0)
             {
@@ -44,11 +60,18 @@ namespace MarkdownViewer
                     string help = @"Markdown Viewer - Simple Windows Markdown Viewer
 
 Usage:
-  MarkdownViewer.exe <file.md>     Open a markdown file
-  MarkdownViewer.exe --install      Register as default .md viewer
-  MarkdownViewer.exe --uninstall    Unregister file association
-  MarkdownViewer.exe --version      Show version
-  MarkdownViewer.exe --help         Show this help";
+  MarkdownViewer.exe <file.md>                    Open a markdown file
+  MarkdownViewer.exe <file.md> --log-level Debug  Open with debug logging
+  MarkdownViewer.exe --install                     Register as default .md viewer
+  MarkdownViewer.exe --uninstall                   Unregister file association
+  MarkdownViewer.exe --version                     Show version
+  MarkdownViewer.exe --help                        Show this help
+
+Log Levels:
+  Debug        Verbose logging (all operations)
+  Information  Normal logging (default)
+  Warning      Only warnings and errors
+  Error        Only errors";
 
                     MessageBox.Show(help, "Help", MessageBoxButtons.OK, MessageBoxIcon.Information);
                     return;
@@ -82,7 +105,7 @@ Usage:
 
                 // Open the file
                 ApplicationConfiguration.Initialize();
-                Application.Run(new MainForm(filePath));
+                Application.Run(new MainForm(filePath, logLevel));
             }
             else
             {
@@ -96,7 +119,7 @@ Usage:
 
                     if (openFileDialog.ShowDialog() == DialogResult.OK)
                     {
-                        Application.Run(new MainForm(openFileDialog.FileName));
+                        Application.Run(new MainForm(openFileDialog.FileName, logLevel));
                     }
                 }
             }

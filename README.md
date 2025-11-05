@@ -2,7 +2,7 @@
 
 Lightweight Windows desktop viewer for Markdown files with full Windows Explorer integration.
 
-![Version](https://img.shields.io/badge/version-1.0.3-blue)
+![Version](https://img.shields.io/badge/version-1.0.4-blue)
 ![.NET](https://img.shields.io/badge/.NET-8.0-purple)
 ![Size](https://img.shields.io/badge/size-1.6_MB-green)
 
@@ -17,7 +17,9 @@ Lightweight Windows desktop viewer for Markdown files with full Windows Explorer
 - ✅ **Tables, Lists, Blockquotes** (via Markdig extensions)
 - ✅ **Live Reload** on file changes (FileSystemWatcher)
 - ✅ **Copy Buttons** for code blocks
-- ✅ **Link Handling**: MD files open in viewer, external links in browser
+- ✅ **Link Navigation**: Navigate between .md files, external links open in browser
+- ✅ **Anchor Links**: Jump to headings with # anchors
+- ✅ **Professional Logging**: Serilog with rolling daily logs and configurable levels
 
 ### Windows Integration
 - ✅ **Double-click** .md files → opens in viewer
@@ -133,6 +135,9 @@ Bob --> Alice: Hi!
 # Open file
 MarkdownViewer.exe <file.md>
 
+# Open with debug logging
+MarkdownViewer.exe <file.md> --log-level Debug
+
 # Install Windows Explorer integration
 MarkdownViewer.exe --install
 
@@ -146,12 +151,32 @@ MarkdownViewer.exe --version
 MarkdownViewer.exe --help
 ```
 
+### Logging
+
+Logs are stored in `./logs/viewer-YYYYMMDD.log` with daily rotation (7 days retention).
+
+**Log Levels:**
+- `Debug` - Verbose logging (all operations, useful for troubleshooting)
+- `Information` - Normal logging (default, key operations only)
+- `Warning` - Only warnings and errors
+- `Error` - Only errors
+
+**Example:**
+```bash
+# Production use (less verbose)
+MarkdownViewer.exe document.md
+
+# Development/Debugging (detailed logs)
+MarkdownViewer.exe document.md --log-level Debug
+```
+
 ## Technology Stack
 
 - **Language**: C# 12 (.NET 8 Managed Code)
 - **UI Framework**: Windows Forms (WinForms)
 - **Rendering**: WebView2 (Edge Chromium)
 - **Markdown Parser**: Markdig 0.37.0
+- **Logging**: Serilog 4.0.0 with rolling file sink
 - **Syntax Highlighting**: Highlight.js 11.9.0 (CDN)
 - **Diagrams**:
   - Mermaid.js 10 (CDN)
@@ -206,8 +231,10 @@ dotnet run -- test-diagrams.md
 - **WebView2 initialization**: Custom cache folder (`.cache`)
 - **Markdown-to-HTML conversion**: `ConvertMarkdownToHtml()`
 - **HTML template**: Embedded CSS, Highlight.js, Mermaid.js, PlantUML rendering
+- **JavaScript link interceptor**: Captures link clicks via `window.chrome.webview.postMessage()`
 - **Live reload**: `FileSystemWatcher` monitors file changes
-- **Link handling**: External links in browser, internal in viewer
+- **Link navigation**: Navigate between .md files, anchor support, external links in browser
+- **Logging**: Serilog with configurable log levels and rolling daily files
 
 ### Markdown Rendering Pipeline
 ```
