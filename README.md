@@ -2,7 +2,7 @@
 
 Lightweight Windows desktop viewer for Markdown files with full Windows Explorer integration.
 
-![Version](https://img.shields.io/badge/version-1.0.4-blue)
+![Version](https://img.shields.io/badge/version-1.0.5-blue)
 ![.NET](https://img.shields.io/badge/.NET-8.0-purple)
 ![Size](https://img.shields.io/badge/size-1.6_MB-green)
 
@@ -11,6 +11,10 @@ Lightweight Windows desktop viewer for Markdown files with full Windows Explorer
 ### Core Features
 - ✅ **Markdown Rendering** with full CommonMark support
 - ✅ **Syntax Highlighting** for code blocks (via Highlight.js)
+- ✅ **Mathematical Formulas** with LaTeX syntax (via KaTeX)
+  - Inline math: `$E = mc^2$`
+  - Display math: `$$\int_{-\infty}^{\infty} e^{-x^2} dx = \sqrt{\pi}$$`
+  - Full LaTeX support: matrices, Greek letters, fractions, summations, integrals, etc.
 - ✅ **Mermaid Diagrams** (flowcharts, sequence, class, state, gantt, ER, etc.)
 - ✅ **PlantUML Diagrams** (class, sequence, use case, activity, component, etc.)
 - ✅ **Images** (including base64-embedded)
@@ -78,6 +82,47 @@ Lightweight Windows desktop viewer for Markdown files with full Windows Explorer
 ```
 
 Removes all registry entries and shortcuts. The executable remains and can be deleted manually.
+
+## Mathematical Formulas
+
+Render beautiful mathematical equations using LaTeX syntax powered by KaTeX.
+
+### Inline Math
+
+Use single dollar signs for inline formulas:
+
+```markdown
+The famous equation $E = mc^2$ was discovered by Einstein.
+Pythagorean theorem: $a^2 + b^2 = c^2$
+```
+
+**Renders as:** The famous equation $E = mc^2$ was discovered by Einstein.
+
+### Display Math
+
+Use double dollar signs for centered display equations:
+
+```markdown
+$$
+\int_{-\infty}^{\infty} e^{-x^2} dx = \sqrt{\pi}
+$$
+```
+
+**Renders as a centered, formatted equation.**
+
+### Supported Features
+
+- **Fractions:** `$\frac{a}{b}$`
+- **Superscripts/Subscripts:** `$x^2$`, `$x_i$`
+- **Greek Letters:** `$\alpha$`, `$\beta$`, `$\gamma$`, `$\pi$`, `$\sigma$`
+- **Square Roots:** `$\sqrt{x}$`, `$\sqrt[3]{8}$`
+- **Summations:** `$\sum_{i=1}^{n} i$`
+- **Integrals:** `$\int_a^b f(x) dx$`
+- **Matrices:** `$\begin{pmatrix} a & b \\ c & d \end{pmatrix}$`
+- **Limits:** `$\lim_{x \to \infty} \frac{1}{x} = 0$`
+- **Derivatives:** `$\frac{d}{dx}$`, `$\frac{\partial f}{\partial x}$`
+
+**See `samples/math-examples.md` and `samples/test-math.md` for comprehensive examples!**
 
 ## Diagram Support
 
@@ -175,7 +220,8 @@ MarkdownViewer.exe document.md --log-level Debug
 - **Language**: C# 12 (.NET 8 Managed Code)
 - **UI Framework**: Windows Forms (WinForms)
 - **Rendering**: WebView2 (Edge Chromium)
-- **Markdown Parser**: Markdig 0.37.0
+- **Markdown Parser**: Markdig 0.37.0 with Mathematics extension
+- **Math Rendering**: KaTeX 0.16.9 (CDN)
 - **Logging**: Serilog 4.0.0 with rolling file sink
 - **Syntax Highlighting**: Highlight.js 11.9.0 (CDN)
 - **Diagrams**:
@@ -229,8 +275,8 @@ dotnet run -- test-diagrams.md
 
 ### MainForm.cs
 - **WebView2 initialization**: Custom cache folder (`.cache`)
-- **Markdown-to-HTML conversion**: `ConvertMarkdownToHtml()`
-- **HTML template**: Embedded CSS, Highlight.js, Mermaid.js, PlantUML rendering
+- **Markdown-to-HTML conversion**: `ConvertMarkdownToHtml()` with Mathematics extension
+- **HTML template**: Embedded CSS, KaTeX, Highlight.js, Mermaid.js, PlantUML rendering
 - **JavaScript link interceptor**: Captures link clicks via `window.chrome.webview.postMessage()`
 - **Live reload**: `FileSystemWatcher` monitors file changes
 - **Link navigation**: Navigate between .md files, anchor support, external links in browser
@@ -240,16 +286,17 @@ dotnet run -- test-diagrams.md
 ```
 .md File
   ↓
-Markdig (with advanced extensions)
+Markdig (with advanced extensions + Mathematics)
   ↓
 HTML String
   ↓
-Embedded CSS + Scripts (Highlight.js, Mermaid.js)
+Embedded CSS + Scripts (KaTeX, Highlight.js, Mermaid.js)
   ↓
 WebView2.NavigateToString()
   ↓
 Client-side processing:
-  - Mermaid: Renders directly in browser
+  - KaTeX: Renders mathematical formulas ($...$ and $$...$$)
+  - Mermaid: Renders diagrams directly in browser
   - PlantUML: Replaces code block with <img> from server
   - Highlight.js: Syntax highlighting for code
   - Copy buttons: Dynamically added to code blocks

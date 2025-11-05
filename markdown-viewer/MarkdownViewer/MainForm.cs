@@ -17,7 +17,7 @@ namespace MarkdownViewer
     /// </summary>
     public class MainForm : Form
     {
-        private const string Version = "1.0.4";
+        private const string Version = "1.0.5";
         private WebView2 webView;
         private string currentFilePath;
         private FileSystemWatcher fileWatcher;
@@ -434,6 +434,7 @@ namespace MarkdownViewer
         {
             var pipeline = new MarkdownPipelineBuilder()
                 .UseAdvancedExtensions()
+                .UseMathematics()
                 .Build();
 
             string content = Markdown.ToHtml(markdown, pipeline);
@@ -450,6 +451,7 @@ namespace MarkdownViewer
     <base href='{baseUrl}'>
     <meta name='viewport' content='width=device-width, initial-scale=1.0'>
     <link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css'>
+    <link rel='stylesheet' href='https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css' integrity='sha384-n8MVd4RsNIU0tAv4ct0nTaAbDJwPJzDEaqSD1odI+WdtXRGWt2kTvGFasHpSy3SV' crossorigin='anonymous'>
     <style>
         body {{
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
@@ -546,11 +548,26 @@ namespace MarkdownViewer
             margin: 1rem 0;
             text-align: center;
         }}
+        /* Math formula styling */
+        .math {{
+            overflow-x: auto;
+            overflow-y: hidden;
+        }}
+        .math.math-display {{
+            display: block;
+            margin: 1rem 0;
+            text-align: center;
+        }}
+        .math.math-inline {{
+            display: inline;
+        }}
     </style>
 </head>
 <body>
     {content}
     <script src='https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js'></script>
+    <script defer src='https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js' integrity='sha384-XjKyOOlGwcjNTAIQHIpgOno0Hl1YQqzUOEleOLALmuqehneUG+vnGctmUb0ZY0l8' crossorigin='anonymous'></script>
+    <script defer src='https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js' integrity='sha384-+VBxd3r6XgURycqtZ117nYw44OOcIax56Z4dCRWbxyPt0Koah1uHoK0o4+/RRE05' crossorigin='anonymous'></script>
     <script type='module'>
         import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
         mermaid.initialize({{ startOnLoad: true, theme: 'default' }});
@@ -558,6 +575,20 @@ namespace MarkdownViewer
     <script>
         // Syntax highlighting
         hljs.highlightAll();
+
+        // Render mathematical formulas with KaTeX
+        document.addEventListener('DOMContentLoaded', function() {{
+            renderMathInElement(document.body, {{
+                delimiters: [
+                    {{left: '$$', right: '$$', display: true}},
+                    {{left: '$', right: '$', display: false}},
+                    {{left: '\\[', right: '\\]', display: true}},
+                    {{left: '\\(', right: '\\)', display: false}}
+                ],
+                throwOnError: false,
+                errorColor: '#cc0000'
+            }});
+        }});
 
         // Process PlantUML diagrams using HEX encoding (~h method)
         document.querySelectorAll('code.language-plantuml').forEach((block) => {{
