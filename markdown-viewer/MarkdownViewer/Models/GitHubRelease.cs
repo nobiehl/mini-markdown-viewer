@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using System.Text.Json.Serialization;
 
-namespace MarkdownViewer
+namespace MarkdownViewer.Models
 {
     /// <summary>
     /// Model for GitHub Release API response.

@@ -1,0 +1,25 @@
+{
+  "name": "dark",
+  "displayName": "Dark",
+  "markdown": {
+    "background": "#1e1e1e",
+    "foreground": "#d4d4d4",
+    "codeBackground": "#2d2d30",
+    "linkColor": "#569cd6",
+    "headingColor": "#4ec9b0",
+    "blockquoteBorder": "#007acc",
+    "tableHeaderBackground": "#2d2d30",
+    "tableBorder": "#3e3e42",
+    "inlineCodeBackground": "#2d2d30",
+    "inlineCodeForeground": "#ce9178"
+  },
+  "ui": {
+    "formBackground": "#1e1e1e",
+    "controlBackground": "#252526",
+    "controlForeground": "#cccccc",
+    "statusBarBackground": "#007acc",
+    "statusBarForeground": "#ffffff",
+    "menuBackground": "#252526",
+    "menuForeground": "#cccccc"
+  }
+}

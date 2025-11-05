@@ -1,6 +1,6 @@
 using System;
 
-namespace MarkdownViewer
+namespace MarkdownViewer.Configuration
 {
     /// <summary>
     /// Configuration for the update checker.

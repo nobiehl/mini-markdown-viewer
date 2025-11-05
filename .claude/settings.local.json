@@ -8,7 +8,17 @@
       "Bash(git add:*)",
       "Bash(git commit:*)",
       "Bash(git push:*)",
-      "Bash(GIT_ASKPASS= \"C:\\Program Files\\GitHub CLI\\gh.exe\" auth setup-git)"
+      "Bash(GIT_ASKPASS= \"C:\\Program Files\\GitHub CLI\\gh.exe\" auth setup-git)",
+      "Bash(dir:*)",
+      "Bash(dotnet run)",
+      "Bash(bin/MarkdownViewer.exe test-subfolder.md)",
+      "Bash(dotnet build:*)",
+      "Bash(bin/MarkdownViewer.exe:*)",
+      "Bash(taskkill:*)",
+      "Bash(nul)",
+      "Bash(tasklist)",
+      "Bash(findstr:*)",
+      "Bash(cat:*)"
     ],
     "deny": [],
     "ask": []

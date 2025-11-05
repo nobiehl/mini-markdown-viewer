@@ -6,6 +6,8 @@ using System.Windows.Forms;
 using Microsoft.Win32;
 using Serilog;
 using Serilog.Events;
+using MarkdownViewer.Configuration;
+using MarkdownViewer.Models;
 
 namespace MarkdownViewer
 {

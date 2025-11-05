@@ -1,0 +1,25 @@
+{
+  "name": "solarized",
+  "displayName": "Solarized Light (No Blue)",
+  "markdown": {
+    "background": "#fdf6e3",
+    "foreground": "#657b83",
+    "codeBackground": "#eee8d5",
+    "linkColor": "#2aa198",
+    "headingColor": "#586e75",
+    "blockquoteBorder": "#93a1a1",
+    "tableHeaderBackground": "#eee8d5",
+    "tableBorder": "#93a1a1",
+    "inlineCodeBackground": "#eee8d5",
+    "inlineCodeForeground": "#dc322f"
+  },
+  "ui": {
+    "formBackground": "#fdf6e3",
+    "controlBackground": "#eee8d5",
+    "controlForeground": "#657b83",
+    "statusBarBackground": "#93a1a1",
+    "statusBarForeground": "#073642",
+    "menuBackground": "#eee8d5",
+    "menuForeground": "#657b83"
+  }
+}

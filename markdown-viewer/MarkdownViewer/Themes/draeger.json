@@ -1,0 +1,25 @@
+{
+  "name": "draeger",
+  "displayName": "Dräger",
+  "markdown": {
+    "background": "#ffffff",
+    "foreground": "#003366",
+    "codeBackground": "#f0f4f8",
+    "linkColor": "#0066cc",
+    "headingColor": "#003366",
+    "blockquoteBorder": "#0066cc",
+    "tableHeaderBackground": "#e6f2ff",
+    "tableBorder": "#b3d9ff",
+    "inlineCodeBackground": "#f0f4f8",
+    "inlineCodeForeground": "#cc0000"
+  },
+  "ui": {
+    "formBackground": "#f5f5f5",
+    "controlBackground": "#ffffff",
+    "controlForeground": "#003366",
+    "statusBarBackground": "#003366",
+    "statusBarForeground": "#ffffff",
+    "menuBackground": "#ffffff",
+    "menuForeground": "#003366"
+  }
+}

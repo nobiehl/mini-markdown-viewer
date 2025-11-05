@@ -52,3 +52,50 @@ Service that checks GitHub for new releases, compares versions, downloads update
 
 ---
 
+
+### SettingsService
+Service for loading and saving application settings from/to JSON file. Provides ISettingsService interface for dependency injection and testing.
+
+**File:** Services/SettingsService.cs
+**Storage:** %APPDATA%/MarkdownViewer/settings.json
+**Used by:** MainWindow (future implementation)
+**Methods:** Load(), Save(), GetSettingsPath()
+
+---
+
+### ThemeService
+Service for managing visual themes. Loads theme definitions from JSON files and applies colors to both WinForms UI controls and WebView2 markdown rendering via CSS injection.
+
+**File:** Services/ThemeService.cs
+**Themes folder:** Themes/*.json
+**Used by:** MainWindow (future implementation)
+**Methods:** LoadTheme(), ApplyThemeAsync(), GetAvailableThemes(), GetCurrentTheme()
+
+---
+
+### MarkdownColors
+Data model containing color definitions for markdown content rendering. Part of Theme model. Includes 10 color properties for background, foreground, code blocks, links, headings, blockquotes, tables, and inline code.
+
+**File:** Models/Theme.cs
+**Properties:** Background, Foreground, CodeBackground, LinkColor, HeadingColor, BlockquoteBorder, TableHeaderBackground, TableBorder, InlineCodeBackground, InlineCodeForeground
+**Applied by:** ThemeService via CSS injection to WebView2
+
+---
+
+### UiColors
+Data model containing color definitions for WinForms UI elements. Part of Theme model. Includes 7 color properties for form, controls, status bar, and menus.
+
+**File:** Models/Theme.cs
+**Properties:** FormBackground, ControlBackground, ControlForeground, StatusBarBackground, StatusBarForeground, MenuBackground, MenuForeground
+**Applied by:** ThemeService via ColorTranslator.FromHtml()
+
+---
+
+### UpdateInfo
+Model class representing the result of an update check operation. Contains information about update availability, version numbers, release notes, and download URL.
+
+**File:** Models/GitHubRelease.cs
+**Used by:** UpdateChecker, UpdateService (future)
+**Properties:** UpdateAvailable, LatestVersion, CurrentVersion, ReleaseNotes, DownloadUrl, FileSize, Error, IsPrerelease
+
+---

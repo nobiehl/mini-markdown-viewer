@@ -1,0 +1,25 @@
+{
+  "name": "standard",
+  "displayName": "Standard (Enhanced)",
+  "markdown": {
+    "background": "#ffffff",
+    "foreground": "#2c3e50",
+    "codeBackground": "#f8f9fa",
+    "linkColor": "#3498db",
+    "headingColor": "#1a252f",
+    "blockquoteBorder": "#3498db",
+    "tableHeaderBackground": "#ecf0f1",
+    "tableBorder": "#bdc3c7",
+    "inlineCodeBackground": "#f8f9fa",
+    "inlineCodeForeground": "#e74c3c"
+  },
+  "ui": {
+    "formBackground": "#ecf0f1",
+    "controlBackground": "#ffffff",
+    "controlForeground": "#2c3e50",
+    "statusBarBackground": "#3498db",
+    "statusBarForeground": "#ffffff",
+    "menuBackground": "#ffffff",
+    "menuForeground": "#2c3e50"
+  }
+}
