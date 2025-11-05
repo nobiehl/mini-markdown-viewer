@@ -14,6 +14,7 @@ namespace MarkdownViewer
     /// </summary>
     public class MainForm : Form
     {
+        private const string Version = "1.0.3";
         private WebView2 webView;
         private string currentFilePath;
         private FileSystemWatcher fileWatcher;
@@ -39,7 +40,7 @@ namespace MarkdownViewer
         private void InitializeComponents()
         {
             // Window setup
-            this.Text = "Markdown Viewer";
+            this.Text = $"Markdown Viewer v{Version}";
             this.Size = new System.Drawing.Size(1024, 768);
             this.StartPosition = FormStartPosition.CenterScreen;
 
@@ -103,8 +104,8 @@ namespace MarkdownViewer
                 string markdown = File.ReadAllText(filePath);
                 string html = ConvertMarkdownToHtml(markdown);
 
-                // Update window title
-                this.Text = $"{Path.GetFileName(filePath)} - Markdown Viewer";
+                // Update window title with filename and version
+                this.Text = $"{Path.GetFileName(filePath)} - Markdown Viewer v{Version}";
 
                 if (webView.CoreWebView2 != null)
                 {
@@ -264,18 +265,21 @@ namespace MarkdownViewer
         // Syntax highlighting
         hljs.highlightAll();
 
-        // Process PlantUML diagrams
+        // Process PlantUML diagrams using HEX encoding (~h method)
         document.querySelectorAll('code.language-plantuml').forEach((block) => {{
             const pre = block.parentElement;
             const code = block.textContent;
 
-            // Use PlantUML server with POST method (more reliable)
+            // Create image element
             const img = document.createElement('img');
 
-            // Use the proxy/cache endpoint which works better
-            // We'll use the png format as it's more reliable than svg for complex diagrams
-            const encodedText = btoa(unescape(encodeURIComponent(code)));
-            img.src = `https://www.plantuml.com/plantuml/png/${{encodedText}}`;
+            // PlantUML HEX encoding: Convert each character to hex
+            const hex = Array.from(code)
+                .map(c => c.charCodeAt(0).toString(16).padStart(2, '0'))
+                .join('');
+
+            // Use ~h prefix for HEX encoding (simpler and more reliable than deflate)
+            img.src = `https://www.plantuml.com/plantuml/png/~h${{hex}}`;
             img.style.maxWidth = '100%';
             img.style.margin = '1rem 0';
             img.style.border = '1px solid #ddd';
@@ -290,7 +294,7 @@ namespace MarkdownViewer
                 errorDiv.style.padding = '10px';
                 errorDiv.style.backgroundColor = '#fee';
                 errorDiv.style.borderRadius = '4px';
-                errorDiv.innerHTML = '<strong>PlantUML Error:</strong> Could not render diagram. Check your PlantUML syntax.';
+                errorDiv.innerHTML = '<strong>PlantUML Error:</strong> Could not render diagram. Check your PlantUML syntax or internet connection.';
                 pre.replaceWith(errorDiv);
             }};
 

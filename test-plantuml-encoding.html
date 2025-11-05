@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>PlantUML Encoding Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 20px auto;
+            padding: 20px;
+        }
+        .test-section {
+            margin: 30px 0;
+            padding: 20px;
+            border: 2px solid #333;
+            border-radius: 8px;
+        }
+        .test-section h2 {
+            margin-top: 0;
+        }
+        img {
+            max-width: 100%;
+            border: 1px solid #ddd;
+            margin: 10px 0;
+        }
+        .error {
+            color: red;
+            padding: 10px;
+            background: #fee;
+            border: 1px solid red;
+            border-radius: 4px;
+        }
+        .success {
+            color: green;
+            padding: 10px;
+            background: #efe;
+            border: 1px solid green;
+            border-radius: 4px;
+        }
+        pre {
+            background: #f5f5f5;
+            padding: 10px;
+            border-radius: 4px;
+            overflow-x: auto;
+        }
+    </style>
+</head>
+<body>
+    <h1>PlantUML Encoding Test</h1>
+
+    <div class="test-section">
+        <h2>Test 1: HEX Encoding (Simple ~h method)</h2>
+        <div id="test1-status">Testing...</div>
+        <div id="test1-result"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>Test 2: Using plantuml-encoder library (CDN)</h2>
+        <div id="test2-status">Testing...</div>
+        <div id="test2-result"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>Test 3: Plain Base64 (our current broken method)</h2>
+        <div id="test3-status">Testing...</div>
+        <div id="test3-result"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>Test 4: pako + custom encode64</h2>
+        <div id="test4-status">Testing...</div>
+        <div id="test4-result"></div>
+    </div>
+
+    <!-- Load pako for deflate compression -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pako/2.1.0/pako.min.js"></script>
+
+    <!-- Load plantuml-encoder from CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/plantuml-encoder@1.4.0/dist/plantuml-encoder.min.js"></script>
+
+    <script>
+        const testDiagram = `@startuml
+Alice -> Bob: Authentication Request
+Bob --> Alice: Authentication Response
+@enduml`;
+
+        // Test 1: HEX encoding with ~h prefix
+        function test1_hexEncoding() {
+            try {
+                // Convert to hex
+                const hex = Array.from(testDiagram)
+                    .map(c => c.charCodeAt(0).toString(16).padStart(2, '0'))
+                    .join('');
+
+                const url = `https://www.plantuml.com/plantuml/png/~h${hex}`;
+
+                document.getElementById('test1-status').innerHTML = '<div class="success">HEX Encoding generated</div>';
+                document.getElementById('test1-result').innerHTML = `
+                    <p><strong>URL:</strong> <code>${url}</code></p>
+                    <img src="${url}" onerror="document.getElementById('test1-status').innerHTML='<div class=error>Failed to load image</div>'"
+                         onload="document.getElementById('test1-status').innerHTML='<div class=success>✅ HEX method works!</div>'">
+                `;
+            } catch (e) {
+                document.getElementById('test1-status').innerHTML = `<div class="error">Error: ${e.message}</div>`;
+            }
+        }
+
+        // Test 2: Using plantuml-encoder library
+        function test2_plantUmlEncoder() {
+            try {
+                if (typeof plantumlEncoder === 'undefined') {
+                    document.getElementById('test2-status').innerHTML = '<div class="error">plantuml-encoder library not loaded</div>';
+                    return;
+                }
+
+                const encoded = plantumlEncoder.encode(testDiagram);
+                const url = `https://www.plantuml.com/plantuml/png/${encoded}`;
+
+                document.getElementById('test2-status').innerHTML = '<div class="success">Using plantuml-encoder library</div>';
+                document.getElementById('test2-result').innerHTML = `
+                    <p><strong>Encoded:</strong> <code>${encoded.substring(0, 50)}...</code></p>
+                    <p><strong>URL:</strong> <code>${url}</code></p>
+                    <img src="${url}" onerror="document.getElementById('test2-status').innerHTML='<div class=error>Failed to load image</div>'"
+                         onload="document.getElementById('test2-status').innerHTML='<div class=success>✅ plantuml-encoder works!</div>'">
+                `;
+            } catch (e) {
+                document.getElementById('test2-status').innerHTML = `<div class="error">Error: ${e.message}</div>`;
+            }
+        }
+
+        // Test 3: Plain Base64 (current broken method)
+        function test3_plainBase64() {
+            try {
+                const encoded = btoa(unescape(encodeURIComponent(testDiagram)));
+                const url = `https://www.plantuml.com/plantuml/png/${encoded}`;
+
+                document.getElementById('test3-status').innerHTML = '<div class="success">Using plain base64 (our current method)</div>';
+                document.getElementById('test3-result').innerHTML = `
+                    <p><strong>Encoded:</strong> <code>${encoded.substring(0, 50)}...</code></p>
+                    <p><strong>URL:</strong> <code>${url}</code></p>
+                    <img src="${url}" onerror="document.getElementById('test3-status').innerHTML='<div class=error>❌ Plain base64 does not work (as expected)</div>'"
+                         onload="document.getElementById('test3-status').innerHTML='<div class=success>Somehow worked?</div>'">
+                `;
+            } catch (e) {
+                document.getElementById('test3-status').innerHTML = `<div class="error">Error: ${e.message}</div>`;
+            }
+        }
+
+        // Test 4: pako deflate + custom encode64
+        function test4_pakoDeflate() {
+            try {
+                if (typeof pako === 'undefined') {
+                    document.getElementById('test4-status').innerHTML = '<div class="error">pako library not loaded</div>';
+                    return;
+                }
+
+                // PlantUML specific base64 alphabet
+                const plantumlAlphabet = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz-_';
+
+                function encode6bit(b) {
+                    if (b < 10) return String.fromCharCode(48 + b);
+                    b -= 10;
+                    if (b < 26) return String.fromCharCode(65 + b);
+                    b -= 26;
+                    if (b < 26) return String.fromCharCode(97 + b);
+                    b -= 26;
+                    if (b === 0) return '-';
+                    if (b === 1) return '_';
+                    return '?';
+                }
+
+                function append3bytes(b1, b2, b3) {
+                    const c1 = b1 >> 2;
+                    const c2 = ((b1 & 0x3) << 4) | (b2 >> 4);
+                    const c3 = ((b2 & 0xF) << 2) | (b3 >> 6);
+                    const c4 = b3 & 0x3F;
+                    return encode6bit(c1 & 0x3F) + encode6bit(c2 & 0x3F) + encode6bit(c3 & 0x3F) + encode6bit(c4 & 0x3F);
+                }
+
+                function encode64(data) {
+                    let r = '';
+                    for (let i = 0; i < data.length; i += 3) {
+                        if (i + 2 === data.length) {
+                            r += append3bytes(data[i], data[i + 1], 0);
+                        } else if (i + 1 === data.length) {
+                            r += append3bytes(data[i], 0, 0);
+                        } else {
+                            r += append3bytes(data[i], data[i + 1], data[i + 2]);
+                        }
+                    }
+                    return r;
+                }
+
+                // Convert string to UTF-8 bytes
+                const utf8 = unescape(encodeURIComponent(testDiagram));
+                const bytes = new Uint8Array(utf8.length);
+                for (let i = 0; i < utf8.length; i++) {
+                    bytes[i] = utf8.charCodeAt(i);
+                }
+
+                // Deflate compress
+                const compressed = pako.deflateRaw(bytes, { level: 9 });
+
+                // Encode with PlantUML's custom base64
+                const encoded = encode64(compressed);
+                const url = `https://www.plantuml.com/plantuml/png/${encoded}`;
+
+                document.getElementById('test4-status').innerHTML = '<div class="success">Using pako + custom encode64</div>';
+                document.getElementById('test4-result').innerHTML = `
+                    <p><strong>Encoded:</strong> <code>${encoded.substring(0, 50)}...</code></p>
+                    <p><strong>URL:</strong> <code>${url}</code></p>
+                    <img src="${url}" onerror="document.getElementById('test4-status').innerHTML='<div class=error>Failed to load image</div>'"
+                         onload="document.getElementById('test4-status').innerHTML='<div class=success>✅ pako + encode64 works!</div>'">
+                `;
+            } catch (e) {
+                document.getElementById('test4-status').innerHTML = `<div class="error">Error: ${e.message}</div>`;
+            }
+        }
+
+        // Run all tests
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                test1_hexEncoding();
+                test2_plantUmlEncoder();
+                test3_plainBase64();
+                test4_pakoDeflate();
+            }, 500);
+        });
+    </script>
+</body>
+</html>
