@@ -8,8 +8,11 @@ Technical documentation for developers working on or extending MarkdownViewer.
 
 ```
 markdown-viewer/MarkdownViewer/
-├── Program.cs              # Entry point & CLI
+├── Program.cs              # Entry point, CLI, update testing
 ├── MainForm.cs             # Main window & rendering
+├── UpdateChecker.cs        # Update checking & installation
+├── UpdateConfiguration.cs  # Update configuration (singleton)
+├── GitHubRelease.cs        # GitHub API models
 └── MarkdownViewer.csproj   # Project configuration
 ```
 
@@ -417,6 +420,166 @@ reg query HKCU\Software\Classes\.md
 reg query HKCU\Software\Classes\MarkdownViewer.Document
 ```
 
+## Update Mechanism
+
+### Architecture Overview
+
+The update system consists of 3 main components:
+
+```
+UpdateConfiguration (Singleton)
+       ↓
+   UpdateChecker
+       ↓
+   GitHub API / Test JSON Files
+```
+
+### UpdateConfiguration.cs
+
+**Purpose:** Centralized configuration with test mode support
+
+**Key Properties:**
+```csharp
+public bool IsTestMode { get; }          // Test or production mode
+public string ApiBaseUrl { get; }        // GitHub API or mock server URL
+public string RepoOwner { get; }         // GitHub repo owner
+public string RepoName { get; }          // GitHub repo name
+public string TestDataPath { get; }      // Path to test JSON files
+public string TestScenario { get; }      // Current test scenario
+```
+
+**Test Mode Activation:**
+```csharp
+// Via environment variables (test-update.ps1)
+MDVIEWER_TEST_MODE=1
+MDVIEWER_TEST_DATA=./test-data
+MDVIEWER_TEST_SCENARIO=update-available
+
+// Via code (Program.cs RunUpdateTest)
+UpdateConfiguration.Instance.EnableTestMode(
+    "http://localhost:8080",
+    "./test-data",
+    "update-available"
+);
+```
+
+### UpdateChecker.cs
+
+**Key Methods:**
+
+```csharp
+Task<UpdateInfo> CheckForUpdatesAsync(string currentVersion)
+```
+- Checks GitHub API or reads local JSON (test mode)
+- Compares versions using `System.Version`
+- Returns `UpdateInfo` with availability and details
+
+```csharp
+bool ShouldCheckForUpdates()
+```
+- Checks if last check was today
+- Reads `logs/last-update-check.txt`
+- Returns true once per day
+
+```csharp
+void RecordUpdateCheck()
+```
+- Writes current date to `logs/last-update-check.txt`
+- Called after each check attempt
+
+```csharp
+Task<bool> DownloadUpdateAsync(string url)
+```
+- Downloads update from GitHub release
+- Saves to `pending-update.exe`
+- 5 minute timeout
+
+```csharp
+static void ApplyPendingUpdate()
+```
+- Called at app startup (before logging!)
+- Creates backup: `MarkdownViewer.exe.backup`
+- Replaces current exe with `pending-update.exe`
+- Restarts application with same arguments
+- Rollback on failure
+
+### GitHubRelease.cs
+
+**Model Classes:**
+
+```csharp
+public class GitHubRelease
+{
+    [JsonPropertyName("tag_name")] public string TagName;
+    [JsonPropertyName("name")] public string Name;
+    [JsonPropertyName("body")] public string Body;
+    [JsonPropertyName("prerelease")] public bool Prerelease;
+    [JsonPropertyName("assets")] public List<GitHubReleaseAsset> Assets;
+}
+
+public class GitHubReleaseAsset
+{
+    [JsonPropertyName("name")] public string Name;
+    [JsonPropertyName("browser_download_url")] public string BrowserDownloadUrl;
+    [JsonPropertyName("size")] public long Size;
+}
+
+public class UpdateInfo
+{
+    public bool UpdateAvailable;
+    public string LatestVersion;
+    public string CurrentVersion;
+    public string ReleaseNotes;
+    public string DownloadUrl;
+    public long FileSize;
+    public string Error;
+    public bool IsPrerelease;
+}
+```
+
+### Test Infrastructure
+
+**test-update.ps1:**
+- Runs 4 test scenarios automatically
+- Sets environment variables
+- Captures exit codes
+- Validates results
+
+**test-data/api-responses/:**
+- `update-available.json`: Version > current (exit 0)
+- `no-update.json`: Version <= current (exit 1)
+- `malformed.json`: Invalid JSON (exit 1, error handled)
+- `prerelease.json`: Beta version > current (exit 0)
+- `rate-limit.json`: GitHub rate limit response
+
+### Adding New Test Scenarios
+
+1. Create JSON file in `test-data/api-responses/your-scenario.json`
+2. Follow GitHub API format (see existing files)
+3. Test: `.\test-update.ps1 -Scenario your-scenario`
+
+### Version Comparison Logic
+
+```csharp
+Version ParseVersion(string versionString)
+{
+    // "v1.2.3" → "1.2.3"
+    string cleaned = versionString.TrimStart('v', 'V');
+
+    // "1.2.3-beta" → "1.2.3"
+    int dashIndex = cleaned.IndexOf('-');
+    if (dashIndex > 0)
+        cleaned = cleaned.Substring(0, dashIndex);
+
+    return new Version(cleaned);
+}
+```
+
+**Comparison:**
+- 1.0.5 < 1.1.0 → Update available
+- 1.1.0 < 1.2.0-beta → Update available (beta > stable)
+- 1.1.0 > 1.0.5 → No update
+
 ## Contributing
 
 When contributing:
@@ -424,7 +587,8 @@ When contributing:
 1. Code style: Standard C# conventions
 2. Comments: XML docs for public methods
 3. Testing: Manual testing before commit
-4. Documentation: Update README.md and DEVELOPMENT.md
+4. **Run update test suite:** `.\test-update.ps1` (must pass 4/4)
+5. Documentation: Update README.md, DEVELOPMENT.md, and DEPLOYMENT-GUIDE.md
 
 ## License
 

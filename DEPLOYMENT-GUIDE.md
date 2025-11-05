@@ -122,16 +122,31 @@ mini-markdown-viewer/
 ├── markdown-viewer/
 │   └── MarkdownViewer/
 │       ├── MarkdownViewer.csproj    # Project file
-│       ├── Program.cs               # Entry point, CLI, registry
+│       ├── Program.cs               # Entry point, CLI, registry, update testing
 │       ├── MainForm.cs              # Main window, rendering
+│       ├── UpdateChecker.cs         # Update checking & installation logic
+│       ├── UpdateConfiguration.cs   # Update configuration (prod/test mode)
+│       ├── GitHubRelease.cs         # GitHub API models
 │       ├── bin/                     # Build output (ignored)
 │       └── obj/                     # Build temp files (ignored)
 ├── bin-single/                      # Single-file output (ignored)
 │   └── MarkdownViewer.exe          # Portable executable
+├── test-data/                       # Test data for update mechanism
+│   ├── README.md                   # Test data documentation
+│   └── api-responses/              # Mock GitHub API responses
+│       ├── update-available.json   # New version scenario
+│       ├── no-update.json          # Already on latest
+│       ├── malformed.json          # Invalid JSON
+│       ├── rate-limit.json         # API rate limit
+│       └── prerelease.json         # Beta version
 ├── .cache/                          # WebView2 cache (ignored)
+├── logs/                            # Application logs (ignored)
+│   ├── viewer-YYYYMMDD.log         # Daily log files
+│   └── last-update-check.txt       # Last update check timestamp
 ├── test-diagrams.md                 # Diagram test file
 ├── test-features.md                 # Feature test file
 ├── test-plantuml-encoding.html      # PlantUML encoding tests
+├── test-update.ps1                  # Automated update test suite
 ├── .gitignore                       # Git exclusions
 ├── LICENSE                          # MIT License
 ├── README.md                        # User documentation
@@ -154,9 +169,38 @@ mini-markdown-viewer/
   <ItemGroup>
     <PackageReference Include="Markdig" Version="0.37.0" />
     <PackageReference Include="Microsoft.Web.WebView2" Version="1.0.2420.47" />
+    <PackageReference Include="Serilog" Version="4.0.0" />
+    <PackageReference Include="Serilog.Sinks.File" Version="6.0.0" />
   </ItemGroup>
 </Project>
 ```
+
+#### Update Mechanism Files
+
+**`UpdateChecker.cs`** (437 lines)
+- Core update checking logic
+- Async methods for GitHub API communication
+- Download and installation management
+- Safe update with backup/rollback
+- Test mode support (reads local JSON files)
+
+**`UpdateConfiguration.cs`** (177 lines)
+- Singleton pattern for global configuration
+- Production mode: GitHub API
+- Test mode: Local JSON mock data
+- Environment variable support
+
+**`GitHubRelease.cs`** (120 lines)
+- JSON models for GitHub Releases API
+- `GitHubRelease` class
+- `GitHubReleaseAsset` class
+- `UpdateInfo` class
+
+**`test-update.ps1`** (155 lines)
+- Automated PowerShell test suite
+- 4 test scenarios
+- Exit code validation
+- Detailed test reporting
 
 #### `.gitignore`
 ```
@@ -348,7 +392,48 @@ This tests 4 encoding methods:
 
 All methods except #3 should show green ✅.
 
-### 3. Regression Testing
+### 3. Update Mechanism Testing
+
+**Automated Test Suite:**
+```bash
+# Run all update test scenarios
+.\test-update.ps1
+
+# Run specific scenario
+.\test-update.ps1 -Scenario update-available
+.\test-update.ps1 -Scenario no-update
+.\test-update.ps1 -Scenario malformed
+.\test-update.ps1 -Scenario prerelease
+```
+
+**Expected Results:**
+- ✅ All 4 tests should pass
+- ✅ Exit codes: 0 for updates available, 1 for no update
+
+**Manual Update Testing:**
+```bash
+# Test manual update check
+bin-single/MarkdownViewer.exe --update
+
+# Test update check with file opening
+bin-single/MarkdownViewer.exe README.md --update
+
+# Test individual scenarios
+bin-single/MarkdownViewer.exe --test-update --test-scenario update-available
+bin-single/MarkdownViewer.exe --test-update --test-scenario no-update
+```
+
+**Update Installation Testing:**
+1. Create test update file: `echo test > bin-single/pending-update.exe`
+2. Start application
+3. Verify backup/rollback behavior
+
+**Test Data:**
+- Located in `test-data/api-responses/`
+- 5 scenarios: update-available, no-update, malformed, rate-limit, prerelease
+- Modify JSON files to test different versions
+
+### 4. Regression Testing
 
 Before each release, test:
 - [ ] All Mermaid diagram types (flowchart, sequence, class)
@@ -361,6 +446,8 @@ Before each release, test:
 - [ ] Links (external, internal anchors)
 - [ ] Live reload
 - [ ] Windows Explorer integration (if --install was run)
+- [ ] **Update mechanism (automated test suite)**
+- [ ] **Update check (manual --update parameter)**
 
 ---
 
@@ -491,9 +578,13 @@ EOF
 - [ ] All features tested locally and verified working
 - [ ] PlantUML diagrams render correctly (not just placeholders)
 - [ ] Mermaid diagrams render correctly
+- [ ] **Update test suite passes (`.\test-update.ps1` → 4/4 tests pass)**
+- [ ] **Manual update check works (`--update` parameter)**
 - [ ] Version updated in 3 places (Program.cs, MainForm.cs, README.md)
+- [ ] **Update test data versions updated (test-data/api-responses/*.json)**
 - [ ] Build successful with no errors
 - [ ] README.md updated with new features/fixes
+- [ ] DEPLOYMENT-GUIDE.md updated (if process changed)
 - [ ] Git working directory clean (`git status` shows no uncommitted changes)
 - [ ] Previous release v1.0.x downloaded and compared
 
@@ -566,6 +657,19 @@ bin-single/MarkdownViewer.exe --version
 
 bin-single/MarkdownViewer.exe --help
 # Should show help text
+
+# Test 4: Update mechanism (automated)
+.\test-update.ps1
+
+# Expected output:
+# ✅ All tests passed!
+# Total: 4
+# Passed: 4
+# Failed: 0
+
+# Test 5: Manual update check
+bin-single/MarkdownViewer.exe --update
+# Should show: "Sie verwenden bereits die neueste Version" or update available dialog
 ```
 
 #### Step 4: Commit Changes
