@@ -1,7 +1,10 @@
 using System;
 using System.IO;
+using System.Linq;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 using Microsoft.Win32;
+using Serilog;
 using Serilog.Events;
 
 namespace MarkdownViewer
@@ -13,7 +16,7 @@ namespace MarkdownViewer
     static class Program
     {
         private const string AppName = "MarkdownViewer";
-        private const string Version = "1.0.5";
+        private const string Version = "1.1.0";
 
         /// <summary>
         /// Main entry point for the application.
@@ -22,6 +25,8 @@ namespace MarkdownViewer
         /// - File path: Opens specified .md file
         /// - --install: Registers Windows Explorer integration
         /// - --uninstall: Removes Windows Explorer integration
+        /// - --update: Check for updates manually
+        /// - --test-update: Run update test (test mode only)
         /// - --version: Shows version information
         /// - --help: Shows usage information
         /// - --log-level [Debug|Information|Warning|Error]: Sets logging verbosity
@@ -30,6 +35,10 @@ namespace MarkdownViewer
         [STAThread]
         static void Main(string[] args)
         {
+            // FIRST: Apply any pending update before anything else
+            // This must be done before logging is initialized
+            UpdateChecker.ApplyPendingUpdate();
+
             // Parse log level from command line (default: Information)
             LogEventLevel logLevel = LogEventLevel.Information;
             for (int i = 0; i < args.Length - 1; i++)
@@ -42,6 +51,18 @@ namespace MarkdownViewer
                     }
                     break;
                 }
+            }
+
+            // Parse update flags
+            bool forceUpdateCheck = args.Any(arg => arg.Equals("--update", StringComparison.OrdinalIgnoreCase));
+            bool testUpdateMode = args.Any(arg => arg.Equals("--test-update", StringComparison.OrdinalIgnoreCase));
+
+            // Handle --test-update mode (for testing update mechanism)
+            if (testUpdateMode)
+            {
+                string scenario = GetArgValue(args, "--test-scenario") ?? "update-available";
+                RunUpdateTest(scenario, logLevel);
+                return;
             }
 
             // Handle command-line arguments
@@ -57,15 +78,25 @@ namespace MarkdownViewer
 
                 if (firstArg == "--help" || firstArg == "-h")
                 {
-                    string help = @"Markdown Viewer - Simple Windows Markdown Viewer
+                    string help = @"Markdown Viewer - Lightweight Windows Markdown Viewer
 
 Usage:
   MarkdownViewer.exe <file.md>                    Open a markdown file
   MarkdownViewer.exe <file.md> --log-level Debug  Open with debug logging
   MarkdownViewer.exe --install                     Register as default .md viewer
   MarkdownViewer.exe --uninstall                   Unregister file association
+  MarkdownViewer.exe --update                      Check for updates
   MarkdownViewer.exe --version                     Show version
   MarkdownViewer.exe --help                        Show this help
+
+Update Behavior:
+  - Automatic check once per day on first start
+  - Silent background check (non-blocking)
+  - Manual check with --update parameter
+
+Test Mode (Development):
+  MarkdownViewer.exe --test-update --test-scenario <name>
+  Scenarios: update-available, no-update, network-error, rate-limit
 
 Log Levels:
   Debug        Verbose logging (all operations)
@@ -105,7 +136,15 @@ Log Levels:
 
                 // Open the file
                 ApplicationConfiguration.Initialize();
-                Application.Run(new MainForm(filePath, logLevel));
+                var form = new MainForm(filePath, logLevel);
+
+                // Start async update check if needed
+                if (forceUpdateCheck || new UpdateChecker().ShouldCheckForUpdates())
+                {
+                    _ = Task.Run(async () => await CheckForUpdatesAsync(form, forceUpdateCheck));
+                }
+
+                Application.Run(form);
             }
             else
             {
@@ -119,7 +158,15 @@ Log Levels:
 
                     if (openFileDialog.ShowDialog() == DialogResult.OK)
                     {
-                        Application.Run(new MainForm(openFileDialog.FileName, logLevel));
+                        var form = new MainForm(openFileDialog.FileName, logLevel);
+
+                        // Start async update check if needed
+                        if (forceUpdateCheck || new UpdateChecker().ShouldCheckForUpdates())
+                        {
+                            _ = Task.Run(async () => await CheckForUpdatesAsync(form, forceUpdateCheck));
+                        }
+
+                        Application.Run(form);
                     }
                 }
             }
@@ -281,6 +328,217 @@ Log Levels:
             {
                 MessageBox.Show($"Failed to unregister file association:\n{ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
+        }
+
+        /// <summary>
+        /// Gets the value of a command-line argument.
+        /// Example: --test-scenario update-available returns "update-available"
+        /// </summary>
+        private static string GetArgValue(string[] args, string argName)
+        {
+            for (int i = 0; i < args.Length - 1; i++)
+            {
+                if (args[i].Equals(argName, StringComparison.OrdinalIgnoreCase))
+                {
+                    return args[i + 1];
+                }
+            }
+            return null;
+        }
+
+        /// <summary>
+        /// Runs an update test with the specified scenario.
+        /// Used for testing the update mechanism without real GitHub releases.
+        /// </summary>
+        private static void RunUpdateTest(string scenario, LogEventLevel logLevel)
+        {
+            Console.WriteLine($"=== Testing Update Scenario: {scenario} ===");
+
+            // Enable test mode
+            string testDataPath = Environment.GetEnvironmentVariable("MDVIEWER_TEST_DATA") ?? "./test-data";
+            UpdateConfiguration.Instance.EnableTestMode("http://localhost:8080", testDataPath, scenario);
+
+            Console.WriteLine($"Configuration: {UpdateConfiguration.Instance}");
+            Console.WriteLine();
+
+            var checker = new UpdateChecker();
+            var updateInfo = checker.CheckForUpdatesAsync(Version).Result;
+
+            Console.WriteLine($"Update Available: {updateInfo.UpdateAvailable}");
+            Console.WriteLine($"Current Version: {updateInfo.CurrentVersion ?? Version}");
+            Console.WriteLine($"Latest Version: {updateInfo.LatestVersion ?? "N/A"}");
+            Console.WriteLine($"Error: {updateInfo.Error ?? "None"}");
+            Console.WriteLine($"Is Prerelease: {updateInfo.IsPrerelease}");
+
+            if (updateInfo.UpdateAvailable)
+            {
+                Console.WriteLine($"Download URL: {updateInfo.DownloadUrl}");
+                Console.WriteLine($"File Size: {updateInfo.FileSize / 1024.0 / 1024.0:F2} MB");
+                if (!string.IsNullOrEmpty(updateInfo.ReleaseNotes))
+                {
+                    int noteLength = Math.Min(100, updateInfo.ReleaseNotes.Length);
+                    Console.WriteLine($"Release Notes: {updateInfo.ReleaseNotes.Substring(0, noteLength)}...");
+                }
+            }
+
+            Console.WriteLine();
+            Console.WriteLine(updateInfo.UpdateAvailable ? "[PASS] Test PASS: Update detected" : "[PASS] Test PASS: No update");
+
+            Environment.Exit(updateInfo.UpdateAvailable ? 0 : 1);
+        }
+
+        /// <summary>
+        /// Checks for updates asynchronously after MainForm has started.
+        /// Runs in background thread, does not block UI.
+        /// Shows dialog if update is available.
+        /// </summary>
+        private static async Task CheckForUpdatesAsync(MainForm form, bool forcedByUser)
+        {
+            try
+            {
+                var checker = new UpdateChecker();
+
+                // Record that we're doing a check
+                checker.RecordUpdateCheck();
+
+                // Check for updates
+                var updateInfo = await checker.CheckForUpdatesAsync(Version);
+
+                // Handle errors
+                if (!string.IsNullOrEmpty(updateInfo.Error))
+                {
+                    Log.Warning("Update check completed with error: {Error}", updateInfo.Error);
+
+                    if (forcedByUser)
+                    {
+                        form.Invoke(new Action(() =>
+                        {
+                            MessageBox.Show(
+                                $"Update-Prüfung fehlgeschlagen:\n{updateInfo.Error}",
+                                "Update-Fehler",
+                                MessageBoxButtons.OK,
+                                MessageBoxIcon.Warning
+                            );
+                        }));
+                    }
+                    return;
+                }
+
+                // No update available
+                if (!updateInfo.UpdateAvailable)
+                {
+                    Log.Information("No update available (latest: {Latest})", updateInfo.LatestVersion);
+
+                    if (forcedByUser)
+                    {
+                        form.Invoke(new Action(() =>
+                        {
+                            MessageBox.Show(
+                                $"Sie verwenden bereits die neueste Version ({Version}).",
+                                "Kein Update verfügbar",
+                                MessageBoxButtons.OK,
+                                MessageBoxIcon.Information
+                            );
+                        }));
+                    }
+                    return;
+                }
+
+                // Update is available!
+                Log.Information("Update available: {Latest} (current: {Current})",
+                    updateInfo.LatestVersion, Version);
+
+                // Show update dialog on UI thread
+                form.Invoke(new Action(async () =>
+                {
+                    var result = MessageBox.Show(
+                        $"Update verfügbar: {updateInfo.LatestVersion}\n\n" +
+                        $"Aktuelle Version: {Version}\n" +
+                        $"Größe: {updateInfo.FileSize / 1024.0 / 1024.0:F1} MB\n\n" +
+                        $"Release Notes:\n{TruncateString(updateInfo.ReleaseNotes, 300)}\n\n" +
+                        $"Jetzt herunterladen?",
+                        "Update verfügbar",
+                        MessageBoxButtons.YesNo,
+                        MessageBoxIcon.Question
+                    );
+
+                    if (result == DialogResult.Yes)
+                    {
+                        Log.Information("User accepted update download");
+
+                        // Download update
+                        string updatePath = Path.Combine(
+                            Path.GetDirectoryName(Application.ExecutablePath),
+                            "pending-update.exe"
+                        );
+
+                        bool downloaded = await checker.DownloadUpdateAsync(updateInfo.DownloadUrl);
+
+                        if (!downloaded)
+                        {
+                            MessageBox.Show(
+                                "Download fehlgeschlagen.\nBitte versuchen Sie es später erneut.",
+                                "Download-Fehler",
+                                MessageBoxButtons.OK,
+                                MessageBoxIcon.Error
+                            );
+                            return;
+                        }
+
+                        // Ask about restart
+                        var restartResult = MessageBox.Show(
+                            "Update wurde heruntergeladen.\n\n" +
+                            "Das Update wird beim nächsten Start installiert.\n\n" +
+                            "Jetzt neu starten?",
+                            "Update heruntergeladen",
+                            MessageBoxButtons.YesNo,
+                            MessageBoxIcon.Question
+                        );
+
+                        if (restartResult == DialogResult.Yes)
+                        {
+                            Log.Information("User requested restart to apply update");
+                            UpdateChecker.ApplyPendingUpdate();
+                        }
+                        else
+                        {
+                            Log.Information("User postponed restart, update will apply on next start");
+                        }
+                    }
+                    else
+                    {
+                        Log.Information("User declined update download");
+                    }
+                }));
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex, "Unexpected error in CheckForUpdatesAsync");
+
+                if (forcedByUser)
+                {
+                    form.Invoke(new Action(() =>
+                    {
+                        MessageBox.Show(
+                            $"Unerwarteter Fehler bei der Update-Prüfung:\n{ex.Message}",
+                            "Fehler",
+                            MessageBoxButtons.OK,
+                            MessageBoxIcon.Error
+                        );
+                    }));
+                }
+            }
+        }
+
+        /// <summary>
+        /// Truncates a string to a maximum length, adding "..." if truncated
+        /// </summary>
+        private static string TruncateString(string text, int maxLength)
+        {
+            if (string.IsNullOrEmpty(text) || text.Length <= maxLength)
+                return text ?? "";
+
+            return text.Substring(0, maxLength) + "...";
         }
     }
 }

@@ -1,0 +1,15 @@
+{
+  "tag_name": "v1.2.0-beta.1",
+  "name": "v1.2.0-beta.1 - Auto-Update Beta",
+  "body": "## Beta Release: Auto-Update Feature\n\n⚠️ **This is a beta release for testing purposes**\n\n### New Features\n- Automatic update checking\n- Download and install updates\n- Test mode for development\n\n### Known Issues\n- Some edge cases not fully tested\n- UI could be improved\n\nPlease report any bugs you find!",
+  "published_at": "2025-11-07T10:00:00Z",
+  "prerelease": true,
+  "assets": [
+    {
+      "name": "MarkdownViewer.exe",
+      "browser_download_url": "http://localhost:8080/download/MarkdownViewer-1.2.0-beta.exe",
+      "size": 1800000,
+      "content_type": "application/x-msdownload"
+    }
+  ]
+}

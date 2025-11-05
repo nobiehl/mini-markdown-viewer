@@ -2,7 +2,7 @@
 
 Lightweight Windows desktop viewer for Markdown files with full Windows Explorer integration.
 
-![Version](https://img.shields.io/badge/version-1.0.5-blue)
+![Version](https://img.shields.io/badge/version-1.1.0-blue)
 ![.NET](https://img.shields.io/badge/.NET-8.0-purple)
 ![Size](https://img.shields.io/badge/size-1.6_MB-green)
 
@@ -24,6 +24,11 @@ Lightweight Windows desktop viewer for Markdown files with full Windows Explorer
 - ✅ **Link Navigation**: Navigate between .md files, external links open in browser
 - ✅ **Anchor Links**: Jump to headings with # anchors
 - ✅ **Professional Logging**: Serilog with rolling daily logs and configurable levels
+- ✅ **Automatic Updates**: Check for updates once per day, manual check with `--update`
+  - Background check (non-blocking)
+  - Release notes display
+  - Safe installation with backup
+  - Test mode for development
 
 ### Windows Integration
 - ✅ **Double-click** .md files → opens in viewer
@@ -183,6 +188,9 @@ MarkdownViewer.exe <file.md>
 # Open with debug logging
 MarkdownViewer.exe <file.md> --log-level Debug
 
+# Check for updates
+MarkdownViewer.exe --update
+
 # Install Windows Explorer integration
 MarkdownViewer.exe --install
 
@@ -194,6 +202,36 @@ MarkdownViewer.exe --version
 
 # Show help
 MarkdownViewer.exe --help
+```
+
+### Automatic Updates
+
+MarkdownViewer automatically checks for updates once per day on first start (non-blocking background check). You can also manually check for updates:
+
+```bash
+# Manual update check
+MarkdownViewer.exe --update
+
+# Update check happens automatically on normal start
+MarkdownViewer.exe README.md  # Will check for updates if not checked today
+```
+
+**Update Behavior:**
+- Checks GitHub Releases API for new versions
+- Silent background check (does not block UI)
+- Shows dialog if update is available with release notes
+- Download to `pending-update.exe` in app directory
+- Installation on next start with automatic backup
+- Last check tracked in `logs/last-update-check.txt`
+
+**Test Mode (Development):**
+```bash
+# Test update scenarios without real releases
+MarkdownViewer.exe --test-update --test-scenario update-available
+MarkdownViewer.exe --test-update --test-scenario no-update
+
+# Run all test scenarios
+.\test-update.ps1
 ```
 
 ### Logging

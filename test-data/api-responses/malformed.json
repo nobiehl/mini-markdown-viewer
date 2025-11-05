@@ -1,0 +1,7 @@
+{
+  "tag_name": "v1.0.6",
+  "name": "Broken Release",
+  "body": "This JSON has invalid structure",
+  "assets": "THIS_SHOULD_BE_AN_ARRAY_NOT_A_STRING",
+  "prerelease": "ALSO_WRONG_TYPE"
+}

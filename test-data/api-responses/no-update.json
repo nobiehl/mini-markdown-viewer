@@ -1,0 +1,15 @@
+{
+  "tag_name": "v1.0.5",
+  "name": "v1.0.5: Mathematical Formula Support",
+  "body": "## What's New in v1.0.5\n\n### Mathematical Formula Rendering\n- KaTeX integration\n- Inline and display math\n- Full LaTeX support\n\nThis is the current version - no update needed.",
+  "published_at": "2025-11-05T14:00:00Z",
+  "prerelease": false,
+  "assets": [
+    {
+      "name": "MarkdownViewer.exe",
+      "browser_download_url": "https://github.com/nobiehl/mini-markdown-viewer/releases/download/v1.0.5/MarkdownViewer.exe",
+      "size": 1677721,
+      "content_type": "application/x-msdownload"
+    }
+  ]
+}

@@ -1,0 +1,15 @@
+{
+  "tag_name": "v1.2.0",
+  "name": "v1.2.0 - Bug Fixes and Improvements",
+  "body": "## What's New in v1.2.0\n\n### Bug Fixes\n- Fixed PlantUML rendering issues\n- Fixed file watcher errors\n- Improved error handling\n\n### Improvements\n- Better performance for large files\n- Reduced memory usage\n- Faster startup time\n\n### Technical Details\n- Optimized WebView2 initialization\n- Better async handling\n- Improved logging\n\n---\n\n**Full Changelog**: https://github.com/nobiehl/mini-markdown-viewer/compare/v1.1.0...v1.2.0",
+  "published_at": "2025-11-06T10:00:00Z",
+  "prerelease": false,
+  "assets": [
+    {
+      "name": "MarkdownViewer.exe",
+      "browser_download_url": "http://localhost:8080/download/MarkdownViewer-1.2.0.exe",
+      "size": 1677721,
+      "content_type": "application/x-msdownload"
+    }
+  ]
+}

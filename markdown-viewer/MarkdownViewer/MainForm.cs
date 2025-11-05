@@ -17,7 +17,7 @@ namespace MarkdownViewer
     /// </summary>
     public class MainForm : Form
     {
-        private const string Version = "1.0.5";
+        private const string Version = "1.1.0";
         private WebView2 webView;
         private string currentFilePath;
         private FileSystemWatcher fileWatcher;
