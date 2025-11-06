@@ -675,17 +675,53 @@ Production-ready release with comprehensive testing, documentation, and polish:
 - Total documentation: ~1,150 lines
 - No code changes (polish/docs only)
 
-**Build Status:**
-- ✅ Compiles successfully (0 errors, expected warnings)
-- ✅ All features functional
-- ✅ Ready for production release
+**Build & Publish:**
+- ✅ Built Release configuration for win-x64
+- ✅ Published single-file deployment to bin-single/
+- ✅ MarkdownViewer.exe: 2.0 MB
+- ✅ All dependencies included
+
+**Release Documentation:**
+- ✅ Created comprehensive RELEASE-NOTES-v1.5.0.md (306 lines)
+  - Production release overview
+  - Complete feature summary (all versions)
+  - Testing infrastructure documentation
+  - Upgrade instructions
+  - Known limitations & compatibility
+- ✅ Committed all documentation to repository
+
+**GitHub Release:**
+- ✅ Created git tag v1.5.0
+- ✅ Pushed tag to origin
+- ✅ Created GitHub release with gh CLI
+- ✅ Uploaded MarkdownViewer.exe as release asset
+- ✅ Added comprehensive release description
+- 📦 Release URL: https://github.com/nobiehl/mini-markdown-viewer/releases/tag/v1.5.0
+
+**Release Summary:**
+- **Release Date:** 2025-11-06
+- **Type:** Production Release
+- **Previous Version:** v1.4.0
+- **Binary Size:** 2.0 MB (single-file)
+- **Documentation Added:** ~1,450 lines
+- **Test Coverage:** 85 integration tests
+
+**Git Commits:**
+- 40eeb0b: Release v1.5.0 - Polish, Documentation, and Testing
+- 5870118: docs: Add release notes for v1.5.0
 
 **What's working:**
 - All v1.0.0 - v1.4.0 features validated
-- Comprehensive testing checklist available
+- Comprehensive testing checklist (85 tests)
 - Complete user documentation
 - Full changelog for transparency
+- Production-ready deployment
 
-**Version:** v1.5.0 ✅ Production Ready
+**Version:** v1.5.0 ✅ Released
+
+**Next Steps:**
+- Project complete for roadmap v1.0.0 - v1.5.0
+- Future enhancements based on community feedback
+- Potential features: Settings UI, performance optimizations, additional languages
 
 ---
