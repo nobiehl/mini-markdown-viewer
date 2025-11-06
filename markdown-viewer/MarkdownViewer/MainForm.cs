@@ -26,10 +26,12 @@ namespace MarkdownViewer
         private WebView2 _webView;
         private StatusBarControl? _statusBar;
         private NavigationBar? _navigationBar;
+        private SearchBar? _searchBar;
         private ContextMenuStrip? _themeContextMenu;
 
         // Core Services
         private readonly NavigationManager _navigationManager;
+        private readonly SearchManager _searchManager;
         private readonly FileWatcherManager _fileWatcher;
         private readonly MarkdownRenderer _renderer;
 
@@ -69,14 +71,18 @@ namespace MarkdownViewer
             // Initialize UI components
             InitializeComponents();
 
-            // Initialize NavigationManager (requires WebView2)
+            // Initialize core managers (require WebView2)
             _navigationManager = new NavigationManager(_webView);
+            _searchManager = new SearchManager(_webView);
 
             // Initialize NavigationBar if enabled
             if (_settings.UI.NavigationBar.Visible)
             {
                 InitializeNavigationBar();
             }
+
+            // Initialize SearchBar (always available via Ctrl+F, hidden by default)
+            InitializeSearchBar();
 
             // Initialize StatusBar if enabled
             if (_settings.UI.StatusBar.Visible)
@@ -472,6 +478,28 @@ namespace MarkdownViewer
         }
 
         /// <summary>
+        /// Initializes and configures the search bar.
+        /// </summary>
+        private void InitializeSearchBar()
+        {
+            Log.Debug("Initializing SearchBar");
+
+            try
+            {
+                _searchBar = new SearchBar(_searchManager, _localizationService);
+
+                // Add to form (docked at top, hidden by default)
+                this.Controls.Add(_searchBar.Control);
+
+                Log.Information("SearchBar initialized successfully");
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex, "Failed to initialize SearchBar");
+            }
+        }
+
+        /// <summary>
         /// Initializes and configures the status bar.
         /// </summary>
         private void InitializeStatusBar()
@@ -691,10 +719,31 @@ namespace MarkdownViewer
                 return true;
             }
 
-            // Ctrl+F: Open search (to be implemented in Feature 1.4.2)
-            // F3: Next search result (to be implemented in Feature 1.4.2)
-            // Shift+F3: Previous search result (to be implemented in Feature 1.4.2)
-            // Esc: Close search (to be implemented in Feature 1.4.2)
+            // Ctrl+F: Open search
+            if (keyData == (Keys.Control | Keys.F))
+            {
+                Log.Debug("Ctrl+F pressed");
+                _searchBar?.Show();
+                return true;
+            }
+
+            // F3: Next search result
+            if (keyData == Keys.F3)
+            {
+                Log.Debug("F3 pressed");
+                _ = _searchManager.NextMatchAsync();
+                return true;
+            }
+
+            // Shift+F3: Previous search result
+            if (keyData == (Keys.Shift | Keys.F3))
+            {
+                Log.Debug("Shift+F3 pressed");
+                _ = _searchManager.PreviousMatchAsync();
+                return true;
+            }
+
+            // Esc: Close search (handled in SearchBar.OnSearchTextBoxKeyDown)
 
             return base.ProcessCmdKey(ref msg, keyData);
         }
