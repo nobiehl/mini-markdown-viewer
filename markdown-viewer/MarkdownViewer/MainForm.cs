@@ -15,23 +15,28 @@ namespace MarkdownViewer
     /// Main window form for displaying Markdown files.
     /// Refactored in v1.2.0 for layered architecture with services.
     /// Enhanced in v1.3.0 with localization and status bar.
+    /// Enhanced in v1.4.0 with navigation and search.
     /// Uses WebView2 for HTML rendering with theme support.
     /// </summary>
     public class MainForm : Form
     {
-        private const string Version = "1.3.0";
+        private const string Version = "1.4.0";
 
         // UI Components
         private WebView2 _webView;
         private StatusBarControl? _statusBar;
+        private NavigationBar? _navigationBar;
         private ContextMenuStrip? _themeContextMenu;
 
-        // Services
+        // Core Services
+        private readonly NavigationManager _navigationManager;
+        private readonly FileWatcherManager _fileWatcher;
+        private readonly MarkdownRenderer _renderer;
+
+        // Application Services
         private readonly LocalizationService _localizationService;
         private readonly SettingsService _settingsService;
         private readonly ThemeService _themeService;
-        private readonly MarkdownRenderer _renderer;
-        private readonly FileWatcherManager _fileWatcher;
 
         // State
         private string _currentFilePath;
@@ -49,7 +54,7 @@ namespace MarkdownViewer
             Log.Information("=== MarkdownViewer v{Version} Starting (LogLevel: {LogLevel}) ===", Version, logLevel);
             Log.Information("Opening file: {FilePath}", filePath);
 
-            // Initialize services
+            // Initialize application services
             _settingsService = new SettingsService();
             _themeService = new ThemeService();
             _renderer = new MarkdownRenderer();
@@ -61,8 +66,17 @@ namespace MarkdownViewer
             // Initialize localization service with language from settings
             _localizationService = new LocalizationService(_settings.Language);
 
-            // Initialize UI
+            // Initialize UI components
             InitializeComponents();
+
+            // Initialize NavigationManager (requires WebView2)
+            _navigationManager = new NavigationManager(_webView);
+
+            // Initialize NavigationBar if enabled
+            if (_settings.UI.NavigationBar.Visible)
+            {
+                InitializeNavigationBar();
+            }
 
             // Initialize StatusBar if enabled
             if (_settings.UI.StatusBar.Visible)
@@ -436,6 +450,28 @@ namespace MarkdownViewer
         }
 
         /// <summary>
+        /// Initializes and configures the navigation bar.
+        /// </summary>
+        private void InitializeNavigationBar()
+        {
+            Log.Debug("Initializing NavigationBar");
+
+            try
+            {
+                _navigationBar = new NavigationBar(_navigationManager, _localizationService);
+
+                // Add to form (docked at top)
+                this.Controls.Add(_navigationBar.Control);
+
+                Log.Information("NavigationBar initialized successfully");
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex, "Failed to initialize NavigationBar");
+            }
+        }
+
+        /// <summary>
         /// Initializes and configures the status bar.
         /// </summary>
         private void InitializeStatusBar()
@@ -632,6 +668,35 @@ namespace MarkdownViewer
                         MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
             }
+        }
+
+        /// <summary>
+        /// Handles keyboard shortcuts for navigation and search.
+        /// </summary>
+        protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
+        {
+            // Alt+Left: Navigate back
+            if (keyData == (Keys.Alt | Keys.Left))
+            {
+                Log.Debug("Alt+Left pressed");
+                _navigationManager.GoBack();
+                return true;
+            }
+
+            // Alt+Right: Navigate forward
+            if (keyData == (Keys.Alt | Keys.Right))
+            {
+                Log.Debug("Alt+Right pressed");
+                _navigationManager.GoForward();
+                return true;
+            }
+
+            // Ctrl+F: Open search (to be implemented in Feature 1.4.2)
+            // F3: Next search result (to be implemented in Feature 1.4.2)
+            // Shift+F3: Previous search result (to be implemented in Feature 1.4.2)
+            // Esc: Close search (to be implemented in Feature 1.4.2)
+
+            return base.ProcessCmdKey(ref msg, keyData);
         }
 
         protected override void Dispose(bool disposing)

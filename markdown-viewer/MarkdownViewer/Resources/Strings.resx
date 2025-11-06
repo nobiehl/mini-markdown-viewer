@@ -305,4 +305,40 @@ Restart now?</value>
   <data name="LanguageRussian" xml:space="preserve">
     <value>Русский</value>
   </data>
+
+  <!-- Navigation Bar (for v1.4.0 Feature 1.4.1) -->
+  <data name="NavigationBack" xml:space="preserve">
+    <value>Back (Alt+Left)</value>
+    <comment>Navigation back button tooltip</comment>
+  </data>
+  <data name="NavigationForward" xml:space="preserve">
+    <value>Forward (Alt+Right)</value>
+    <comment>Navigation forward button tooltip</comment>
+  </data>
+
+  <!-- Search Bar (for v1.4.0 Feature 1.4.2) -->
+  <data name="SearchPlaceholder" xml:space="preserve">
+    <value>Search... (Ctrl+F)</value>
+    <comment>Search textbox placeholder</comment>
+  </data>
+  <data name="SearchNoResults" xml:space="preserve">
+    <value>No results</value>
+    <comment>Message when search has no results</comment>
+  </data>
+  <data name="SearchResults" xml:space="preserve">
+    <value>{0} of {1}</value>
+    <comment>Search results counter (current of total)</comment>
+  </data>
+  <data name="SearchPrevious" xml:space="preserve">
+    <value>Previous (Shift+F3)</value>
+    <comment>Previous search result button tooltip</comment>
+  </data>
+  <data name="SearchNext" xml:space="preserve">
+    <value>Next (F3)</value>
+    <comment>Next search result button tooltip</comment>
+  </data>
+  <data name="SearchClose" xml:space="preserve">
+    <value>Close (Esc)</value>
+    <comment>Close search bar button tooltip</comment>
+  </data>
 </root>
