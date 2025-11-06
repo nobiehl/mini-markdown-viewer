@@ -429,6 +429,35 @@ A: WebView2 uses Edge Chromium engine, is preinstalled on Windows 10/11, and pro
 **Q: Can I rename the executable?**
 A: Yes, but run `--install` again afterwards so registry entries reference the correct path.
 
+## Documentation
+
+### User Documentation
+- [User Guide](docs/USER-GUIDE.md) - Complete feature guide with examples
+- [Changelog](docs/CHANGELOG.md) - Version history and release notes
+
+### Release Notes
+- [v1.5.2](docs/RELEASE-NOTES-v1.5.2.md) - Update check retry fix + 7-day interval
+- [v1.5.0](docs/RELEASE-NOTES-v1.5.0.md) - Testing & Documentation
+- [v1.4.0](docs/RELEASE-NOTES-v1.4.0.md) - Navigation + Search
+- [v1.3.0](docs/RELEASE-NOTES-v1.3.0.md) - Localization + StatusBar
+- [v1.2.0](docs/RELEASE-NOTES-v1.2.0.md) - Themes + Architecture
+
+### Developer Documentation
+- [Development Guide](docs/DEVELOPMENT.md) - Technical documentation for developers
+- [Architecture](docs/ARCHITECTURE.md) - System architecture and design patterns
+- [Deployment Guide](docs/DEPLOYMENT-GUIDE.md) - Build and deployment instructions
+- [Testing Checklist](docs/TESTING-CHECKLIST.md) - Complete test scenarios
+
+### Reference
+- [Glossary](docs/GLOSSARY.md) - Terms, classes, and concepts
+- [Roadmap](docs/ROADMAP.md) - Feature roadmap
+- [Process Model](docs/PROCESS-MODEL.md) - Development workflow
+
+### Technical Details
+- [Update Mechanism](docs/UPDATE-MECHANISMUS-DOKUMENTATION.md) - Complete update system documentation with diagrams
+- [Update Interval Fix](docs/UPDATE-INTERVALL-FIX.md) - 7-day interval explanation
+- [GitHub Token Support](docs/GITHUB-TOKEN-SUPPORT.md) - Optional token authentication
+
 ## License
 
 MIT License - see LICENSE file for details.
