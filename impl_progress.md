@@ -445,3 +445,66 @@ Implemented Theme Switcher via right-click context menu with full localization:
 **Version:** v1.3.0 (ready for release)
 
 ---
+
+## [2025-11-06] Session 6 - v1.3.0 Release
+
+**Status:** ✅ Completed
+
+**What was completed:**
+
+Successfully released v1.3.0 to GitHub with complete documentation:
+
+**Build & Publish:**
+- ✅ Built Release configuration for win-x64
+- ✅ Published single-file deployment to bin-single/
+- ✅ MarkdownViewer.exe: 2.0 MB
+- ✅ Themes/ folder deployed with 4 JSON files
+- ✅ All dependencies included
+
+**Release Documentation:**
+- ✅ Created comprehensive RELEASE-NOTES-v1.3.0.md (294 lines)
+  - Detailed feature descriptions
+  - Technical implementation details
+  - Upgrade instructions from v1.2.0
+  - Known limitations
+  - What's next (v1.4.0 roadmap)
+- ✅ Committed release notes to repository
+
+**GitHub Release:**
+- ✅ Created git tag v1.3.0
+- ✅ Pushed tag to origin
+- ✅ Created GitHub release with gh CLI
+- ✅ Uploaded MarkdownViewer.exe as release asset
+- ✅ Added comprehensive release description
+- 📦 Release URL: https://github.com/nobiehl/mini-markdown-viewer/releases/tag/v1.3.0
+
+**Release Summary:**
+- **Release Date:** 2025-11-06
+- **Type:** Feature Release
+- **Previous Version:** v1.2.0
+- **Binary Size:** 2.0 MB (single-file)
+- **Total Code Added:** ~3,800 lines
+
+**Key Features in v1.3.0:**
+1. **Multi-Language Support** - 8 languages fully supported
+2. **Status Bar** - Optional 5-section status bar (hidden by default)
+3. **Theme Switcher** - Right-click context menu for instant theme switching
+
+**Files Included in Release:**
+- MarkdownViewer.exe (single-file, win-x64)
+- Bundled: .NET 8.0 runtime, all dependencies
+- External: Themes/*.json (4 theme files)
+
+**Git Commits:**
+- 17aa71a: Feature 1.3.1 - Localization Infrastructure
+- 617678f: Feature 1.3.2 - StatusBar Implementation
+- 97bf4a5: Feature 1.3.3 - Theme Switcher
+- b21916b: docs: Add release notes for v1.3.0
+
+**Version:** v1.3.0 ✅ Released
+
+**Next Steps:**
+- [ ] v1.4.0: Full UI Localization + Settings Dialog
+- [ ] v1.5.0: Navigation Bar + Search + Explorer Panel
+
+---
