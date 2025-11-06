@@ -508,3 +508,114 @@ Successfully released v1.3.0 to GitHub with complete documentation:
 - [ ] v1.5.0: Navigation Bar + Search + Explorer Panel
 
 ---
+
+## [2025-11-06] Session 7 - v1.4.0 Navigation + Search
+
+**Status:** ✅ Completed
+
+**What was implemented:**
+
+Complete implementation of Navigation and Search features:
+
+**Feature 1.4.1: Navigation Implementation**
+
+Core Components:
+- **NavigationManager.cs** (107 lines)
+  - Manages WebView2 history (back/forward)
+  - CanGoBack/CanGoForward properties
+  - GoBack()/GoForward() methods
+  - NavigationChanged event for state updates
+  - Automatic initialization with WebView2
+
+- **NavigationBar.cs** (161 lines)
+  - ToolStrip with Back (←) and Forward (→) buttons
+  - Auto-enable/disable based on navigation state
+  - Localized tooltips
+  - Hidden by default (UI.NavigationBar.Visible = false)
+
+MainForm Integration:
+- Added NavigationManager and NavigationBar fields
+- Keyboard shortcuts: Alt+Left (back), Alt+Right (forward)
+- ProcessCmdKey override for shortcut handling
+
+**Feature 1.4.2: Search Implementation**
+
+Core Components:
+- **SearchManager.cs** (339 lines)
+  - mark.js-based in-page search engine
+  - Async SearchAsync() with CDN injection of mark.js v8.11.1
+  - NextMatchAsync() / PreviousMatchAsync() for navigation
+  - ClearSearchAsync() removes all highlights
+  - SearchResultsChanged event with match counts
+  - Custom CSS: yellow highlight, orange for current match
+  - WebView2 WebMessageReceived for result callbacks
+
+- **SearchBar.cs** (247 lines)
+  - ToolStrip with TextBox, Results Label, Prev/Next/Close buttons
+  - 300ms debounce for search input
+  - Results display: "X of Y" or "No results"
+  - Navigation buttons auto-enable/disable
+  - Hidden by default (shown via Ctrl+F)
+
+MainForm Integration:
+- Added SearchManager and SearchBar fields
+- Keyboard shortcuts:
+  - Ctrl+F: Show search bar
+  - F3: Next match
+  - Shift+F3: Previous match
+  - Enter: Next match (in search textbox)
+  - Shift+Enter: Previous match (in search textbox)
+  - Esc: Close search (in search textbox)
+
+**Localization:**
+- Added NavigationBack, NavigationForward strings to Strings.resx
+- Added SearchPlaceholder, SearchNoResults, SearchResults, SearchPrevious, SearchNext, SearchClose strings
+
+**Version Updates:**
+- MainForm.cs: Version = "1.4.0"
+- Program.cs: Version = "1.4.0"
+- AppSettings.cs: Version = "1.4.0"
+
+**Build Results:**
+- ✅ Build successful (0 errors, 54 nullable warnings)
+- ✅ All features compile correctly
+- ✅ NavigationBarSettings and SearchSettings already in AppSettings
+
+**Metrics:**
+- NavigationManager + NavigationBar: 268 lines
+- SearchManager + SearchBar: 586 lines
+- MainForm updates: ~120 lines added (now 763 lines total)
+- Total v1.4.0 additions: ~1,010 lines
+- Resource strings: +8 new strings
+
+**Git Commits:**
+- 8a69963: Feature 1.4.1 - Navigation Implementation (6 files, +378 lines)
+- d9d31ea: Feature 1.4.2 - Search Implementation (3 files, +632 lines)
+
+**What's working:**
+- WebView2 back/forward navigation with keyboard shortcuts
+- In-page search with real-time highlighting
+- Match navigation (previous/next)
+- Results counter
+- Smooth scrolling to matches
+- Current match highlighted differently (orange vs yellow)
+- Full keyboard navigation
+- Localized UI elements
+
+**Technical Highlights:**
+- mark.js loaded dynamically from CDN
+- JavaScript injection for search operations
+- Event-driven architecture for search results
+- Custom CSS injection for highlighting
+- WebMessage-based communication between JS and C#
+
+**Version:** v1.4.0 ✅ Implemented
+
+**Next Steps:**
+- [ ] Test v1.4.0 manually
+- [ ] Create release notes
+- [ ] Build and publish v1.4.0
+- [ ] Create GitHub release v1.4.0
+- [ ] v1.5.0: Polish + Documentation + Testing
+
+---
