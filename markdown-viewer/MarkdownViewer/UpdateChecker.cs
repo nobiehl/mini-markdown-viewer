@@ -80,6 +80,20 @@ namespace MarkdownViewer
                     client.DefaultRequestHeaders.Add("User-Agent", "MarkdownViewer");
                     client.Timeout = TimeSpan.FromSeconds(30);
 
+                    // Optional GitHub token for higher rate limits
+                    // Unauthenticated: 60 requests/hour
+                    // Authenticated: 5000 requests/hour
+                    string? githubToken = Environment.GetEnvironmentVariable("GITHUB_TOKEN");
+                    if (!string.IsNullOrEmpty(githubToken))
+                    {
+                        client.DefaultRequestHeaders.Add("Authorization", $"Bearer {githubToken}");
+                        Log.Debug("Using GitHub token for authentication");
+                    }
+                    else
+                    {
+                        Log.Debug("No GitHub token provided (using unauthenticated API, 60 requests/hour limit)");
+                    }
+
                     response = await client.GetStringAsync(apiUrl);
                     Log.Debug("API Response received ({Length} bytes)", response.Length);
                 }
@@ -181,7 +195,7 @@ namespace MarkdownViewer
         /// Checks if an update check should be performed.
         /// Returns true if:
         /// - No previous check recorded (first run)
-        /// - Last check was on a different day
+        /// - Last check was more than 7 days ago
         /// </summary>
         /// <returns>True if update check should be performed</returns>
         public bool ShouldCheckForUpdates()
@@ -196,12 +210,20 @@ namespace MarkdownViewer
                     return true;
                 }
 
-                string lastCheck = File.ReadAllText(lastCheckPath).Trim();
-                string today = DateTime.Now.ToString("yyyy-MM-dd");
+                string lastCheckStr = File.ReadAllText(lastCheckPath).Trim();
 
-                bool shouldCheck = lastCheck != today;
-                Log.Debug("Last check: {LastCheck}, Today: {Today}, Should check: {ShouldCheck}",
-                    lastCheck, today, shouldCheck);
+                if (!DateTime.TryParse(lastCheckStr, out DateTime lastCheck))
+                {
+                    Log.Debug("Could not parse last check date, performing check");
+                    return true;
+                }
+
+                DateTime now = DateTime.Now;
+                TimeSpan elapsed = now - lastCheck;
+                bool shouldCheck = elapsed.TotalDays >= 7;
+
+                Log.Debug("Last check: {LastCheck}, Now: {Now}, Days elapsed: {Days:F1}, Should check: {ShouldCheck}",
+                    lastCheck, now, elapsed.TotalDays, shouldCheck);
 
                 return shouldCheck;
             }
@@ -213,8 +235,8 @@ namespace MarkdownViewer
         }
 
         /// <summary>
-        /// Records that an update check was performed today.
-        /// Writes current date to last-update-check.txt in logs folder.
+        /// Records that an update check was performed.
+        /// Writes current date and time to last-update-check.txt in logs folder.
         /// </summary>
         public void RecordUpdateCheck()
         {
@@ -229,10 +251,10 @@ namespace MarkdownViewer
                     Directory.CreateDirectory(logsFolder);
                 }
 
-                string today = DateTime.Now.ToString("yyyy-MM-dd");
-                File.WriteAllText(lastCheckPath, today);
+                string now = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
+                File.WriteAllText(lastCheckPath, now);
 
-                Log.Debug("Update check recorded: {Date}", today);
+                Log.Debug("Update check recorded: {DateTime}", now);
             }
             catch (Exception ex)
             {

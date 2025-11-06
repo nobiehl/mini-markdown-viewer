@@ -400,23 +400,20 @@ Log Levels:
             {
                 var checker = new UpdateChecker();
 
-                // Record that we're doing a check
-                checker.RecordUpdateCheck();
-
                 // Check for updates
                 var updateInfo = await checker.CheckForUpdatesAsync(Version);
 
-                // Handle errors
+                // Handle errors - DO NOT record check on error!
                 if (!string.IsNullOrEmpty(updateInfo.Error))
                 {
-                    Log.Warning("Update check completed with error: {Error}", updateInfo.Error);
+                    Log.Warning("Update check failed with error: {Error} - Will retry on next start", updateInfo.Error);
 
                     if (forcedByUser)
                     {
                         form.Invoke(new Action(() =>
                         {
                             MessageBox.Show(
-                                $"Update-Prüfung fehlgeschlagen:\n{updateInfo.Error}",
+                                $"Update-Prüfung fehlgeschlagen:\n{updateInfo.Error}\n\nWird beim nächsten Start erneut versucht.",
                                 "Update-Fehler",
                                 MessageBoxButtons.OK,
                                 MessageBoxIcon.Warning
@@ -425,6 +422,10 @@ Log Levels:
                     }
                     return;
                 }
+
+                // Success! Record that we successfully checked
+                checker.RecordUpdateCheck();
+                Log.Debug("Update check successful, recorded timestamp");
 
                 // No update available
                 if (!updateInfo.UpdateAvailable)

@@ -67,7 +67,7 @@ namespace MarkdownViewer.Models
     public class UpdateSettings
     {
         public bool CheckOnStartup { get; set; } = true;
-        public int CheckIntervalDays { get; set; } = 1;
+        public int CheckIntervalDays { get; set; } = 7;
         public bool AutoDownload { get; set; } = false;
         public bool IncludePrereleases { get; set; } = false;
     }
