@@ -50,7 +50,7 @@ Lightweight Windows desktop viewer for Markdown files with themes, localization,
 #### 📊 StatusBar (v1.3.0)
 - **5 Sections**: Update status, Explorer registration, Language selector, Info, Help
 - **Real-time Status**: Shows current state of all features
-- **Hidden by Default**: Enable via settings or StatusBar toggle
+- **Always Visible**: Displayed at bottom of window
 
 #### 🧭 Navigation (v1.4.0)
 - **Back/Forward Buttons**: Navigate document history (Alt+Left/Right)

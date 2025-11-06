@@ -26,11 +26,11 @@ Model class representing a GitHub release from the API. Contains tag_name, name,
 ---
 
 ### StatusBar
-UI component at the bottom of the window showing status icons (update, explorer registration, language, info, help). Hidden by default.
+UI component at the bottom of the window showing status icons (update, explorer registration, language, info, help). Always visible by default.
 
 **Component:** WinForms StatusStrip
-**Manager:** UI/StatusBarManager.cs
-**Toggle:** Ctrl+B, Context Menu
+**Manager:** UI/StatusBarControl.cs
+**Visibility:** Always visible (Visible = true by default)
 
 ---
 

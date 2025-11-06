@@ -96,10 +96,8 @@ Opens file selection dialog.
 - Русский (Russian)
 
 ### Switch Language
-1. **Enable StatusBar** (if hidden):
-   - Edit `%APPDATA%\MarkdownViewer\settings.json`
-   - Set `"UI": {"StatusBar": {"Visible": true}}`
-2. **Select Language** from StatusBar dropdown
+1. Look at the **StatusBar** at the bottom of the window
+2. **Select Language** from the language dropdown
 3. Language changes instantly
 
 ---
@@ -205,17 +203,6 @@ Settings stored in `%APPDATA%\MarkdownViewer\settings.json`
 ```
 
 ### Common Customizations
-
-#### Enable StatusBar
-```json
-{
-  "UI": {
-    "StatusBar": {
-      "Visible": true
-    }
-  }
-}
-```
 
 #### Enable NavigationBar
 ```json
