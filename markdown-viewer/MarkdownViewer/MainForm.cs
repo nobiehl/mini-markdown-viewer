@@ -7,22 +7,26 @@ using Serilog.Events;
 using MarkdownViewer.Core;
 using MarkdownViewer.Models;
 using MarkdownViewer.Services;
+using MarkdownViewer.UI;
 
 namespace MarkdownViewer
 {
     /// <summary>
     /// Main window form for displaying Markdown files.
     /// Refactored in v1.2.0 for layered architecture with services.
+    /// Enhanced in v1.3.0 with localization and status bar.
     /// Uses WebView2 for HTML rendering with theme support.
     /// </summary>
     public class MainForm : Form
     {
-        private const string Version = "1.2.0";
+        private const string Version = "1.3.0";
 
         // UI Components
         private WebView2 _webView;
+        private StatusBarControl? _statusBar;
 
         // Services
+        private readonly LocalizationService _localizationService;
         private readonly SettingsService _settingsService;
         private readonly ThemeService _themeService;
         private readonly MarkdownRenderer _renderer;
@@ -53,8 +57,17 @@ namespace MarkdownViewer
             // Load settings and theme
             LoadSettings();
 
+            // Initialize localization service with language from settings
+            _localizationService = new LocalizationService(_settings.Language);
+
             // Initialize UI
             InitializeComponents();
+
+            // Initialize StatusBar if enabled
+            if (_settings.UI.StatusBar.Visible)
+            {
+                InitializeStatusBar();
+            }
 
             // Load initial file
             _currentFilePath = filePath;
@@ -416,6 +429,104 @@ namespace MarkdownViewer
                 Log.Information("File changed, reloading: {FilePath}", filePath);
                 LoadMarkdownFile(_currentFilePath);
             }));
+        }
+
+        /// <summary>
+        /// Initializes and configures the status bar.
+        /// </summary>
+        private void InitializeStatusBar()
+        {
+            Log.Debug("Initializing StatusBar");
+
+            try
+            {
+                _statusBar = new StatusBarControl(_localizationService);
+
+                // Wire up event handlers
+                _statusBar.LanguageChanged += OnLanguageChanged;
+                _statusBar.InfoClicked += OnInfoClicked;
+                _statusBar.HelpClicked += OnHelpClicked;
+
+                // Add to form
+                this.Controls.Add(_statusBar);
+
+                // Check initial statuses
+                _statusBar.CheckExplorerRegistration();
+                _statusBar.SetUpdateStatus(UpdateStatus.Unknown);
+
+                Log.Information("StatusBar initialized successfully");
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex, "Failed to initialize StatusBar");
+            }
+        }
+
+        /// <summary>
+        /// Handles language change from status bar.
+        /// Refreshes all UI text.
+        /// </summary>
+        private void OnLanguageChanged(object? sender, EventArgs e)
+        {
+            Log.Information("Language changed to: {Language}", _localizationService.GetCurrentLanguage());
+
+            try
+            {
+                // Update settings with new language
+                _settings.Language = _localizationService.GetCurrentLanguage();
+                _settingsService.Save(_settings);
+
+                // Refresh status bar text
+                _statusBar?.RefreshLanguage();
+
+                // Note: Full UI localization will be implemented when all UI strings are migrated to resources
+                // For now, only StatusBar is fully localized
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex, "Failed to handle language change");
+            }
+        }
+
+        /// <summary>
+        /// Handles info button click in status bar.
+        /// Shows application info dialog.
+        /// </summary>
+        private void OnInfoClicked(object? sender, EventArgs e)
+        {
+            Log.Debug("Info button clicked");
+
+            string info = $"Markdown Viewer v{Version}\n\n" +
+                          $"Language: {_localizationService.GetCurrentLanguage().ToUpper()}\n" +
+                          $"Theme: {_settings.Theme}\n" +
+                          $"Settings: {Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\MarkdownViewer\\settings.json";
+
+            MessageBox.Show(info, "Info", MessageBoxButtons.OK, MessageBoxIcon.Information);
+        }
+
+        /// <summary>
+        /// Handles help button click in status bar.
+        /// Shows help information.
+        /// </summary>
+        private void OnHelpClicked(object? sender, EventArgs e)
+        {
+            Log.Debug("Help button clicked");
+
+            string help = $"Markdown Viewer v{Version}\n\n" +
+                          "Keyboard Shortcuts:\n" +
+                          "• F5 - Reload file\n" +
+                          "• Ctrl+Mouse Wheel - Zoom in/out\n\n" +
+                          "Features:\n" +
+                          "• Live file reload\n" +
+                          "• Syntax highlighting\n" +
+                          "• Math formulas (KaTeX)\n" +
+                          "• Mermaid diagrams\n" +
+                          "• PlantUML diagrams\n" +
+                          "• 4 Themes\n" +
+                          "• 8 Languages\n\n" +
+                          "GitHub: github.com/nobiehl/mini-markdown-viewer";
+
+            MessageBox.Show(help, "Help", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
 
         protected override void Dispose(bool disposing)
