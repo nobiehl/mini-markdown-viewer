@@ -80,3 +80,27 @@ Created new folder structure for v1.2.0 architecture refactoring:
 - [ ] Feature 1.2.7: Create unit tests for ThemeService
 
 ---
+
+## [2025-11-06] Session 2 - v1.2.0 Complete Refactoring
+
+**Status:** ✅ Completed
+
+**What was implemented:**
+
+Completed v1.2.0 release with full architectural refactoring:
+
+**Core Layer Extraction:**
+1. **MarkdownRenderer.cs** (336 lines)
+   - Extracted from MainForm.cs ConvertMarkdownToHtml method
+   - Theme-aware HTML generation
+   - Supports: Syntax highlighting, Math (KaTeX), Mermaid, PlantUML
+   - Embeds CDN resources: Highlight.js, KaTeX, Mermaid.js
+   
+2. **FileWatcherManager.cs** (101 lines)
+   - Extracted from MainForm.cs SetupFileWatcher method
+   - Event-based file change notifications
+   - Automatic disposal management
+   - IDisposable pattern implemented
+
+**MainForm.cs Refactoring:**
+- **735 lines → 433 lines** (41

@@ -99,3 +99,24 @@ Model class representing the result of an update check operation. Contains infor
 **Properties:** UpdateAvailable, LatestVersion, CurrentVersion, ReleaseNotes, DownloadUrl, FileSize, Error, IsPrerelease
 
 ---
+
+### MarkdownRenderer
+Core component responsible for converting Markdown text to themed HTML. Extracted from MainForm.cs in v1.2.0. Uses Markdig pipeline with advanced extensions and mathematics support.
+
+**File:** Core/MarkdownRenderer.cs
+**Features:** Syntax highlighting (Highlight.js), Math formulas (KaTeX), Mermaid diagrams, PlantUML diagrams (HEX encoding), Copy buttons
+**Theme-aware:** Applies Theme.MarkdownColors to generated HTML/CSS
+**Dependencies:** Markdig, Theme model
+
+---
+
+### FileWatcherManager
+Core component for live-reload functionality. Watches a single file for changes and raises FileChanged event. Extracted from MainForm.cs in v1.2.0.
+
+**File:** Core/FileWatcherManager.cs
+**Pattern:** IDisposable, Event-driven
+**Event:** FileChanged (EventHandler<string>)
+**Methods:** Watch(filePath), StopWatching(), Dispose()
+**Anti-flicker:** 100ms delay to avoid multiple editor save triggers
+
+---
