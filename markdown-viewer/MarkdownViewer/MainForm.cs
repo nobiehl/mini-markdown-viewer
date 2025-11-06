@@ -24,6 +24,7 @@ namespace MarkdownViewer
         // UI Components
         private WebView2 _webView;
         private StatusBarControl? _statusBar;
+        private ContextMenuStrip? _themeContextMenu;
 
         // Services
         private readonly LocalizationService _localizationService;
@@ -68,6 +69,9 @@ namespace MarkdownViewer
             {
                 InitializeStatusBar();
             }
+
+            // Initialize Theme Context Menu
+            InitializeThemeContextMenu();
 
             // Load initial file
             _currentFilePath = filePath;
@@ -515,7 +519,8 @@ namespace MarkdownViewer
             string help = $"Markdown Viewer v{Version}\n\n" +
                           "Keyboard Shortcuts:\n" +
                           "• F5 - Reload file\n" +
-                          "• Ctrl+Mouse Wheel - Zoom in/out\n\n" +
+                          "• Ctrl+Mouse Wheel - Zoom in/out\n" +
+                          "• Right-click - Theme menu\n\n" +
                           "Features:\n" +
                           "• Live file reload\n" +
                           "• Syntax highlighting\n" +
@@ -527,6 +532,106 @@ namespace MarkdownViewer
                           "GitHub: github.com/nobiehl/mini-markdown-viewer";
 
             MessageBox.Show(help, "Help", MessageBoxButtons.OK, MessageBoxIcon.Information);
+        }
+
+        /// <summary>
+        /// Initializes the theme context menu.
+        /// Allows right-click theme switching.
+        /// </summary>
+        private void InitializeThemeContextMenu()
+        {
+            Log.Debug("Initializing Theme Context Menu");
+
+            try
+            {
+                _themeContextMenu = new ContextMenuStrip();
+
+                // Get available themes
+                var themes = _themeService.GetAvailableThemes();
+
+                // Create menu items for each theme
+                foreach (string themeId in themes)
+                {
+                    string displayName = GetThemeDisplayName(themeId);
+                    var menuItem = new ToolStripMenuItem(displayName)
+                    {
+                        Tag = themeId,
+                        Checked = themeId == _settings.Theme
+                    };
+
+                    menuItem.Click += OnThemeSelected;
+                    _themeContextMenu.Items.Add(menuItem);
+                }
+
+                // Assign context menu to the form
+                this.ContextMenuStrip = _themeContextMenu;
+
+                Log.Information("Theme Context Menu initialized with {Count} themes", themes.Count);
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex, "Failed to initialize Theme Context Menu");
+            }
+        }
+
+        /// <summary>
+        /// Gets the localized display name for a theme.
+        /// </summary>
+        private string GetThemeDisplayName(string themeId)
+        {
+            return themeId.ToLower() switch
+            {
+                "dark" => _localizationService.GetString("ThemeDark"),
+                "solarized" => _localizationService.GetString("ThemeSolarized"),
+                "draeger" => _localizationService.GetString("ThemeDraeger"),
+                "standard" => _localizationService.GetString("ThemeStandard"),
+                _ => themeId
+            };
+        }
+
+        /// <summary>
+        /// Handles theme selection from context menu.
+        /// Applies the selected theme and reloads the current file.
+        /// </summary>
+        private void OnThemeSelected(object? sender, EventArgs e)
+        {
+            if (sender is ToolStripMenuItem menuItem && menuItem.Tag is string themeId)
+            {
+                Log.Information("Theme changed to: {Theme}", themeId);
+
+                try
+                {
+                    // Update current theme
+                    _currentTheme = _themeService.LoadTheme(themeId);
+
+                    // Update settings and save
+                    _settings.Theme = themeId;
+                    _settingsService.Save(_settings);
+
+                    // Update menu item checked states
+                    if (_themeContextMenu != null)
+                    {
+                        foreach (ToolStripMenuItem item in _themeContextMenu.Items)
+                        {
+                            item.Checked = item.Tag as string == themeId;
+                        }
+                    }
+
+                    // Apply theme to UI
+                    ApplyThemeToUI();
+
+                    // Reload current file to apply theme to markdown
+                    LoadMarkdownFile(_currentFilePath);
+
+                    Log.Information("Theme applied successfully: {Theme}", themeId);
+                }
+                catch (Exception ex)
+                {
+                    Log.Error(ex, "Failed to apply theme: {Theme}", themeId);
+                    MessageBox.Show($"Failed to apply theme: {ex.Message}", "Error",
+                        MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+            }
         }
 
         protected override void Dispose(bool disposing)

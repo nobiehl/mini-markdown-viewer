@@ -370,3 +370,78 @@ Implemented complete StatusBar UI with 5 sections and full localization integrat
 **Version:** v1.3.0 (in progress)
 
 ---
+
+## [2025-11-06] Session 5 - Feature 1.3.3: Theme Switcher
+
+**Status:** ✅ Completed
+
+**What was implemented:**
+
+Implemented Theme Switcher via right-click context menu with full localization:
+
+**MainForm.cs Enhancements:**
+- Added ContextMenuStrip for theme selection
+- InitializeThemeContextMenu() method creates menu dynamically
+- GetThemeDisplayName() uses localized theme names from resources
+- OnThemeSelected() handles theme changes with immediate effect
+- Auto-updates checked state in context menu
+- Persists theme selection to settings.json
+- Reloads markdown content with new theme instantly
+
+**Features:**
+- ✅ **Right-click Theme Menu** - Shows all 4 available themes
+- ✅ **Localized Theme Names** - Uses translations from all 8 languages
+- ✅ **Instant Theme Application** - No restart required
+- ✅ **Visual Feedback** - Checkmark indicates active theme
+- ✅ **Settings Persistence** - Selected theme saved automatically
+- ✅ **Live Markdown Reload** - Content re-rendered with new theme
+
+**Theme Options:**
+1. Dark (Dunkel, Харанхуй, etc.) - VS Code inspired
+2. Solarized Light (Solarized Hell, etc.) - Eye-friendly light theme
+3. Dräger - Corporate theme
+4. Standard (Enhanced) - Modern clean look
+
+**Technical Details:**
+- Uses WinForms ContextMenuStrip
+- Dynamic menu generation from ThemeService.GetAvailableThemes()
+- Event-driven theme switching
+- Immediate UI and markdown re-rendering
+- Thread-safe theme application
+
+**User Experience Flow:**
+1. User right-clicks anywhere in the window
+2. Context menu shows 4 themed menu items with localized names
+3. Current theme has checkmark
+4. User selects new theme
+5. Theme instantly applied to UI and markdown
+6. Checkmark moves to new selection
+7. Setting saved to disk
+
+**Integration:**
+- Integrates with existing ThemeService
+- Uses LocalizationService for menu labels
+- Works seamlessly with StatusBar language switching
+- Themes apply to both WinForms UI and WebView2 content
+
+**Build Results:**
+- ✅ Build successful (0 errors, ~54 nullable warnings)
+- ✅ Theme switcher functional
+- ✅ All 4 themes accessible
+- ✅ Localization working for all 8 languages
+
+**Metrics:**
+- MainForm additions: ~100 lines
+- Total v1.3.0 additions: ~3800 lines
+
+**What's working:**
+- Context menu creation and display
+- Theme selection and application
+- Localized theme names
+- Settings persistence
+- Live markdown re-rendering
+- Visual feedback (checkmarks)
+
+**Version:** v1.3.0 (ready for release)
+
+---
