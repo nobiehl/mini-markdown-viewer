@@ -16,11 +16,12 @@ namespace MarkdownViewer
     /// Refactored in v1.2.0 for layered architecture with services.
     /// Enhanced in v1.3.0 with localization and status bar.
     /// Enhanced in v1.4.0 with navigation and search.
+    /// Finalized in v1.5.0 with polish, testing, and documentation.
     /// Uses WebView2 for HTML rendering with theme support.
     /// </summary>
     public class MainForm : Form
     {
-        private const string Version = "1.4.0";
+        private const string Version = "1.5.0";
 
         // UI Components
         private WebView2 _webView;

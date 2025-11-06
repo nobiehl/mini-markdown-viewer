@@ -1,10 +1,12 @@
 # MarkdownViewer - Lightweight Windows Desktop Markdown Viewer
 
-Lightweight Windows desktop viewer for Markdown files with full Windows Explorer integration.
+Lightweight Windows desktop viewer for Markdown files with themes, localization, navigation, and search. Full Windows Explorer integration included.
 
-![Version](https://img.shields.io/badge/version-1.1.0-blue)
+![Version](https://img.shields.io/badge/version-1.5.0-blue)
 ![.NET](https://img.shields.io/badge/.NET-8.0-purple)
-![Size](https://img.shields.io/badge/size-1.6_MB-green)
+![Size](https://img.shields.io/badge/size-2.0_MB-green)
+![Languages](https://img.shields.io/badge/languages-8-orange)
+![Themes](https://img.shields.io/badge/themes-4-purple)
 
 ## Features
 
@@ -30,6 +32,39 @@ Lightweight Windows desktop viewer for Markdown files with full Windows Explorer
   - Safe installation with backup
   - Test mode for development
 
+### Advanced Features (v1.2.0 - v1.5.0)
+
+#### 🎨 Themes (v1.2.0)
+- **4 Built-in Themes**: Dark, Solarized Light, Dräger, Standard
+- **Theme Switcher**: Right-click → select theme
+- **Instant Application**: No restart required
+- **Settings Persistence**: Theme saved to `settings.json`
+- **Custom Themes**: Add your own in `Themes/` folder
+
+#### 🌍 Localization (v1.3.0)
+- **8 Languages**: English, Deutsch, Монгол, Français, Español, 日本語, 简体中文, Русский
+- **Instant Language Switching**: via StatusBar dropdown
+- **Localized UI**: All interface elements translated
+- **Fallback Support**: Missing translations fall back to English
+
+#### 📊 StatusBar (v1.3.0)
+- **5 Sections**: Update status, Explorer registration, Language selector, Info, Help
+- **Real-time Status**: Shows current state of all features
+- **Hidden by Default**: Enable via settings or StatusBar toggle
+
+#### 🧭 Navigation (v1.4.0)
+- **Back/Forward Buttons**: Navigate document history (Alt+Left/Right)
+- **WebView2 History**: Seamless integration with browser navigation
+- **Navigation Bar**: Optional toolbar (hidden by default)
+- **Keyboard Shortcuts**: Alt+Left (back), Alt+Right (forward)
+
+#### 🔍 In-Page Search (v1.4.0)
+- **Real-time Highlighting**: Yellow for matches, orange for current
+- **Match Navigation**: F3 (next), Shift+F3 (previous)
+- **Results Counter**: "X of Y" display
+- **Keyboard Shortcuts**: Ctrl+F (open), Enter/Shift+Enter (navigate), Esc (close)
+- **mark.js Integration**: Fast highlighting with smooth scrolling
+
 ### Windows Integration
 - ✅ **Double-click** .md files → opens in viewer
 - ✅ **Right-click context menu** ("Open with Markdown Viewer")
@@ -38,10 +73,12 @@ Lightweight Windows desktop viewer for Markdown files with full Windows Explorer
 - ✅ **File open dialog** when started without arguments
 
 ### Properties
-- 🚀 **Fast**: 1.6 MB single-file executable
+- 🚀 **Fast**: 2.0 MB single-file executable
 - 📦 **Portable**: No installation required
 - 🔒 **No admin rights**: Registry entries in HKCU only
 - 🧹 **Clean uninstall**: `--uninstall` removes everything
+- 🌍 **Multi-language**: 8 languages supported
+- 🎨 **Themeable**: 4 built-in themes + custom themes
 
 ## Quick Start
 
