@@ -21,7 +21,7 @@ namespace MarkdownViewer
     /// </summary>
     public class MainForm : Form
     {
-        private const string Version = "1.5.0";
+        private const string Version = "1.5.1";
 
         // UI Components
         private WebView2 _webView;
@@ -532,6 +532,58 @@ namespace MarkdownViewer
         }
 
         /// <summary>
+        /// Toggles the StatusBar visibility (F11 shortcut).
+        /// Creates or destroys the StatusBar as needed and persists state to settings.
+        /// </summary>
+        private void ToggleStatusBar()
+        {
+            Log.Debug("Toggling StatusBar");
+
+            try
+            {
+                if (_statusBar == null)
+                {
+                    // StatusBar doesn't exist - create it
+                    Log.Information("Creating StatusBar");
+                    InitializeStatusBar();
+                    _settings.UI.StatusBar.Visible = true;
+                }
+                else
+                {
+                    // StatusBar exists - remove it
+                    Log.Information("Removing StatusBar");
+
+                    // Unsubscribe from events
+                    _statusBar.LanguageChanged -= OnLanguageChanged;
+                    _statusBar.InfoClicked -= OnInfoClicked;
+                    _statusBar.HelpClicked -= OnHelpClicked;
+
+                    // Remove from form
+                    this.Controls.Remove(_statusBar);
+
+                    // Dispose
+                    _statusBar.Dispose();
+                    _statusBar = null;
+
+                    _settings.UI.StatusBar.Visible = false;
+                }
+
+                // Save settings to persist state
+                _settingsService.Save(_settings);
+                Log.Information("StatusBar visibility: {Visible}", _settings.UI.StatusBar.Visible);
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex, "Failed to toggle StatusBar");
+                MessageBox.Show(
+                    $"Failed to toggle StatusBar: {ex.Message}",
+                    "Error",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Error);
+            }
+        }
+
+        /// <summary>
         /// Handles language change from status bar.
         /// Refreshes all UI text.
         /// </summary>
@@ -584,6 +636,10 @@ namespace MarkdownViewer
             string help = $"Markdown Viewer v{Version}\n\n" +
                           "Keyboard Shortcuts:\n" +
                           "• F5 - Reload file\n" +
+                          "• F11 - Toggle StatusBar\n" +
+                          "• Ctrl+F - Open search\n" +
+                          "• F3 / Shift+F3 - Next/Previous match\n" +
+                          "• Alt+Left / Alt+Right - Navigate back/forward\n" +
                           "• Ctrl+Mouse Wheel - Zoom in/out\n" +
                           "• Right-click - Theme menu\n\n" +
                           "Features:\n" +
@@ -593,7 +649,8 @@ namespace MarkdownViewer
                           "• Mermaid diagrams\n" +
                           "• PlantUML diagrams\n" +
                           "• 4 Themes\n" +
-                          "• 8 Languages\n\n" +
+                          "• 8 Languages\n" +
+                          "• Navigation & Search\n\n" +
                           "GitHub: github.com/nobiehl/mini-markdown-viewer";
 
             MessageBox.Show(help, "Help", MessageBoxButtons.OK, MessageBoxIcon.Information);
@@ -741,6 +798,14 @@ namespace MarkdownViewer
             {
                 Log.Debug("Shift+F3 pressed");
                 _ = _searchManager.PreviousMatchAsync();
+                return true;
+            }
+
+            // F11: Toggle StatusBar
+            if (keyData == Keys.F11)
+            {
+                Log.Debug("F11 pressed - toggling StatusBar");
+                ToggleStatusBar();
                 return true;
             }
 
