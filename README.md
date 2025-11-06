@@ -2,7 +2,7 @@
 
 Lightweight Windows desktop viewer for Markdown files with themes, localization, navigation, and search. Full Windows Explorer integration included.
 
-![Version](https://img.shields.io/badge/version-1.5.0-blue)
+![Version](https://img.shields.io/badge/version-1.5.2-blue)
 ![.NET](https://img.shields.io/badge/.NET-8.0-purple)
 ![Size](https://img.shields.io/badge/size-2.0_MB-green)
 ![Languages](https://img.shields.io/badge/languages-8-orange)
@@ -26,10 +26,10 @@ Lightweight Windows desktop viewer for Markdown files with themes, localization,
 - ✅ **Link Navigation**: Navigate between .md files, external links open in browser
 - ✅ **Anchor Links**: Jump to headings with # anchors
 - ✅ **Professional Logging**: Serilog with rolling daily logs and configurable levels
-- ✅ **Automatic Updates**: Check for updates once per day, manual check with `--update`
-  - Background check (non-blocking)
+- ✅ **Automatic Updates**: Check for updates once every 7 days, manual check with `--update`
+  - Background check (non-blocking, automatic retry on failure)
   - Release notes display
-  - Safe installation with backup
+  - Safe installation with backup and rollback
   - Test mode for development
 
 ### Advanced Features (v1.2.0 - v1.5.0)
@@ -243,23 +243,24 @@ MarkdownViewer.exe --help
 
 ### Automatic Updates
 
-MarkdownViewer automatically checks for updates once per day on first start (non-blocking background check). You can also manually check for updates:
+MarkdownViewer automatically checks for updates once every 7 days on first start (non-blocking background check). You can also manually check for updates:
 
 ```bash
 # Manual update check
 MarkdownViewer.exe --update
 
 # Update check happens automatically on normal start
-MarkdownViewer.exe README.md  # Will check for updates if not checked today
+MarkdownViewer.exe README.md  # Will check for updates if not checked in the last 7 days
 ```
 
 **Update Behavior:**
-- Checks GitHub Releases API for new versions
+- Checks GitHub Releases API for new versions (once every 7 days)
 - Silent background check (does not block UI)
+- Automatic retry on failure (403 rate limit, network errors)
 - Shows dialog if update is available with release notes
 - Download to `pending-update.exe` in app directory
-- Installation on next start with automatic backup
-- Last check tracked in `logs/last-update-check.txt`
+- Installation on next start with automatic backup and rollback
+- Last check tracked in `logs/last-update-check.txt` (only on success)
 
 **Test Mode (Development):**
 ```bash

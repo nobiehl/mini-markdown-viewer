@@ -1,4 +1,4 @@
-# User Guide - MarkdownViewer v1.5.0
+# User Guide - MarkdownViewer v1.5.2
 
 Complete guide for using MarkdownViewer with all features.
 

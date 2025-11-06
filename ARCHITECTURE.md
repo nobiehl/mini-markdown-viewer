@@ -555,15 +555,18 @@ Displayed to User
 
 ### Update Check
 ```
-Application Start (once per day)
+Application Start (once every 7 days)
     ↓
 UpdateService.ShouldCheckForUpdates()
     ↓
-Check logs/last-update-check.txt
+Check logs/last-update-check.txt (elapsed.TotalDays >= 7?)
     ↓
 Task.Run(CheckForUpdatesAsync)  // Background
     ↓
 GitHub API (or test JSON)
+    ↓
+On Success: RecordUpdateCheck() saves timestamp
+On Failure: No timestamp saved → Automatic retry next start
     ↓
 UpdateInfo (Model)
     ↓

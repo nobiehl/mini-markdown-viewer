@@ -473,19 +473,23 @@ Task<UpdateInfo> CheckForUpdatesAsync(string currentVersion)
 - Checks GitHub API or reads local JSON (test mode)
 - Compares versions using `System.Version`
 - Returns `UpdateInfo` with availability and details
+- On error: Returns UpdateInfo with Error property set
+- Automatic retry on next start (v1.5.2 fix)
 
 ```csharp
 bool ShouldCheckForUpdates()
 ```
-- Checks if last check was today
+- Checks if 7 days have elapsed since last successful check
 - Reads `logs/last-update-check.txt`
-- Returns true once per day
+- Returns true if elapsed.TotalDays >= 7
+- Returns true if file doesn't exist (first run)
 
 ```csharp
 void RecordUpdateCheck()
 ```
-- Writes current date to `logs/last-update-check.txt`
-- Called after each check attempt
+- Writes current date and time to `logs/last-update-check.txt`
+- **Critical (v1.5.2):** Only called on successful API response
+- Not called on errors (403, network failures) to enable automatic retry
 
 ```csharp
 Task<bool> DownloadUpdateAsync(string url)

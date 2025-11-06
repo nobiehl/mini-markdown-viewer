@@ -3,7 +3,7 @@
 Definitions of all terms, classes, services, and concepts used in MarkdownViewer.
 
 **Alphabetical Order**
-**Last Updated:** 2025-11-05
+**Last Updated:** 2025-11-06
 
 ---
 
@@ -44,11 +44,35 @@ Visual appearance definition containing colors for both Markdown rendering and W
 ---
 
 ### UpdateChecker
-Service that checks GitHub for new releases, compares versions, downloads updates, and applies them safely with backup/rollback.
+Service that checks GitHub for new releases once every 7 days, compares versions, downloads updates, and applies them safely with backup/rollback. Implements automatic retry logic for failed checks.
 
-**File:** UpdateChecker.cs → Services/UpdateService.cs (refactored in v1.2.0)
-**Methods:** CheckForUpdatesAsync, DownloadUpdateAsync, ApplyPendingUpdate
+**File:** UpdateChecker.cs
+**Methods:** CheckForUpdatesAsync, DownloadUpdateAsync, ApplyPendingUpdate, ShouldCheckForUpdates, RecordUpdateCheck
 **Test Mode:** Supports local JSON mock data
+**Retry Logic:** Only records timestamp on success, retries on failure (v1.5.2)
+**Interval:** 7 days (changed from daily in v1.5.2)
+
+---
+
+### RecordUpdateCheck
+Method that saves the current timestamp to logs/last-update-check.txt. Only called on successful update check to enable automatic retry on failure.
+
+**Location:** UpdateChecker.cs
+**Called by:** Program.cs:CheckForUpdatesAsync() (after success)
+**File:** logs/last-update-check.txt
+**Format:** yyyy-MM-dd HH:mm:ss
+**Critical:** Only called on successful API response (v1.5.2 fix)
+
+---
+
+### ShouldCheckForUpdates
+Method that determines if an update check should be performed. Returns true if no previous check exists or if 7 days have elapsed since last successful check.
+
+**Location:** UpdateChecker.cs
+**Returns:** bool
+**Logic:** elapsed.TotalDays >= 7
+**File Read:** logs/last-update-check.txt
+**Changed in v1.5.2:** From daily check to 7-day interval
 
 ---
 

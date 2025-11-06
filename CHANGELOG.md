@@ -6,6 +6,31 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ---
 
+## [1.5.2] - 2025-11-06
+
+### Fixed
+- **Critical Bug**: Update check retry logic
+  - RecordUpdateCheck() now only called on successful API response
+  - Failed checks (403 rate limit, network errors) no longer block retries
+  - Automatic retry on next start until success
+  - Enhanced error logging: "Will retry on next start"
+  - Problem: Timestamp was saved BEFORE API call, preventing retries for 7 days
+  - Impact: Users never received updates if first check failed
+
+### Changed
+- **Update Interval**: Changed from daily to once every 7 days
+  - Reduces API calls from ~30/month to ~4/month
+  - Prevents GitHub API rate limit issues (60 requests/hour)
+  - Optional GitHub token support for power users (5000 requests/hour)
+
+### Documentation
+- **UPDATE-MECHANISMUS-DOKUMENTATION.md**: Complete update mechanism with 3 Mermaid diagrams
+- **RELEASE-NOTES-v1.5.2.md**: Detailed bug analysis and fix documentation
+- **UPDATE-INTERVALL-FIX.md**: 7-day interval explanation
+- **GITHUB-TOKEN-SUPPORT.md**: Optional token authentication guide
+
+---
+
 ## [1.5.0] - 2025-11-06
 
 ### Added
@@ -199,6 +224,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 | Version | Date | Type | Key Features |
 |---------|------|------|--------------|
+| 1.5.2 | 2025-11-06 | Bugfix | Update check retry logic + 7-day interval |
 | 1.5.0 | 2025-11-06 | Polish | Testing, Documentation |
 | 1.4.0 | 2025-11-06 | Feature | Navigation + Search |
 | 1.3.0 | 2025-11-06 | Feature | Localization + StatusBar + Theme Switcher |
