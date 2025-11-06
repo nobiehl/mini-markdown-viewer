@@ -14,25 +14,25 @@ namespace MarkdownViewer.Models
         /// Tag name of the release (e.g., "v1.0.5")
         /// </summary>
         [JsonPropertyName("tag_name")]
-        public string TagName { get; set; }
+        public string? TagName { get; set; }
 
         /// <summary>
         /// Display name of the release (e.g., "v1.0.5: Math Support")
         /// </summary>
         [JsonPropertyName("name")]
-        public string Name { get; set; }
+        public string? Name { get; set; }
 
         /// <summary>
         /// Release description/notes in Markdown format
         /// </summary>
         [JsonPropertyName("body")]
-        public string Body { get; set; }
+        public string? Body { get; set; }
 
         /// <summary>
         /// Publication timestamp (ISO 8601 format)
         /// </summary>
         [JsonPropertyName("published_at")]
-        public string PublishedAt { get; set; }
+        public string? PublishedAt { get; set; }
 
         /// <summary>
         /// Whether this is a prerelease version
@@ -44,7 +44,7 @@ namespace MarkdownViewer.Models
         /// List of downloadable assets (binaries, archives, etc.)
         /// </summary>
         [JsonPropertyName("assets")]
-        public List<GitHubReleaseAsset> Assets { get; set; }
+        public List<GitHubReleaseAsset>? Assets { get; set; }
     }
 
     /// <summary>
@@ -56,13 +56,13 @@ namespace MarkdownViewer.Models
         /// File name (e.g., "MarkdownViewer.exe")
         /// </summary>
         [JsonPropertyName("name")]
-        public string Name { get; set; }
+        public string? Name { get; set; }
 
         /// <summary>
         /// Direct download URL
         /// </summary>
         [JsonPropertyName("browser_download_url")]
-        public string BrowserDownloadUrl { get; set; }
+        public string? BrowserDownloadUrl { get; set; }
 
         /// <summary>
         /// File size in bytes
@@ -74,7 +74,7 @@ namespace MarkdownViewer.Models
         /// MIME type (e.g., "application/x-msdownload")
         /// </summary>
         [JsonPropertyName("content_type")]
-        public string ContentType { get; set; }
+        public string? ContentType { get; set; }
     }
 
     /// <summary>
@@ -90,22 +90,22 @@ namespace MarkdownViewer.Models
         /// <summary>
         /// Latest version tag (e.g., "v1.0.6")
         /// </summary>
-        public string LatestVersion { get; set; }
+        public string LatestVersion { get; set; } = string.Empty;
 
         /// <summary>
         /// Current installed version
         /// </summary>
-        public string CurrentVersion { get; set; }
+        public string CurrentVersion { get; set; } = string.Empty;
 
         /// <summary>
         /// Release notes (Markdown)
         /// </summary>
-        public string ReleaseNotes { get; set; }
+        public string ReleaseNotes { get; set; } = string.Empty;
 
         /// <summary>
         /// Direct download URL for the new version
         /// </summary>
-        public string DownloadUrl { get; set; }
+        public string DownloadUrl { get; set; } = string.Empty;
 
         /// <summary>
         /// File size in bytes
@@ -115,7 +115,7 @@ namespace MarkdownViewer.Models
         /// <summary>
         /// Error message if update check failed
         /// </summary>
-        public string Error { get; set; }
+        public string Error { get; set; } = string.Empty;
 
         /// <summary>
         /// Whether this is a prerelease version

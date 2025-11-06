@@ -6,7 +6,7 @@ namespace MarkdownViewer.Models
     /// </summary>
     public class AppSettings
     {
-        public string Version { get; set; } = "1.5.2";
+        public string Version { get; set; } = "1.5.3";
         public string Language { get; set; } = "system";
         public string Theme { get; set; } = "standard";
 

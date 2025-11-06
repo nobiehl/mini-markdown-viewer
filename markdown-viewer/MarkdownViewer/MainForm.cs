@@ -21,7 +21,7 @@ namespace MarkdownViewer
     /// </summary>
     public class MainForm : Form
     {
-        private const string Version = "1.5.2";
+        private const string Version = "1.5.3";
 
         // UI Components
         private WebView2 _webView;
@@ -44,7 +44,7 @@ namespace MarkdownViewer
         // State
         private string _currentFilePath;
         private AppSettings _settings;
-        private Theme _currentTheme;
+        private Theme? _currentTheme;
 
         /// <summary>
         /// Initializes the main form with a specified Markdown file.
@@ -511,6 +511,8 @@ namespace MarkdownViewer
 
                 // Wire up event handlers
                 _statusBar.LanguageChanged += OnLanguageChanged;
+                _statusBar.UpdateClicked += OnUpdateClicked;
+                _statusBar.ExplorerClicked += OnExplorerClicked;
                 _statusBar.InfoClicked += OnInfoClicked;
                 _statusBar.HelpClicked += OnHelpClicked;
 
@@ -600,6 +602,159 @@ namespace MarkdownViewer
                           "GitHub: github.com/nobiehl/mini-markdown-viewer";
 
             MessageBox.Show(help, "Help", MessageBoxButtons.OK, MessageBoxIcon.Information);
+        }
+
+        /// <summary>
+        /// Handles update status icon click in status bar.
+        /// Triggers manual update check.
+        /// </summary>
+        private async void OnUpdateClicked(object? sender, EventArgs e)
+        {
+            Log.Debug("Update icon clicked");
+
+            try
+            {
+                // Show checking status
+                _statusBar?.SetUpdateStatus(UpdateStatus.Checking);
+
+                // Check for updates
+                var checker = new UpdateChecker();
+                var updateInfo = await checker.CheckForUpdatesAsync(Version);
+
+                if (updateInfo.UpdateAvailable)
+                {
+                    _statusBar?.SetUpdateStatus(UpdateStatus.UpdateAvailable, updateInfo.LatestVersion);
+
+                    var result = MessageBox.Show(
+                        $"Update available: v{updateInfo.LatestVersion}\n\n" +
+                        $"Current version: v{Version}\n\n" +
+                        $"Release notes:\n{updateInfo.ReleaseNotes}\n\n" +
+                        "Download and install now?",
+                        "Update Available",
+                        MessageBoxButtons.YesNo,
+                        MessageBoxIcon.Information);
+
+                    if (result == DialogResult.Yes)
+                    {
+                        // Download update
+                        var success = await checker.DownloadUpdateAsync(updateInfo.DownloadUrl);
+
+                        if (success)
+                        {
+                            MessageBox.Show(
+                                "Update downloaded successfully!\n\n" +
+                                "The update will be installed when you restart the application.",
+                                "Update Downloaded",
+                                MessageBoxButtons.OK,
+                                MessageBoxIcon.Information);
+                        }
+                        else
+                        {
+                            _statusBar?.SetUpdateStatus(UpdateStatus.Error);
+                            MessageBox.Show(
+                                "Failed to download update.\n\nPlease try again later or download manually from GitHub.",
+                                "Download Failed",
+                                MessageBoxButtons.OK,
+                                MessageBoxIcon.Error);
+                        }
+                    }
+                }
+                else
+                {
+                    _statusBar?.SetUpdateStatus(UpdateStatus.UpToDate);
+                    MessageBox.Show(
+                        $"You are running the latest version (v{Version}).",
+                        "Up to Date",
+                        MessageBoxButtons.OK,
+                        MessageBoxIcon.Information);
+                }
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex, "Failed to check for updates");
+                _statusBar?.SetUpdateStatus(UpdateStatus.Error);
+                MessageBox.Show(
+                    $"Failed to check for updates:\n\n{ex.Message}",
+                    "Error",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Error);
+            }
+        }
+
+        /// <summary>
+        /// Handles explorer status icon click in status bar.
+        /// Shows install/uninstall prompt.
+        /// </summary>
+        private void OnExplorerClicked(object? sender, EventArgs e)
+        {
+            Log.Debug("Explorer icon clicked");
+
+            try
+            {
+                if (_statusBar?.IsExplorerRegistered == true)
+                {
+                    // Already registered - offer to uninstall
+                    var result = MessageBox.Show(
+                        "Windows Explorer integration is currently installed.\n\n" +
+                        "This includes:\n" +
+                        "• Double-click .md files to open in MarkdownViewer\n" +
+                        "• Right-click context menu\n" +
+                        "• 'Send To' menu integration\n\n" +
+                        "Would you like to uninstall the integration?",
+                        "Uninstall Explorer Integration",
+                        MessageBoxButtons.YesNo,
+                        MessageBoxIcon.Question);
+
+                    if (result == DialogResult.Yes)
+                    {
+                        Program.UninstallFileAssociation();
+                        _statusBar?.CheckExplorerRegistration();
+
+                        MessageBox.Show(
+                            "Windows Explorer integration has been removed successfully.",
+                            "Uninstall Complete",
+                            MessageBoxButtons.OK,
+                            MessageBoxIcon.Information);
+                    }
+                }
+                else
+                {
+                    // Not registered - offer to install
+                    var result = MessageBox.Show(
+                        "Windows Explorer integration is not currently installed.\n\n" +
+                        "Installing will enable:\n" +
+                        "• Double-click .md files to open in MarkdownViewer\n" +
+                        "• Right-click context menu\n" +
+                        "• 'Send To' menu integration\n\n" +
+                        "No admin rights required (uses HKEY_CURRENT_USER).\n\n" +
+                        "Would you like to install the integration?",
+                        "Install Explorer Integration",
+                        MessageBoxButtons.YesNo,
+                        MessageBoxIcon.Question);
+
+                    if (result == DialogResult.Yes)
+                    {
+                        Program.InstallFileAssociation();
+                        _statusBar?.CheckExplorerRegistration();
+
+                        MessageBox.Show(
+                            "Windows Explorer integration has been installed successfully!\n\n" +
+                            "You can now double-click .md files to open them in MarkdownViewer.",
+                            "Install Complete",
+                            MessageBoxButtons.OK,
+                            MessageBoxIcon.Information);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex, "Failed to handle explorer registration");
+                MessageBox.Show(
+                    $"Failed to update Explorer integration:\n\n{ex.Message}",
+                    "Error",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Error);
+            }
         }
 
         /// <summary>

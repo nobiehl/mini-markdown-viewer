@@ -18,7 +18,7 @@ namespace MarkdownViewer
     static class Program
     {
         private const string AppName = "MarkdownViewer";
-        private const string Version = "1.5.2";
+        private const string Version = "1.5.3";
 
         /// <summary>
         /// Main entry point for the application.
@@ -182,7 +182,7 @@ Log Levels:
         /// 3. "Open With" dialog integration
         /// 4. "Send To" menu shortcut
         /// </summary>
-        private static void InstallFileAssociation()
+        public static void InstallFileAssociation()
         {
             try
             {
@@ -297,7 +297,7 @@ Log Levels:
         /// Deletes registry entries and "Send To" shortcut.
         /// Safe to call even if --install was never executed (uses throwOnMissingSubKey: false).
         /// </summary>
-        private static void UninstallFileAssociation()
+        public static void UninstallFileAssociation()
         {
             try
             {

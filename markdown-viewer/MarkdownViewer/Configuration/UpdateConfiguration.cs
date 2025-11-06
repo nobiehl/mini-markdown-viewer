@@ -9,7 +9,7 @@ namespace MarkdownViewer.Configuration
     /// </summary>
     public class UpdateConfiguration
     {
-        private static UpdateConfiguration _instance;
+        private static UpdateConfiguration? _instance;
         private static readonly object _lock = new object();
 
         /// <summary>
@@ -43,27 +43,27 @@ namespace MarkdownViewer.Configuration
         /// Production: "https://api.github.com"
         /// Test: "http://localhost:8080" (or custom)
         /// </summary>
-        public string ApiBaseUrl { get; private set; }
+        public string ApiBaseUrl { get; private set; } = string.Empty;
 
         /// <summary>
         /// GitHub repository owner
         /// </summary>
-        public string RepoOwner { get; private set; }
+        public string RepoOwner { get; private set; } = string.Empty;
 
         /// <summary>
         /// GitHub repository name
         /// </summary>
-        public string RepoName { get; private set; }
+        public string RepoName { get; private set; } = string.Empty;
 
         /// <summary>
         /// Path to test data directory (only used in test mode)
         /// </summary>
-        public string TestDataPath { get; private set; }
+        public string TestDataPath { get; private set; } = string.Empty;
 
         /// <summary>
         /// Test scenario name (only used in test mode)
         /// </summary>
-        public string TestScenario { get; private set; }
+        public string TestScenario { get; private set; } = string.Empty;
 
         /// <summary>
         /// Private constructor - loads configuration from environment variables

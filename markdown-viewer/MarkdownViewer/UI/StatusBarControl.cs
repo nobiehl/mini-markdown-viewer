@@ -28,8 +28,19 @@ namespace MarkdownViewer.UI
         private readonly ToolStripStatusLabel _infoLabel;
         private readonly ToolStripStatusLabel _helpLabel;
 
+        // Cached icons for status changes
+        private readonly Bitmap? _iconRefreshCw;
+        private readonly Bitmap? _iconCheckCircle;
+        private readonly Bitmap? _iconAlertCircle;
+        private readonly Bitmap? _iconFolder;
+        private readonly Bitmap? _iconGlobe;
+        private readonly Bitmap? _iconInfo;
+        private readonly Bitmap? _iconHelpCircle;
+
         // Events
         public event EventHandler? LanguageChanged;
+        public event EventHandler? UpdateClicked;
+        public event EventHandler? ExplorerClicked;
         public event EventHandler? InfoClicked;
         public event EventHandler? HelpClicked;
 
@@ -54,31 +65,52 @@ namespace MarkdownViewer.UI
             // StatusBar configuration
             this.SizingGrip = false;
             this.Dock = DockStyle.Bottom;
+            this.ShowItemToolTips = true; // Enable tooltips for status items!
+
+            // Load Feather Icons (20x20, dark gray color for better visibility)
+            var iconColor = Color.FromArgb(64, 64, 64); // Dark gray
+            _iconRefreshCw = IconHelper.LoadIcon("refresh-cw", 20, iconColor);
+            _iconCheckCircle = IconHelper.LoadIcon("check-circle", 20, iconColor);
+            _iconAlertCircle = IconHelper.LoadIcon("alert-circle", 20, iconColor);
+            _iconFolder = IconHelper.LoadIcon("folder", 20, iconColor);
+            _iconGlobe = IconHelper.LoadIcon("globe", 20, iconColor);
+            _iconInfo = IconHelper.LoadIcon("info", 20, iconColor);
+            _iconHelpCircle = IconHelper.LoadIcon("help-circle", 20, iconColor);
 
             // Create status items
             _updateStatus = new ToolStripStatusLabel
             {
-                Text = "🔄",
+                Image = _iconRefreshCw,
                 ToolTipText = _localization.GetString("StatusBarUpToDate"),
-                DisplayStyle = ToolStripItemDisplayStyle.Text,
-                AutoSize = true
+                DisplayStyle = ToolStripItemDisplayStyle.Image,
+                AutoSize = true,
+                IsLink = true,
+                Padding = new Padding(5, 0, 5, 0)
             };
+
+            _updateStatus.Click += (s, e) => UpdateClicked?.Invoke(this, EventArgs.Empty);
 
             _explorerStatus = new ToolStripStatusLabel
             {
-                Text = "📁",
+                Image = _iconFolder,
                 ToolTipText = _localization.GetString("StatusBarExplorerNotRegistered"),
-                DisplayStyle = ToolStripItemDisplayStyle.Text,
-                AutoSize = true
+                DisplayStyle = ToolStripItemDisplayStyle.Image,
+                AutoSize = true,
+                IsLink = true,
+                Padding = new Padding(5, 0, 5, 0)
             };
+
+            _explorerStatus.Click += (s, e) => ExplorerClicked?.Invoke(this, EventArgs.Empty);
 
             _languageSelector = new ToolStripDropDownButton
             {
+                Image = _iconGlobe,
                 Text = GetLanguageDisplayName(_localization.GetCurrentLanguage()),
                 ToolTipText = _localization.GetString("StatusBarLanguage", _localization.GetCurrentLanguage().ToUpper()),
-                DisplayStyle = ToolStripItemDisplayStyle.Text,
+                DisplayStyle = ToolStripItemDisplayStyle.ImageAndText,
                 AutoSize = true,
-                ShowDropDownArrow = true
+                ShowDropDownArrow = true,
+                Padding = new Padding(5, 0, 5, 0)
             };
 
             // Populate language dropdown
@@ -86,22 +118,24 @@ namespace MarkdownViewer.UI
 
             _infoLabel = new ToolStripStatusLabel
             {
-                Text = _localization.GetString("StatusBarInfo"),
+                Image = _iconInfo,
                 ToolTipText = _localization.GetString("StatusBarInfo"),
-                DisplayStyle = ToolStripItemDisplayStyle.Text,
+                DisplayStyle = ToolStripItemDisplayStyle.Image,
                 AutoSize = true,
-                IsLink = true
+                IsLink = true,
+                Padding = new Padding(5, 0, 5, 0)
             };
 
             _infoLabel.Click += (s, e) => InfoClicked?.Invoke(this, EventArgs.Empty);
 
             _helpLabel = new ToolStripStatusLabel
             {
-                Text = _localization.GetString("StatusBarHelp"),
+                Image = _iconHelpCircle,
                 ToolTipText = _localization.GetString("StatusBarHelp"),
-                DisplayStyle = ToolStripItemDisplayStyle.Text,
+                DisplayStyle = ToolStripItemDisplayStyle.Image,
                 AutoSize = true,
-                IsLink = true
+                IsLink = true,
+                Padding = new Padding(5, 0, 5, 0)
             };
 
             _helpLabel.Click += (s, e) => HelpClicked?.Invoke(this, EventArgs.Empty);
@@ -200,34 +234,29 @@ namespace MarkdownViewer.UI
             switch (status)
             {
                 case UpdateStatus.UpToDate:
-                    _updateStatus.Text = "✅";
-                    _updateStatus.ToolTipText = _localization.GetString("StatusBarUpToDate");
-                    _updateStatus.ForeColor = Color.Green;
+                    _updateStatus.Image = _iconCheckCircle;
+                    _updateStatus.ToolTipText = _localization.GetString("StatusBarUpToDate") + " (Click to check)";
                     break;
 
                 case UpdateStatus.UpdateAvailable:
-                    _updateStatus.Text = "🔄";
-                    _updateStatus.ToolTipText = _localization.GetString("StatusBarUpdateAvailable", latestVersion ?? "?");
-                    _updateStatus.ForeColor = Color.Orange;
+                    _updateStatus.Image = _iconRefreshCw;
+                    _updateStatus.ToolTipText = _localization.GetString("StatusBarUpdateAvailable", latestVersion ?? "?") + " (Click to download)";
                     break;
 
                 case UpdateStatus.Checking:
-                    _updateStatus.Text = "⏳";
+                    _updateStatus.Image = _iconRefreshCw;
                     _updateStatus.ToolTipText = "Checking for updates...";
-                    _updateStatus.ForeColor = Color.Gray;
                     break;
 
                 case UpdateStatus.Error:
-                    _updateStatus.Text = "❌";
-                    _updateStatus.ToolTipText = "Update check failed";
-                    _updateStatus.ForeColor = Color.Red;
+                    _updateStatus.Image = _iconAlertCircle;
+                    _updateStatus.ToolTipText = "Update check failed (Click to retry)";
                     break;
 
                 case UpdateStatus.Unknown:
                 default:
-                    _updateStatus.Text = "❓";
-                    _updateStatus.ToolTipText = "Update status unknown";
-                    _updateStatus.ForeColor = Color.Gray;
+                    _updateStatus.Image = _iconRefreshCw;
+                    _updateStatus.ToolTipText = "Update status unknown (Click to check)";
                     break;
             }
         }
@@ -259,15 +288,13 @@ namespace MarkdownViewer.UI
         {
             if (IsExplorerRegistered)
             {
-                _explorerStatus.Text = "✅📁";
-                _explorerStatus.ToolTipText = _localization.GetString("StatusBarExplorerRegistered");
-                _explorerStatus.ForeColor = Color.Green;
+                _explorerStatus.Image = _iconCheckCircle;
+                _explorerStatus.ToolTipText = _localization.GetString("StatusBarExplorerRegistered") + " (Click to uninstall)";
             }
             else
             {
-                _explorerStatus.Text = "❌📁";
-                _explorerStatus.ToolTipText = _localization.GetString("StatusBarExplorerNotRegistered");
-                _explorerStatus.ForeColor = Color.Gray;
+                _explorerStatus.Image = _iconFolder;
+                _explorerStatus.ToolTipText = _localization.GetString("StatusBarExplorerNotRegistered") + " (Click to install)";
             }
         }
 
@@ -276,7 +303,7 @@ namespace MarkdownViewer.UI
         /// </summary>
         public void RefreshLanguage()
         {
-            // Update language selector
+            // Update language selector (globe icon is set as Image property)
             string currentLang = _localization.GetCurrentLanguage();
             _languageSelector.Text = GetLanguageDisplayName(currentLang);
             _languageSelector.ToolTipText = _localization.GetString("StatusBarLanguage", currentLang.ToUpper());
@@ -291,10 +318,8 @@ namespace MarkdownViewer.UI
                 }
             }
 
-            // Update info and help labels
-            _infoLabel.Text = _localization.GetString("StatusBarInfo");
+            // Info and help labels keep their icons, only update tooltips
             _infoLabel.ToolTipText = _localization.GetString("StatusBarInfo");
-            _helpLabel.Text = _localization.GetString("StatusBarHelp");
             _helpLabel.ToolTipText = _localization.GetString("StatusBarHelp");
 
             // Update status tooltips
