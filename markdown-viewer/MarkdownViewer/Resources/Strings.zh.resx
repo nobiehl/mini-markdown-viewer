@@ -1,0 +1,308 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" msdata:Ordinal="5" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+
+  <!-- MainForm Strings -->
+  <data name="WindowTitle" xml:space="preserve">
+    <value>Markdown Viewer v{0}</value>
+    <comment>带版本号的窗口标题</comment>
+  </data>
+  <data name="WindowTitleWithFile" xml:space="preserve">
+    <value>{0} - Markdown Viewer v{1}</value>
+    <comment>带文件名和版本号的窗口标题</comment>
+  </data>
+  <data name="LoggingWarning" xml:space="preserve">
+    <value>警告：无法初始化日志记录：
+{0}</value>
+    <comment>日志初始化警告</comment>
+  </data>
+  <data name="LoggingWarningTitle" xml:space="preserve">
+    <value>日志警告</value>
+  </data>
+  <data name="WebView2InitError" xml:space="preserve">
+    <value>WebView2 初始化失败：
+{0}
+
+请查看日志以获取详细信息。</value>
+    <comment>WebView2 初始化错误</comment>
+  </data>
+  <data name="WebView2InitErrorTitle" xml:space="preserve">
+    <value>初始化错误</value>
+  </data>
+  <data name="WebView2ProcessFailed" xml:space="preserve">
+    <value>WebView2 进程失败：{0}
+请查看日志以获取详细信息。</value>
+    <comment>WebView2 进程错误</comment>
+  </data>
+  <data name="ErrorTitle" xml:space="preserve">
+    <value>错误</value>
+  </data>
+  <data name="FileLoadError" xml:space="preserve">
+    <value>加载文件时出错：{0}
+
+请查看日志以获取详细信息。</value>
+    <comment>文件加载错误</comment>
+  </data>
+  <data name="FileNotFound" xml:space="preserve">
+    <value>文件未找到：
+{0}</value>
+    <comment>文件未找到错误</comment>
+  </data>
+  <data name="LinkOpenFailed" xml:space="preserve">
+    <value>无法打开链接：{0}</value>
+    <comment>链接打开错误</comment>
+  </data>
+
+  <!-- Program.cs - General -->
+  <data name="AppName" xml:space="preserve">
+    <value>Markdown Viewer</value>
+  </data>
+  <data name="VersionTitle" xml:space="preserve">
+    <value>版本</value>
+  </data>
+  <data name="VersionMessage" xml:space="preserve">
+    <value>Markdown Viewer v{0}</value>
+  </data>
+  <data name="HelpTitle" xml:space="preserve">
+    <value>帮助</value>
+  </data>
+  <data name="HelpText" xml:space="preserve">
+    <value>Markdown Viewer - 轻量级 Windows Markdown 查看器
+
+用法：
+  MarkdownViewer.exe &lt;file.md&gt;                    打开 Markdown 文件
+  MarkdownViewer.exe &lt;file.md&gt; --log-level Debug  以调试日志打开
+  MarkdownViewer.exe --install                     注册为默认 .md 查看器
+  MarkdownViewer.exe --uninstall                   取消文件关联
+  MarkdownViewer.exe --update                      检查更新
+  MarkdownViewer.exe --version                     显示版本
+  MarkdownViewer.exe --help                        显示此帮助
+
+更新行为：
+  - 每天首次启动时自动检查一次
+  - 静默后台检查（非阻塞）
+  - 使用 --update 参数手动检查
+
+测试模式（开发）：
+  MarkdownViewer.exe --test-update --test-scenario &lt;name&gt;
+  场景：update-available, no-update, network-error, rate-limit
+
+日志级别：
+  Debug        详细日志（所有操作）
+  Information  正常日志（默认）
+  Warning      仅警告和错误
+  Error        仅错误</value>
+  </data>
+  <data name="FileNotFoundError" xml:space="preserve">
+    <value>文件未找到：{0}</value>
+  </data>
+  <data name="OnlyMdSupported" xml:space="preserve">
+    <value>仅支持 .md 文件</value>
+  </data>
+  <data name="OpenFileDialogFilter" xml:space="preserve">
+    <value>Markdown 文件 (*.md)|*.md|所有文件 (*.*)|*.*</value>
+  </data>
+  <data name="OpenFileDialogTitle" xml:space="preserve">
+    <value>打开 Markdown 文件</value>
+  </data>
+
+  <!-- Installation -->
+  <data name="InstallSuccessMessage" xml:space="preserve">
+    <value>Markdown Viewer 注册成功！
+
+集成点：
+• .md 文件的默认程序
+• 右键上下文菜单
+• "打开方式"对话框
+• "发送到"菜单</value>
+  </data>
+  <data name="InstallSuccessTitle" xml:space="preserve">
+    <value>成功</value>
+  </data>
+  <data name="InstallFailedMessage" xml:space="preserve">
+    <value>注册文件关联失败：
+{0}</value>
+  </data>
+  <data name="UninstallSuccessMessage" xml:space="preserve">
+    <value>Markdown Viewer 取消注册成功！
+
+已删除所有集成点。</value>
+  </data>
+  <data name="UninstallFailedMessage" xml:space="preserve">
+    <value>删除文件关联失败：
+{0}</value>
+  </data>
+
+  <!-- Updates -->
+  <data name="UpdateCheckFailedMessage" xml:space="preserve">
+    <value>检查更新失败：
+{0}</value>
+  </data>
+  <data name="UpdateCheckFailedTitle" xml:space="preserve">
+    <value>更新错误</value>
+  </data>
+  <data name="NoUpdateAvailableMessage" xml:space="preserve">
+    <value>您已在使用最新版本（{0}）。</value>
+  </data>
+  <data name="NoUpdateAvailableTitle" xml:space="preserve">
+    <value>没有可用更新</value>
+  </data>
+  <data name="UpdateAvailableMessage" xml:space="preserve">
+    <value>有可用更新：{0}
+
+当前版本：{1}
+大小：{2} MB
+
+发行说明：
+{3}
+
+立即下载？</value>
+  </data>
+  <data name="UpdateAvailableTitle" xml:space="preserve">
+    <value>有可用更新</value>
+  </data>
+  <data name="UpdateDownloadFailedMessage" xml:space="preserve">
+    <value>下载失败。
+请稍后重试。</value>
+  </data>
+  <data name="UpdateDownloadFailedTitle" xml:space="preserve">
+    <value>下载错误</value>
+  </data>
+  <data name="UpdateDownloadedMessage" xml:space="preserve">
+    <value>更新已下载。
+
+更新将在下次启动时安装。
+
+立即重新启动？</value>
+  </data>
+  <data name="UpdateDownloadedTitle" xml:space="preserve">
+    <value>更新已下载</value>
+  </data>
+  <data name="UpdateCheckUnexpectedError" xml:space="preserve">
+    <value>检查更新时发生意外错误：
+{0}</value>
+  </data>
+
+  <!-- StatusBar (for v1.3.2) -->
+  <data name="StatusBarUpdateAvailable" xml:space="preserve">
+    <value>有可用更新：{0}</value>
+  </data>
+  <data name="StatusBarUpToDate" xml:space="preserve">
+    <value>已是最新</value>
+  </data>
+  <data name="StatusBarExplorerRegistered" xml:space="preserve">
+    <value>资源管理器集成已激活</value>
+  </data>
+  <data name="StatusBarExplorerNotRegistered" xml:space="preserve">
+    <value>资源管理器集成未激活</value>
+  </data>
+  <data name="StatusBarLanguage" xml:space="preserve">
+    <value>语言：{0}</value>
+  </data>
+  <data name="StatusBarInfo" xml:space="preserve">
+    <value>信息</value>
+  </data>
+  <data name="StatusBarHelp" xml:space="preserve">
+    <value>帮助</value>
+  </data>
+
+  <!-- Theme Switcher Context Menu (for v1.3.3) -->
+  <data name="ThemeDark" xml:space="preserve">
+    <value>深色</value>
+  </data>
+  <data name="ThemeSolarized" xml:space="preserve">
+    <value>Solarized 浅色</value>
+  </data>
+  <data name="ThemeDraeger" xml:space="preserve">
+    <value>Dräger</value>
+  </data>
+  <data name="ThemeStandard" xml:space="preserve">
+    <value>标准（增强）</value>
+  </data>
+  <data name="ThemeMenuTitle" xml:space="preserve">
+    <value>主题</value>
+  </data>
+
+  <!-- Language Names -->
+  <data name="LanguageEnglish" xml:space="preserve">
+    <value>English</value>
+  </data>
+  <data name="LanguageGerman" xml:space="preserve">
+    <value>Deutsch</value>
+  </data>
+  <data name="LanguageMongolian" xml:space="preserve">
+    <value>Монгол</value>
+  </data>
+  <data name="LanguageFrench" xml:space="preserve">
+    <value>Français</value>
+  </data>
+  <data name="LanguageSpanish" xml:space="preserve">
+    <value>Español</value>
+  </data>
+  <data name="LanguageJapanese" xml:space="preserve">
+    <value>日本語</value>
+  </data>
+  <data name="LanguageChinese" xml:space="preserve">
+    <value>简体中文</value>
+  </data>
+  <data name="LanguageRussian" xml:space="preserve">
+    <value>Русский</value>
+  </data>
+</root>

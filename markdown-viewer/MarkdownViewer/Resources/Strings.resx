@@ -1,0 +1,308 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" msdata:Ordinal="5" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+
+  <!-- MainForm Strings -->
+  <data name="WindowTitle" xml:space="preserve">
+    <value>Markdown Viewer v{0}</value>
+    <comment>Main window title with version placeholder</comment>
+  </data>
+  <data name="WindowTitleWithFile" xml:space="preserve">
+    <value>{0} - Markdown Viewer v{1}</value>
+    <comment>Window title with filename and version</comment>
+  </data>
+  <data name="LoggingWarning" xml:space="preserve">
+    <value>Warning: Could not initialize logging:
+{0}</value>
+    <comment>Logging initialization warning</comment>
+  </data>
+  <data name="LoggingWarningTitle" xml:space="preserve">
+    <value>Logging Warning</value>
+  </data>
+  <data name="WebView2InitError" xml:space="preserve">
+    <value>Failed to initialize WebView2:
+{0}
+
+Check logs for details.</value>
+    <comment>WebView2 initialization error message</comment>
+  </data>
+  <data name="WebView2InitErrorTitle" xml:space="preserve">
+    <value>Initialization Error</value>
+  </data>
+  <data name="WebView2ProcessFailed" xml:space="preserve">
+    <value>WebView2 process failed: {0}
+Check logs for details.</value>
+    <comment>WebView2 process failure message</comment>
+  </data>
+  <data name="ErrorTitle" xml:space="preserve">
+    <value>Error</value>
+  </data>
+  <data name="FileLoadError" xml:space="preserve">
+    <value>Error loading file: {0}
+
+Check logs for details.</value>
+    <comment>File loading error message</comment>
+  </data>
+  <data name="FileNotFound" xml:space="preserve">
+    <value>File not found:
+{0}</value>
+    <comment>File not found error</comment>
+  </data>
+  <data name="LinkOpenFailed" xml:space="preserve">
+    <value>Failed to open link: {0}</value>
+    <comment>Link opening error</comment>
+  </data>
+
+  <!-- Program.cs - General -->
+  <data name="AppName" xml:space="preserve">
+    <value>Markdown Viewer</value>
+  </data>
+  <data name="VersionTitle" xml:space="preserve">
+    <value>Version</value>
+  </data>
+  <data name="VersionMessage" xml:space="preserve">
+    <value>Markdown Viewer v{0}</value>
+  </data>
+  <data name="HelpTitle" xml:space="preserve">
+    <value>Help</value>
+  </data>
+  <data name="HelpText" xml:space="preserve">
+    <value>Markdown Viewer - Lightweight Windows Markdown Viewer
+
+Usage:
+  MarkdownViewer.exe &lt;file.md&gt;                    Open a markdown file
+  MarkdownViewer.exe &lt;file.md&gt; --log-level Debug  Open with debug logging
+  MarkdownViewer.exe --install                     Register as default .md viewer
+  MarkdownViewer.exe --uninstall                   Unregister file association
+  MarkdownViewer.exe --update                      Check for updates
+  MarkdownViewer.exe --version                     Show version
+  MarkdownViewer.exe --help                        Show this help
+
+Update Behavior:
+  - Automatic check once per day on first start
+  - Silent background check (non-blocking)
+  - Manual check with --update parameter
+
+Test Mode (Development):
+  MarkdownViewer.exe --test-update --test-scenario &lt;name&gt;
+  Scenarios: update-available, no-update, network-error, rate-limit
+
+Log Levels:
+  Debug        Verbose logging (all operations)
+  Information  Normal logging (default)
+  Warning      Only warnings and errors
+  Error        Only errors</value>
+  </data>
+  <data name="FileNotFoundError" xml:space="preserve">
+    <value>File not found: {0}</value>
+  </data>
+  <data name="OnlyMdSupported" xml:space="preserve">
+    <value>Only .md files are supported</value>
+  </data>
+  <data name="OpenFileDialogFilter" xml:space="preserve">
+    <value>Markdown files (*.md)|*.md|All files (*.*)|*.*</value>
+  </data>
+  <data name="OpenFileDialogTitle" xml:space="preserve">
+    <value>Open Markdown File</value>
+  </data>
+
+  <!-- Installation -->
+  <data name="InstallSuccessMessage" xml:space="preserve">
+    <value>Markdown Viewer successfully registered!
+
+Integration points:
+• Default program for .md files
+• Right-click context menu
+• 'Open With' dialog
+• 'Send To' menu</value>
+  </data>
+  <data name="InstallSuccessTitle" xml:space="preserve">
+    <value>Success</value>
+  </data>
+  <data name="InstallFailedMessage" xml:space="preserve">
+    <value>Failed to register file association:
+{0}</value>
+  </data>
+  <data name="UninstallSuccessMessage" xml:space="preserve">
+    <value>Markdown Viewer successfully unregistered!
+
+All integration points have been removed.</value>
+  </data>
+  <data name="UninstallFailedMessage" xml:space="preserve">
+    <value>Failed to unregister file association:
+{0}</value>
+  </data>
+
+  <!-- Updates -->
+  <data name="UpdateCheckFailedMessage" xml:space="preserve">
+    <value>Update check failed:
+{0}</value>
+  </data>
+  <data name="UpdateCheckFailedTitle" xml:space="preserve">
+    <value>Update Error</value>
+  </data>
+  <data name="NoUpdateAvailableMessage" xml:space="preserve">
+    <value>You are already using the latest version ({0}).</value>
+  </data>
+  <data name="NoUpdateAvailableTitle" xml:space="preserve">
+    <value>No Update Available</value>
+  </data>
+  <data name="UpdateAvailableMessage" xml:space="preserve">
+    <value>Update available: {0}
+
+Current version: {1}
+Size: {2} MB
+
+Release Notes:
+{3}
+
+Download now?</value>
+  </data>
+  <data name="UpdateAvailableTitle" xml:space="preserve">
+    <value>Update Available</value>
+  </data>
+  <data name="UpdateDownloadFailedMessage" xml:space="preserve">
+    <value>Download failed.
+Please try again later.</value>
+  </data>
+  <data name="UpdateDownloadFailedTitle" xml:space="preserve">
+    <value>Download Error</value>
+  </data>
+  <data name="UpdateDownloadedMessage" xml:space="preserve">
+    <value>Update has been downloaded.
+
+The update will be installed on next start.
+
+Restart now?</value>
+  </data>
+  <data name="UpdateDownloadedTitle" xml:space="preserve">
+    <value>Update Downloaded</value>
+  </data>
+  <data name="UpdateCheckUnexpectedError" xml:space="preserve">
+    <value>Unexpected error during update check:
+{0}</value>
+  </data>
+
+  <!-- StatusBar (for v1.3.2) -->
+  <data name="StatusBarUpdateAvailable" xml:space="preserve">
+    <value>Update available: {0}</value>
+  </data>
+  <data name="StatusBarUpToDate" xml:space="preserve">
+    <value>Up to date</value>
+  </data>
+  <data name="StatusBarExplorerRegistered" xml:space="preserve">
+    <value>Explorer integration active</value>
+  </data>
+  <data name="StatusBarExplorerNotRegistered" xml:space="preserve">
+    <value>Explorer integration inactive</value>
+  </data>
+  <data name="StatusBarLanguage" xml:space="preserve">
+    <value>Language: {0}</value>
+  </data>
+  <data name="StatusBarInfo" xml:space="preserve">
+    <value>Info</value>
+  </data>
+  <data name="StatusBarHelp" xml:space="preserve">
+    <value>Help</value>
+  </data>
+
+  <!-- Theme Switcher Context Menu (for v1.3.3) -->
+  <data name="ThemeDark" xml:space="preserve">
+    <value>Dark</value>
+  </data>
+  <data name="ThemeSolarized" xml:space="preserve">
+    <value>Solarized Light</value>
+  </data>
+  <data name="ThemeDraeger" xml:space="preserve">
+    <value>Dräger</value>
+  </data>
+  <data name="ThemeStandard" xml:space="preserve">
+    <value>Standard (Enhanced)</value>
+  </data>
+  <data name="ThemeMenuTitle" xml:space="preserve">
+    <value>Themes</value>
+  </data>
+
+  <!-- Language Names -->
+  <data name="LanguageEnglish" xml:space="preserve">
+    <value>English</value>
+  </data>
+  <data name="LanguageGerman" xml:space="preserve">
+    <value>Deutsch</value>
+  </data>
+  <data name="LanguageMongolian" xml:space="preserve">
+    <value>Монгол</value>
+  </data>
+  <data name="LanguageFrench" xml:space="preserve">
+    <value>Français</value>
+  </data>
+  <data name="LanguageSpanish" xml:space="preserve">
+    <value>Español</value>
+  </data>
+  <data name="LanguageJapanese" xml:space="preserve">
+    <value>日本語</value>
+  </data>
+  <data name="LanguageChinese" xml:space="preserve">
+    <value>简体中文</value>
+  </data>
+  <data name="LanguageRussian" xml:space="preserve">
+    <value>Русский</value>
+  </data>
+</root>

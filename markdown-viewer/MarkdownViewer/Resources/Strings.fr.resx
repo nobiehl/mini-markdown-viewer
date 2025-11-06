@@ -1,0 +1,308 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" msdata:Ordinal="5" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+
+  <!-- MainForm Strings -->
+  <data name="WindowTitle" xml:space="preserve">
+    <value>Markdown Viewer v{0}</value>
+    <comment>Titre de la fenêtre avec version</comment>
+  </data>
+  <data name="WindowTitleWithFile" xml:space="preserve">
+    <value>{0} - Markdown Viewer v{1}</value>
+    <comment>Titre de la fenêtre avec nom de fichier et version</comment>
+  </data>
+  <data name="LoggingWarning" xml:space="preserve">
+    <value>Attention : Impossible d'initialiser la journalisation :
+{0}</value>
+    <comment>Avertissement d'initialisation de journalisation</comment>
+  </data>
+  <data name="LoggingWarningTitle" xml:space="preserve">
+    <value>Avertissement de journalisation</value>
+  </data>
+  <data name="WebView2InitError" xml:space="preserve">
+    <value>Échec de l'initialisation de WebView2 :
+{0}
+
+Consultez les journaux pour plus de détails.</value>
+    <comment>Erreur d'initialisation de WebView2</comment>
+  </data>
+  <data name="WebView2InitErrorTitle" xml:space="preserve">
+    <value>Erreur d'initialisation</value>
+  </data>
+  <data name="WebView2ProcessFailed" xml:space="preserve">
+    <value>Échec du processus WebView2 : {0}
+Consultez les journaux pour plus de détails.</value>
+    <comment>Échec du processus WebView2</comment>
+  </data>
+  <data name="ErrorTitle" xml:space="preserve">
+    <value>Erreur</value>
+  </data>
+  <data name="FileLoadError" xml:space="preserve">
+    <value>Erreur lors du chargement du fichier : {0}
+
+Consultez les journaux pour plus de détails.</value>
+    <comment>Erreur de chargement de fichier</comment>
+  </data>
+  <data name="FileNotFound" xml:space="preserve">
+    <value>Fichier introuvable :
+{0}</value>
+    <comment>Erreur fichier introuvable</comment>
+  </data>
+  <data name="LinkOpenFailed" xml:space="preserve">
+    <value>Impossible d'ouvrir le lien : {0}</value>
+    <comment>Erreur d'ouverture de lien</comment>
+  </data>
+
+  <!-- Program.cs - General -->
+  <data name="AppName" xml:space="preserve">
+    <value>Markdown Viewer</value>
+  </data>
+  <data name="VersionTitle" xml:space="preserve">
+    <value>Version</value>
+  </data>
+  <data name="VersionMessage" xml:space="preserve">
+    <value>Markdown Viewer v{0}</value>
+  </data>
+  <data name="HelpTitle" xml:space="preserve">
+    <value>Aide</value>
+  </data>
+  <data name="HelpText" xml:space="preserve">
+    <value>Markdown Viewer - Visionneuse Markdown légère pour Windows
+
+Utilisation :
+  MarkdownViewer.exe &lt;fichier.md&gt;                 Ouvrir un fichier Markdown
+  MarkdownViewer.exe &lt;fichier.md&gt; --log-level Debug  Ouvrir avec journalisation détaillée
+  MarkdownViewer.exe --install                     Enregistrer comme visionneuse .md par défaut
+  MarkdownViewer.exe --uninstall                   Supprimer l'association de fichiers
+  MarkdownViewer.exe --update                      Vérifier les mises à jour
+  MarkdownViewer.exe --version                     Afficher la version
+  MarkdownViewer.exe --help                        Afficher cette aide
+
+Comportement de mise à jour :
+  - Vérification automatique une fois par jour au premier démarrage
+  - Vérification silencieuse en arrière-plan (non bloquante)
+  - Vérification manuelle avec le paramètre --update
+
+Mode test (Développement) :
+  MarkdownViewer.exe --test-update --test-scenario &lt;nom&gt;
+  Scénarios : update-available, no-update, network-error, rate-limit
+
+Niveaux de journalisation :
+  Debug        Journalisation détaillée (toutes les opérations)
+  Information  Journalisation normale (par défaut)
+  Warning      Seulement les avertissements et erreurs
+  Error        Seulement les erreurs</value>
+  </data>
+  <data name="FileNotFoundError" xml:space="preserve">
+    <value>Fichier introuvable : {0}</value>
+  </data>
+  <data name="OnlyMdSupported" xml:space="preserve">
+    <value>Seuls les fichiers .md sont pris en charge</value>
+  </data>
+  <data name="OpenFileDialogFilter" xml:space="preserve">
+    <value>Fichiers Markdown (*.md)|*.md|Tous les fichiers (*.*)|*.*</value>
+  </data>
+  <data name="OpenFileDialogTitle" xml:space="preserve">
+    <value>Ouvrir un fichier Markdown</value>
+  </data>
+
+  <!-- Installation -->
+  <data name="InstallSuccessMessage" xml:space="preserve">
+    <value>Markdown Viewer enregistré avec succès !
+
+Points d'intégration :
+• Programme par défaut pour les fichiers .md
+• Menu contextuel du clic droit
+• Boîte de dialogue 'Ouvrir avec'
+• Menu 'Envoyer vers'</value>
+  </data>
+  <data name="InstallSuccessTitle" xml:space="preserve">
+    <value>Succès</value>
+  </data>
+  <data name="InstallFailedMessage" xml:space="preserve">
+    <value>Échec de l'enregistrement de l'association de fichiers :
+{0}</value>
+  </data>
+  <data name="UninstallSuccessMessage" xml:space="preserve">
+    <value>Markdown Viewer désenregistré avec succès !
+
+Tous les points d'intégration ont été supprimés.</value>
+  </data>
+  <data name="UninstallFailedMessage" xml:space="preserve">
+    <value>Échec de la suppression de l'association de fichiers :
+{0}</value>
+  </data>
+
+  <!-- Updates -->
+  <data name="UpdateCheckFailedMessage" xml:space="preserve">
+    <value>Échec de la vérification de mise à jour :
+{0}</value>
+  </data>
+  <data name="UpdateCheckFailedTitle" xml:space="preserve">
+    <value>Erreur de mise à jour</value>
+  </data>
+  <data name="NoUpdateAvailableMessage" xml:space="preserve">
+    <value>Vous utilisez déjà la dernière version ({0}).</value>
+  </data>
+  <data name="NoUpdateAvailableTitle" xml:space="preserve">
+    <value>Aucune mise à jour disponible</value>
+  </data>
+  <data name="UpdateAvailableMessage" xml:space="preserve">
+    <value>Mise à jour disponible : {0}
+
+Version actuelle : {1}
+Taille : {2} Mo
+
+Notes de version :
+{3}
+
+Télécharger maintenant ?</value>
+  </data>
+  <data name="UpdateAvailableTitle" xml:space="preserve">
+    <value>Mise à jour disponible</value>
+  </data>
+  <data name="UpdateDownloadFailedMessage" xml:space="preserve">
+    <value>Échec du téléchargement.
+Veuillez réessayer plus tard.</value>
+  </data>
+  <data name="UpdateDownloadFailedTitle" xml:space="preserve">
+    <value>Erreur de téléchargement</value>
+  </data>
+  <data name="UpdateDownloadedMessage" xml:space="preserve">
+    <value>La mise à jour a été téléchargée.
+
+La mise à jour sera installée au prochain démarrage.
+
+Redémarrer maintenant ?</value>
+  </data>
+  <data name="UpdateDownloadedTitle" xml:space="preserve">
+    <value>Mise à jour téléchargée</value>
+  </data>
+  <data name="UpdateCheckUnexpectedError" xml:space="preserve">
+    <value>Erreur inattendue lors de la vérification de mise à jour :
+{0}</value>
+  </data>
+
+  <!-- StatusBar (for v1.3.2) -->
+  <data name="StatusBarUpdateAvailable" xml:space="preserve">
+    <value>Mise à jour disponible : {0}</value>
+  </data>
+  <data name="StatusBarUpToDate" xml:space="preserve">
+    <value>À jour</value>
+  </data>
+  <data name="StatusBarExplorerRegistered" xml:space="preserve">
+    <value>Intégration Explorer active</value>
+  </data>
+  <data name="StatusBarExplorerNotRegistered" xml:space="preserve">
+    <value>Intégration Explorer inactive</value>
+  </data>
+  <data name="StatusBarLanguage" xml:space="preserve">
+    <value>Langue : {0}</value>
+  </data>
+  <data name="StatusBarInfo" xml:space="preserve">
+    <value>Info</value>
+  </data>
+  <data name="StatusBarHelp" xml:space="preserve">
+    <value>Aide</value>
+  </data>
+
+  <!-- Theme Switcher Context Menu (for v1.3.3) -->
+  <data name="ThemeDark" xml:space="preserve">
+    <value>Sombre</value>
+  </data>
+  <data name="ThemeSolarized" xml:space="preserve">
+    <value>Solarized Clair</value>
+  </data>
+  <data name="ThemeDraeger" xml:space="preserve">
+    <value>Dräger</value>
+  </data>
+  <data name="ThemeStandard" xml:space="preserve">
+    <value>Standard (Amélioré)</value>
+  </data>
+  <data name="ThemeMenuTitle" xml:space="preserve">
+    <value>Thèmes</value>
+  </data>
+
+  <!-- Language Names -->
+  <data name="LanguageEnglish" xml:space="preserve">
+    <value>English</value>
+  </data>
+  <data name="LanguageGerman" xml:space="preserve">
+    <value>Deutsch</value>
+  </data>
+  <data name="LanguageMongolian" xml:space="preserve">
+    <value>Монгол</value>
+  </data>
+  <data name="LanguageFrench" xml:space="preserve">
+    <value>Français</value>
+  </data>
+  <data name="LanguageSpanish" xml:space="preserve">
+    <value>Español</value>
+  </data>
+  <data name="LanguageJapanese" xml:space="preserve">
+    <value>日本語</value>
+  </data>
+  <data name="LanguageChinese" xml:space="preserve">
+    <value>简体中文</value>
+  </data>
+  <data name="LanguageRussian" xml:space="preserve">
+    <value>Русский</value>
+  </data>
+</root>
