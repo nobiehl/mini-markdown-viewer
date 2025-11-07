@@ -499,6 +499,58 @@ namespace MarkdownViewer.UI
         }
 
         #endregion
+
+        /// <summary>
+        /// Applies theme colors to icons in the StatusBar.
+        /// Reloads all icons with the foreground color from the theme.
+        /// </summary>
+        /// <param name="theme">Theme to apply</param>
+        public void ApplyTheme(Models.Theme theme)
+        {
+            try
+            {
+                // Parse icon color from theme
+                var iconColor = System.Drawing.ColorTranslator.FromHtml(theme.UI.StatusBarForeground);
+
+                // Reload icons with theme color
+                var newRefreshIcon = IconHelper.LoadIcon("refresh-cw", 20, iconColor);
+                var newCheckIcon = IconHelper.LoadIcon("check-circle", 20, iconColor);
+                var newAlertIcon = IconHelper.LoadIcon("alert-circle", 20, iconColor);
+                var newFolderIcon = IconHelper.LoadIcon("folder", 20, iconColor);
+                var newGlobeIcon = IconHelper.LoadIcon("globe", 20, iconColor);
+                var newInfoIcon = IconHelper.LoadIcon("info", 20, iconColor);
+                var newHelpIcon = IconHelper.LoadIcon("help-circle", 20, iconColor);
+
+                // Update status items with new icons
+                if (newRefreshIcon != null) _updateStatus.Image = newRefreshIcon;
+                if (newFolderIcon != null) _explorerStatus.Image = newFolderIcon;
+                if (newGlobeIcon != null) _languageSelector.Image = newGlobeIcon;
+                if (newInfoIcon != null) _infoLabel.Image = newInfoIcon;
+                if (newHelpIcon != null) _helpLabel.Image = newHelpIcon;
+
+                // Update icons based on current status
+                switch (UpdateStatusValue)
+                {
+                    case UpdateStatus.Checking:
+                        if (newRefreshIcon != null) _updateStatus.Image = newRefreshIcon;
+                        break;
+                    case UpdateStatus.UpToDate:
+                        if (newCheckIcon != null) _updateStatus.Image = newCheckIcon;
+                        break;
+                    case UpdateStatus.UpdateAvailable:
+                        if (newRefreshIcon != null) _updateStatus.Image = newRefreshIcon;
+                        break;
+                    case UpdateStatus.Error:
+                        if (newAlertIcon != null) _updateStatus.Image = newAlertIcon;
+                        break;
+                }
+            }
+            catch (Exception ex)
+            {
+                // Log error but don't crash the application
+                System.Diagnostics.Debug.WriteLine($"Failed to apply theme to StatusBar icons: {ex.Message}");
+            }
+        }
     }
 
     /// <summary>

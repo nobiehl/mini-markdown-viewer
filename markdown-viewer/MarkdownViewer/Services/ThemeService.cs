@@ -193,6 +193,12 @@ namespace MarkdownViewer.Services
             {
                 statusBar.BackColor = ColorTranslator.FromHtml(theme.UI.StatusBarBackground);
                 statusBar.ForeColor = ColorTranslator.FromHtml(theme.UI.StatusBarForeground);
+
+                // Apply theme to StatusBarControl icons
+                if (statusBar is UI.StatusBarControl statusBarControl)
+                {
+                    statusBarControl.ApplyTheme(theme);
+                }
             }
             // ToolStrip (navigation bar)
             else if (control is ToolStrip toolStrip)
