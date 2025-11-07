@@ -10,15 +10,19 @@ System architecture documentation for MarkdownViewer v1.2.0+
 
 ## Overview
 
-MarkdownViewer follows a **layered architecture** with clear separation of concerns:
+MarkdownViewer follows a **MVP (Model-View-Presenter) architecture** with clear separation of concerns and full UI testability:
 
 ```
 ┌─────────────────────────────────────────┐
-│            UI Layer                     │
-│  (MainWindow, Managers, Controls)       │
+│         Presentation Layer              │
+│  (Presenters - Business Logic)          │
+│  ↑ Events    ↓ Method Calls             │
+├─────────────────────────────────────────┤
+│            View Layer                   │
+│  (WinForms UI via View Interfaces)      │
 ├─────────────────────────────────────────┤
 │          Services Layer                 │
-│  (Business Logic, External APIs)        │
+│  (Application Services, External APIs)  │
 ├─────────────────────────────────────────┤
 │           Core Layer                    │
 │  (Domain Logic, Pure Functions)         │
@@ -27,6 +31,9 @@ MarkdownViewer follows a **layered architecture** with clear separation of conce
 │  (Data Structures, Settings)            │
 └─────────────────────────────────────────┘
 ```
+
+**Architecture Version:** v2.0.0 (MVP Refactoring)
+**Previous Version:** v1.5.x (Layered Architecture)
 
 ---
 
@@ -583,6 +590,390 @@ StatusBarManager.UpdateIcon (if update available)
     ↓
 User Click → Download → Install → Restart
 ```
+
+---
+
+## MVP (Model-View-Presenter) Pattern
+
+### Architecture Goals (v2.0.0)
+
+The MVP refactoring was implemented to achieve:
+- **Full UI Testability**: Unit tests for all business logic without WinForms dependencies
+- **Clear Separation of Concerns**: Views handle UI, Presenters handle logic
+- **Dependency Injection**: All components injected for easy mocking
+- **Event-Driven Communication**: Views raise events, Presenters handle them
+
+### MVP Components
+
+```
+┌──────────────────────────────────────────────────────┐
+│                    View Layer                        │
+│  MainForm implements IMainView                       │
+│  StatusBarControl implements IStatusBarView          │
+│  SearchBar implements ISearchBarView                 │
+│  NavigationBar implements INavigationBarView         │
+│                                                      │
+│  Events: ViewLoaded, ThemeChangeRequested, etc.      │
+│  Methods: DisplayMarkdown(), UpdateTheme(), etc.     │
+└──────────────────────────────────────────────────────┘
+                        ↓ Events / ↑ Method Calls
+┌──────────────────────────────────────────────────────┐
+│                 Presenter Layer                      │
+│  MainPresenter (orchestrates main window)            │
+│  StatusBarPresenter (theme/language selection)       │
+│  SearchBarPresenter (search logic)                   │
+│  NavigationPresenter (history management)            │
+│                                                      │
+│  Dependencies: Injected via constructor              │
+└──────────────────────────────────────────────────────┘
+                        ↓ Calls
+┌──────────────────────────────────────────────────────┐
+│              Services & Core Layers                  │
+│  ISettingsService, IThemeService, etc.               │
+│  MarkdownRenderer, FileWatcherManager                │
+└──────────────────────────────────────────────────────┘
+```
+
+### View Interfaces
+
+#### IMainView (Views/IMainView.cs)
+
+**Purpose:** Abstracts MainForm for testability
+
+```csharp
+public interface IMainView
+{
+    // Properties
+    string CurrentFilePath { get; set; }
+    string WindowTitle { get; set; }
+    bool IsNavigationBarVisible { get; set; }
+    bool IsSearchBarVisible { get; set; }
+
+    // Events (View → Presenter)
+    event EventHandler ViewLoaded;
+    event EventHandler<ThemeChangedEventArgs> ThemeChangeRequested;
+    event EventHandler<LanguageChangedEventArgs> LanguageChangeRequested;
+    event EventHandler SearchRequested;
+    event EventHandler RefreshRequested;
+    event EventHandler NavigateBackRequested;
+    event EventHandler NavigateForwardRequested;
+
+    // Methods (Presenter → View)
+    void DisplayMarkdown(string html);
+    void ShowError(string message, string title);
+    void ShowInfo(string message, string title);
+    void UpdateTheme(Theme theme);
+    void SetNavigationState(bool canGoBack, bool canGoForward);
+    void SetSearchResults(int currentMatch, int totalMatches);
+    void ShowSearchBar();
+    void HideSearchBar();
+}
+```
+
+**Implementation:** MainForm.cs implements IMainView
+**Tests:** MockMainView.cs simulates UI for testing
+
+#### IWebViewAdapter (Views/IWebViewAdapter.cs)
+
+**Purpose:** Abstracts WebView2 for testability
+
+```csharp
+public interface IWebViewAdapter
+{
+    // Properties
+    bool IsInitialized { get; }
+    bool CanGoBack { get; }
+    bool CanGoForward { get; }
+
+    // Events
+    event EventHandler Initialized;
+    event EventHandler<NavigationStartingEventArgs> NavigationStarting;
+    event EventHandler<WebMessageReceivedEventArgs> WebMessageReceived;
+
+    // Methods
+    Task NavigateToStringAsync(string html);
+    Task<string> ExecuteScriptAsync(string script);
+    void GoBack();
+    void GoForward();
+    void Reload();
+}
+```
+
+**Implementation:** WebView2Adapter.cs wraps actual WebView2
+**Tests:** MockWebViewAdapter.cs simulates browser for testing
+
+#### IDialogService (Services/IDialogService.cs)
+
+**Purpose:** Abstracts MessageBox for testability
+
+```csharp
+public interface IDialogService
+{
+    void ShowError(string message, string title = "Error");
+    void ShowInfo(string message, string title = "Information");
+    void ShowWarning(string message, string title = "Warning");
+    ServiceDialogResult ShowConfirmation(string message, string title = "Confirm");
+    ServiceDialogResult ShowYesNo(string message, string title = "Question");
+}
+
+public enum ServiceDialogResult
+{
+    OK, Cancel, Yes, No
+}
+```
+
+**Implementation:** WinFormsDialogService.cs wraps MessageBox
+**Tests:** MockDialogService.cs tracks calls for assertions
+
+### Presenter Architecture
+
+#### MainPresenter (Presenters/MainPresenter.cs)
+
+**Responsibilities:**
+- Theme and language switching
+- Settings persistence
+- File loading and watching
+- Coordinating view updates
+
+**Dependencies (Constructor Injection):**
+```csharp
+public MainPresenter(
+    IMainView view,
+    IWebViewAdapter webView,
+    ISettingsService settingsService,
+    IThemeService themeService,
+    ILocalizationService localizationService,
+    IDialogService dialogService,
+    MarkdownRenderer renderer,
+    FileWatcherManager fileWatcher)
+{
+    // Subscribe to view events
+    _view.ViewLoaded += OnViewLoaded;
+    _view.ThemeChangeRequested += OnThemeChangeRequested;
+    _view.LanguageChangeRequested += OnLanguageChangeRequested;
+    _view.SearchRequested += OnSearchRequested;
+    _view.RefreshRequested += OnRefreshRequested;
+}
+```
+
+**Event Handlers:**
+- `OnViewLoaded()`: Loads settings, applies theme
+- `OnThemeChangeRequested()`: Loads theme, saves settings, updates view
+- `OnLanguageChangeRequested()`: Changes language, saves settings
+- `OnSearchRequested()`: Shows search bar
+- `OnRefreshRequested()`: Reloads markdown file
+
+**Public Properties:**
+```csharp
+public AppSettings CurrentSettings { get; }
+public Theme CurrentTheme { get; }
+public string CurrentFilePath { get; }
+```
+
+**Testing:**
+- 10 unit tests in MainPresenterTests.cs
+- All tests passing (no WinForms dependencies!)
+- Tests verify: settings loading, theme changes, language changes, error handling
+
+#### Other Presenters
+
+**StatusBarPresenter:** Theme and language selection logic
+**SearchBarPresenter:** Search functionality with WebView integration
+**NavigationPresenter:** Back/forward navigation management
+
+### Dependency Injection Container
+
+#### Configuration (Program.cs)
+
+```csharp
+private static ServiceProvider BuildServiceProvider(string filePath, LogEventLevel logLevel)
+{
+    var services = new ServiceCollection();
+
+    // Singleton Services (shared state)
+    services.AddSingleton<ISettingsService, SettingsService>();
+    services.AddSingleton<IThemeService, ThemeService>();
+    services.AddSingleton<ILocalizationService>(sp =>
+    {
+        var settingsService = sp.GetRequiredService<ISettingsService>();
+        var settings = settingsService.Load();
+        return new LocalizationService(settings.Language);
+    });
+    services.AddSingleton<IDialogService, WinFormsDialogService>();
+
+    // Transient Components (new per request)
+    services.AddTransient<MarkdownRenderer>();
+    services.AddTransient<FileWatcherManager>();
+
+    // Presenters (transient)
+    services.AddTransient<MainPresenter>();
+    services.AddTransient<StatusBarPresenter>();
+    services.AddTransient<SearchBarPresenter>();
+    services.AddTransient<NavigationPresenter>();
+
+    // Views (transient, created by DI)
+    services.AddTransient<MainForm>(sp =>
+    {
+        // MainForm created with all dependencies injected
+        var form = new MainForm(filePath);
+        // Presenter wired up automatically
+        return form;
+    });
+
+    return services.BuildServiceProvider();
+}
+```
+
+**Usage in Main():**
+```csharp
+using var serviceProvider = BuildServiceProvider(filePath, logLevel);
+var form = serviceProvider.GetRequiredService<MainForm>();
+Application.Run(form);
+```
+
+### Event Flow Architecture
+
+#### User Action → View → Presenter → Service → Model
+
+**Example: Theme Change**
+
+```
+User right-clicks and selects "Dark" theme
+    ↓
+MainForm.OnThemeChanged (UI event handler)
+    ↓
+ThemeChangeRequested event raised with "dark" theme name
+    ↓
+MainPresenter.OnThemeChangeRequested receives event
+    ↓
+Presenter calls _themeService.LoadTheme("dark")
+    ↓
+ThemeService loads theme from embedded resources
+    ↓
+Presenter saves theme to settings: _settingsService.Save(settings)
+    ↓
+Presenter updates view: _view.UpdateTheme(newTheme)
+    ↓
+MainForm.UpdateTheme() applies theme to UI and WebView2
+    ↓
+User sees theme change instantly
+```
+
+**Key Benefits:**
+- Business logic (loading, saving) in testable Presenter
+- UI code (applying colors) in View
+- Services (file I/O, resource loading) mockable
+- Full test coverage without WinForms
+
+### Testing Architecture
+
+#### Unit Tests (MarkdownViewer.Tests/)
+
+**Test Project Structure:**
+```
+MarkdownViewer.Tests/
+├── Presenters/
+│   ├── MainPresenterTests.cs         (10 tests)
+│   ├── StatusBarPresenterTests.cs    (planned)
+│   └── SearchBarPresenterTests.cs    (planned)
+├── Mocks/
+│   ├── MockMainView.cs               (IMainView mock)
+│   ├── MockWebViewAdapter.cs         (IWebViewAdapter mock)
+│   ├── MockDialogService.cs          (IDialogService mock)
+│   └── MockServices.cs               (Service mocks)
+└── Core/
+    └── LinkNavigationHelperTests.cs  (31 tests)
+```
+
+**Test Framework:** xUnit 2.6.2
+**Mocking:** Moq 4.20.72 (for complex scenarios)
+**Manual Mocks:** Used for simple interfaces (better readability)
+
+**Example Test (MainPresenterTests.cs):**
+```csharp
+[Fact]
+public void ThemeChangeRequested_ShouldUpdateThemeAndSaveSettings()
+{
+    // Arrange
+    var newTheme = new Theme { Name = "solarized" };
+    _mockThemeService.MockThemes["solarized"] = newTheme;
+
+    // Act
+    _mockView.TriggerThemeChange("solarized");
+
+    // Assert
+    Assert.Equal(newTheme, _mockView.LastAppliedTheme);
+    Assert.Equal(1, _mockSettingsService.SaveCallCount);
+    Assert.Equal("solarized", _mockSettingsService.MockSettings.Theme);
+}
+```
+
+**Benefits:**
+- ✅ No WinForms dependencies
+- ✅ Fast execution (no UI initialization)
+- ✅ Easy to debug (pure C# logic)
+- ✅ High coverage (business logic fully testable)
+
+#### Integration Tests (Planned)
+
+**Test Scenarios:**
+- First launch → Default settings loaded
+- Theme switching → UI and settings updated
+- Language switching → Strings updated
+- File watching → Live reload works
+- Update flow → Download and install
+
+**Framework:** xUnit with WinForms host
+
+#### UI Automation Tests (Planned)
+
+**Framework:** FlaUI.UIA3 5.0.0 (installed)
+
+**Test Scenarios:**
+- Click theme selector → Theme changes
+- Press Ctrl+F → Search bar appears
+- Type in search → Results highlighted
+- Press F3 → Next match navigated
+
+**Benefits:**
+- Tests actual UI behavior
+- Catches visual regressions
+- Validates keyboard shortcuts
+- End-to-end validation
+
+### Migration Path (v1.5.x → v2.0.0)
+
+**Phase 1: Foundations** ✅ Complete
+- Install NuGet packages (DI, Moq, FlaUI)
+- Create view interfaces (IMainView, IWebViewAdapter, etc.)
+- Create service interfaces (IDialogService)
+
+**Phase 2: Presenters** ✅ Complete
+- Implement MainPresenter with business logic
+- Implement other presenters (StatusBar, SearchBar, Navigation)
+- Create WebView2Adapter wrapper
+
+**Phase 3: View Refactoring** 🚧 In Progress (Phase 3.1 Complete)
+- MainForm implements IMainView ✅
+- Add event declarations and wiring ✅
+- Refactor other controls (StatusBar, SearchBar, NavigationBar) ⏳
+
+**Phase 4: DI Container** ✅ Complete
+- Configure DI container in Program.cs
+- Register all services and presenters
+- Integrate into Main() method
+
+**Phase 5: Testing** ✅ Phase 5.1 Complete
+- Create mock implementations ✅
+- Write unit tests for presenters ✅
+- Integration tests ⏳
+- UI automation tests ⏳
+
+**Phase 6: Documentation** 🚧 In Progress
+- Update ARCHITECTURE.md with MVP pattern ✅
+- Update GLOSSARY.md with new terms ✅
+- Update DEVELOPMENT.md with test instructions ⏳
+- Update impl_progress.md ⏳
 
 ---
 

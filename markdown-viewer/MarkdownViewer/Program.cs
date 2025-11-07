@@ -6,8 +6,13 @@ using System.Windows.Forms;
 using Microsoft.Win32;
 using Serilog;
 using Serilog.Events;
+using Microsoft.Extensions.DependencyInjection;
 using MarkdownViewer.Configuration;
 using MarkdownViewer.Models;
+using MarkdownViewer.Services;
+using MarkdownViewer.Views;
+using MarkdownViewer.Presenters;
+using MarkdownViewer.Core;
 
 namespace MarkdownViewer
 {
@@ -138,7 +143,10 @@ Log Levels:
 
                 // Open the file
                 ApplicationConfiguration.Initialize();
-                var form = new MainForm(filePath, logLevel);
+
+                // Build DI container and resolve MainForm
+                using var serviceProvider = BuildServiceProvider(filePath, logLevel);
+                var form = serviceProvider.GetRequiredService<MainForm>();
 
                 // Start async update check if needed
                 if (forceUpdateCheck || new UpdateChecker().ShouldCheckForUpdates())
@@ -160,7 +168,9 @@ Log Levels:
 
                     if (openFileDialog.ShowDialog() == DialogResult.OK)
                     {
-                        var form = new MainForm(openFileDialog.FileName, logLevel);
+                        // Build DI container and resolve MainForm
+                        using var serviceProvider = BuildServiceProvider(openFileDialog.FileName, logLevel);
+                        var form = serviceProvider.GetRequiredService<MainForm>();
 
                         // Start async update check if needed
                         if (forceUpdateCheck || new UpdateChecker().ShouldCheckForUpdates())
@@ -542,6 +552,52 @@ Log Levels:
                 return text ?? "";
 
             return text.Substring(0, maxLength) + "...";
+        }
+
+        /// <summary>
+        /// Builds and configures the dependency injection service provider.
+        /// Registers all services, presenters, and views for MVP pattern.
+        /// </summary>
+        private static ServiceProvider BuildServiceProvider(string filePath, LogEventLevel logLevel)
+        {
+            var services = new ServiceCollection();
+
+            // Register Application Services (Singleton)
+            services.AddSingleton<ISettingsService, SettingsService>();
+            services.AddSingleton<IThemeService, ThemeService>();
+            services.AddSingleton<ILocalizationService>(sp =>
+            {
+                var settingsService = sp.GetRequiredService<ISettingsService>();
+                var settings = settingsService.Load();
+                return new LocalizationService(settings.Language);
+            });
+            services.AddSingleton<IDialogService, WinFormsDialogService>();
+
+            // Register Core Components (Transient)
+            services.AddTransient<MarkdownRenderer>();
+            services.AddTransient<FileWatcherManager>();
+
+            // Register WebView2 Adapter (Transient - created per form)
+            services.AddTransient<IWebViewAdapter>(sp =>
+            {
+                var webView = new Microsoft.Web.WebView2.WinForms.WebView2();
+                return new WebView2Adapter(webView);
+            });
+
+            // Register Presenters (Transient)
+            services.AddTransient<MainPresenter>();
+            services.AddTransient<StatusBarPresenter>();
+            services.AddTransient<SearchBarPresenter>();
+            services.AddTransient<NavigationPresenter>();
+
+            // Register MainForm (Transient)
+            services.AddTransient<MainForm>(sp =>
+            {
+                // Create MainForm with DI (will need constructor refactoring)
+                return new MainForm(filePath, logLevel);
+            });
+
+            return services.BuildServiceProvider();
         }
     }
 }

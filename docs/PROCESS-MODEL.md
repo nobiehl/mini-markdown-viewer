@@ -62,17 +62,119 @@ Saubere, testbare, wartbare Architektur mit klarer Dokumentation und nachvollzie
 #### 3.1 Unit Tests
 - Alle neuen Services haben Tests
 - Test Coverage >= 80%
-- Tests laufen erfolgreich
+- Tests laufen erfolgreich: `dotnet test`
+
+##### 3.1.1 Link Navigation Tests (LinkNavigationHelperTests.cs - 30 Tests)
+
+**ResolveRelativePath Tests (8 Tests):**
+- [ ] ResolveRelativePath_WithAbsolutePath_ReturnsNormalizedPath
+- [ ] ResolveRelativePath_WithRelativePath_ResolvesRelativeToCurrentFileDirectory
+- [ ] ResolveRelativePath_WithRelativePathGoingUp_ResolvesCorrectly
+- [ ] ResolveRelativePath_WithDeepRelativePath_ResolvesCorrectly
+- [ ] ResolveRelativePath_WithNullLinkPath_ThrowsArgumentException
+- [ ] ResolveRelativePath_WithEmptyLinkPath_ThrowsArgumentException
+- [ ] ResolveRelativePath_WithNullCurrentFile_ThrowsArgumentException
+- [ ] Integration_ResolveAndValidateLocalMarkdownLink_Success
+
+**GetLinkType Tests (8 Tests):**
+- [ ] GetLinkType_WithHttpUrl_ReturnsExternalHttp
+- [ ] GetLinkType_WithHttpsUrl_ReturnsExternalHttp
+- [ ] GetLinkType_WithAnchorLink_ReturnsAnchor
+- [ ] GetLinkType_WithMarkdownFile_ReturnsLocalMarkdown
+- [ ] GetLinkType_WithMarkdownExtension_ReturnsLocalMarkdown
+- [ ] GetLinkType_WithUnknownLink_ReturnsUnknown
+- [ ] GetLinkType_WithNullLink_ReturnsUnknown
+- [ ] GetLinkType_WithEmptyLink_ReturnsUnknown
+
+**ValidateFileExists Tests (4 Tests):**
+- [ ] ValidateFileExists_WithExistingFile_ReturnsTrue
+- [ ] ValidateFileExists_WithNonExistentFile_ReturnsFalse
+- [ ] ValidateFileExists_WithNullPath_ReturnsFalse
+- [ ] ValidateFileExists_WithEmptyPath_ReturnsFalse
+
+**IsInlineResource Tests (8 Tests):**
+- [ ] IsInlineResource_WithPlantUmlUrl_ReturnsTrue
+- [ ] IsInlineResource_WithCdnUrl_ReturnsTrue
+- [ ] IsInlineResource_WithImageUrl_ReturnsTrue
+- [ ] IsInlineResource_WithJpgUrl_ReturnsTrue
+- [ ] IsInlineResource_WithSvgUrl_ReturnsTrue
+- [ ] IsInlineResource_WithRegularWebPage_ReturnsFalse
+- [ ] IsInlineResource_WithNullUrl_ReturnsFalse
+- [ ] IsInlineResource_WithEmptyUrl_ReturnsFalse
+
+**Integration Tests (2 Tests):**
+- [ ] Integration_ResolveAndValidateLocalMarkdownLink_Success
+- [ ] Integration_ResolveAndValidateMissingFile_Fails
+
+**Kommando zum Ausführen:**
+```bash
+cd markdown-viewer/MarkdownViewer.Tests
+dotnet test --verbosity normal
+```
 
 #### 3.2 Integration Tests
-- End-to-End Szenarien testen
-- Manual Testing durchführen
-- Edge Cases prüfen
 
-#### 3.3 Dokumentation prüfen
-- Alle neuen Features dokumentiert?
-- Code-Kommentare vorhanden?
-- GLOSSARY.md vollständig?
+##### 3.2.1 Link Navigation Integration Tests
+**Manual Testing durchführen mit test-links.md:**
+
+**External Links:**
+- [ ] HTTP Link (http://www.google.com) öffnet im Browser
+- [ ] HTTPS Link (https://github.com) öffnet im Browser
+- [ ] PlantUML inline resources werden NICHT im Browser geöffnet
+- [ ] CDN resources (jsdelivr, cloudflare) werden NICHT im Browser geöffnet
+
+**Local File Links:**
+- [ ] Relative Link zu existierender Datei (test.md) funktioniert
+- [ ] Relative Link mit Verzeichnis (docs/file.md) funktioniert
+- [ ] Relative Link nach oben (../README.md) funktioniert
+- [ ] Absolute Pfad Link funktioniert
+- [ ] Link zu nicht-existierender Datei wird geloggt (KEIN MessageBox!)
+- [ ] FileWatcher crasht NICHT bei relativen Pfaden
+
+**Anchor Links:**
+- [ ] Anchor Link (#external-links) scrollt zur Section
+- [ ] Anchor Link (#local-links) scrollt zur Section
+- [ ] Anchor Link zu nicht-existierender Section scrollt nicht (aber crasht nicht)
+
+**Logging:**
+- [ ] Alle Link-Klicks werden geloggt (Link-Typ, Quelle, Ziel)
+- [ ] Pfad-Auflösung wird geloggt (relativ → absolut)
+- [ ] File-Existenz-Checks werden geloggt
+- [ ] Fehlgeschlagene Navigationen werden geloggt
+- [ ] KEINE MessageBox-Dialoge bei fehlenden Dateien!
+
+**Test-Kommando:**
+```bash
+# Starte App mit test-links.md
+cd markdown-viewer/MarkdownViewer/bin/Release/net8.0-windows
+./MarkdownViewer.exe "C:\develop\workspace\misc\test-links.md"
+
+# Prüfe Logs
+cat logs/viewer-YYYYMMDD.log | grep "Link type:"
+cat logs/viewer-YYYYMMDD.log | grep "Path resolution:"
+cat logs/viewer-YYYYMMDD.log | grep "File not found:"
+```
+
+#### 3.3 Theme Tests
+- [ ] Theme wird beim Start korrekt angewendet (kein "Mischmasch")
+- [ ] Statusbar hat korrekte Theme-Farben beim Start
+- [ ] Icons sind sichtbar auf allen Themes (dark, light, solarized, draeger)
+- [ ] Theme-Wechsel zur Laufzeit funktioniert
+- [ ] Icons werden bei Theme-Wechsel regeneriert
+- [ ] Settings werden gespeichert
+
+#### 3.4 File Watching Tests
+- [ ] File Watcher funktioniert mit absoluten Pfaden
+- [ ] File Watcher funktioniert mit relativen Pfaden (nach Auflösung!)
+- [ ] File Watcher crasht NICHT bei fehlenden Verzeichnissen
+- [ ] Änderungen an Datei triggern Reload
+- [ ] File Watcher wird korrekt disposed
+
+#### 3.5 Dokumentation prüfen
+- [ ] Alle neuen Features dokumentiert?
+- [ ] Code-Kommentare vorhanden?
+- [ ] GLOSSARY.md vollständig?
+- [ ] impl_progress.md aktualisiert?
 
 ### Phase 4: Konsolidierung
 
@@ -159,18 +261,27 @@ graph TD
 
 ### Vor jedem Commit:
 - [ ] Code kompiliert ohne Fehler
+- [ ] **KEINE Compiler-Warnungen** (0 warnings erforderlich!)
 - [ ] Alle Tests laufen durch
 - [ ] impl_progress.md aktualisiert
 - [ ] Neue Begriffe im Glossar
 - [ ] Relevante Doku angepasst
 
 ### Vor jedem Release:
+- [ ] **Code kompiliert mit 0 Errors und 0 Warnings** (KRITISCH!)
 - [ ] Test Coverage >= 80%
 - [ ] Alle Features dokumentiert
 - [ ] Glossar konsolidiert
 - [ ] Doku synchronisiert
 - [ ] Manual Testing durchgeführt
 - [ ] CHANGELOG.md vollständig
+- [ ] Binary getestet (kein Crash, alle Features funktionieren)
+
+### Code Quality Standards:
+- **NIEMALS** mit Warnungen releasen
+- Nullable Reference Warnings müssen behoben werden
+- Unused Code muss entfernt werden
+- Alle Warnungen ernst nehmen und beheben
 
 ## Tools & Commands
 
@@ -202,6 +313,9 @@ dotnet test /p:CollectCoverage=true /p:CoverletOutputFormat=lcov
 - ❌ Große Refactorings ohne Tests
 - ❌ Code schreiben ohne Plan
 - ❌ Glossar am Ende zusammenstellen (zu aufwändig)
+- ❌ **Mit Compiler-Warnungen releasen** (Code Quality!)
+- ❌ Nullable Reference Warnings ignorieren
+- ❌ "Die Warnungen sind nicht schlimm" Mentalität
 
 ## Nächste Schritte
 

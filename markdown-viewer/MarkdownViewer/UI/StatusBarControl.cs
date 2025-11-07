@@ -1,24 +1,30 @@
 using System;
+using System.Collections.Generic;
 using System.Drawing;
+using System.Linq;
 using System.Windows.Forms;
 using Microsoft.Win32;
 using MarkdownViewer.Services;
+using MarkdownViewer.Views;
 
 namespace MarkdownViewer.UI
 {
     /// <summary>
-    /// Status bar control with 7 sections:
+    /// Status bar control with 7 sections.
+    /// Implements IStatusBarView for MVP pattern (v2.0.0).
+    ///
+    /// Sections:
     /// 1. Update status (icon with tooltip)
     /// 2. Explorer registration status (icon with tooltip)
     /// 3. Spring (pushes items to the right)
-    /// 4. Theme selector (dropdown) - NEW
+    /// 4. Theme selector (dropdown)
     /// 5. Language selector (dropdown)
     /// 6. Info (clickable label)
     /// 7. Help (clickable label)
     ///
     /// StatusBar is hidden by default according to settings.
     /// </summary>
-    public class StatusBarControl : StatusStrip
+    public class StatusBarControl : StatusStrip, IStatusBarView
     {
         // Services
         private readonly ILocalizationService _localization;
@@ -26,7 +32,7 @@ namespace MarkdownViewer.UI
         // Status items
         private readonly ToolStripStatusLabel _updateStatus;
         private readonly ToolStripStatusLabel _explorerStatus;
-        private readonly ToolStripDropDownButton _themeSelector;  // NEW
+        private readonly ToolStripDropDownButton _themeSelector;
         private readonly ToolStripDropDownButton _languageSelector;
         private readonly ToolStripStatusLabel _infoLabel;
         private readonly ToolStripStatusLabel _helpLabel;
@@ -40,13 +46,33 @@ namespace MarkdownViewer.UI
         private readonly Bitmap? _iconInfo;
         private readonly Bitmap? _iconHelpCircle;
 
-        // Events
-        public event EventHandler? LanguageChanged;
-        public event EventHandler? ThemeChanged;  // NEW
+        // Additional events (not in IStatusBarView, but useful)
         public event EventHandler? UpdateClicked;
         public event EventHandler? ExplorerClicked;
         public event EventHandler? InfoClicked;
         public event EventHandler? HelpClicked;
+
+        #region IStatusBarView Implementation
+
+        /// <summary>
+        /// Gets or sets the current theme name.
+        /// </summary>
+        public string CurrentTheme { get; set; } = "standard";
+
+        /// <summary>
+        /// Gets or sets the current language code.
+        /// </summary>
+        public string CurrentLanguage
+        {
+            get => _localization.GetCurrentLanguage();
+            set => _localization.SetLanguage(value);
+        }
+
+        // Events required by IStatusBarView
+        public new event EventHandler<ThemeChangedEventArgs>? ThemeChanged;
+        public new event EventHandler<LanguageChangedEventArgs>? LanguageChanged;
+
+        #endregion
 
         /// <summary>
         /// Gets or sets the current update status.
@@ -57,11 +83,6 @@ namespace MarkdownViewer.UI
         /// Gets or sets the current explorer registration status.
         /// </summary>
         public bool IsExplorerRegistered { get; private set; } = false;
-
-        /// <summary>
-        /// Gets or sets the current theme name.
-        /// </summary>
-        public string CurrentTheme { get; private set; } = "standard";
 
         /// <summary>
         /// Initializes a new instance of the StatusBarControl.
@@ -236,7 +257,7 @@ namespace MarkdownViewer.UI
                 _themeSelector.Text = $"Theme: {GetThemeDisplayName(themeName)}";
 
                 // Raise event for MainForm to handle
-                ThemeChanged?.Invoke(this, EventArgs.Empty);
+                ThemeChanged?.Invoke(this, new ThemeChangedEventArgs(themeName));
             }
         }
 
@@ -290,7 +311,7 @@ namespace MarkdownViewer.UI
                 RefreshLanguage();
 
                 // Raise event
-                LanguageChanged?.Invoke(this, EventArgs.Empty);
+                LanguageChanged?.Invoke(this, new LanguageChangedEventArgs(langCode));
             }
         }
 
@@ -418,6 +439,66 @@ namespace MarkdownViewer.UI
             UpdateExplorerStatus();
             SetUpdateStatus(UpdateStatusValue, null); // Refresh without changing status
         }
+
+        #region IStatusBarView Methods
+
+        /// <summary>
+        /// Updates the available themes in the theme selector dropdown.
+        /// Called by presenter.
+        /// </summary>
+        public void UpdateAvailableThemes(IEnumerable<string> themeNames)
+        {
+            var themes = themeNames?.ToList() ?? new List<string>();
+            PopulateThemeDropdown(themes, CurrentTheme);
+        }
+
+        /// <summary>
+        /// Updates the available languages in the language selector dropdown.
+        /// Called by presenter.
+        /// </summary>
+        public void UpdateAvailableLanguages(IEnumerable<string> languageCodes)
+        {
+            // Language dropdown is populated in constructor
+            // This method allows dynamic update if needed in future
+            var languages = languageCodes?.ToList() ?? new List<string>();
+
+            _languageSelector.DropDownItems.Clear();
+
+            foreach (var langCode in languages)
+            {
+                var menuItem = new ToolStripMenuItem
+                {
+                    Text = GetLanguageDisplayName(langCode),
+                    Tag = langCode,
+                    Checked = langCode == CurrentLanguage
+                };
+
+                menuItem.Click += OnLanguageItemClick;
+                _languageSelector.DropDownItems.Add(menuItem);
+            }
+        }
+
+        /// <summary>
+        /// Sets a general status message.
+        /// Currently not displayed (reserved for future use).
+        /// </summary>
+        public void SetStatus(string message)
+        {
+            // TODO: Could add a general status label in future
+            // For now, this is a no-op
+        }
+
+        /// <summary>
+        /// Sets the line and column information.
+        /// Currently not displayed (reserved for future use).
+        /// </summary>
+        public void SetLineInfo(int lineNumber, int columnNumber)
+        {
+            // TODO: Could add line/column indicator in future (like VS Code)
+            // For now, this is a no-op
+        }
+
+        #endregion
     }
 
     /// <summary>

@@ -8,6 +8,8 @@ using MarkdownViewer.Core;
 using MarkdownViewer.Models;
 using MarkdownViewer.Services;
 using MarkdownViewer.UI;
+using MarkdownViewer.Views;
+using MarkdownViewer.Presenters;
 
 namespace MarkdownViewer
 {
@@ -17,9 +19,11 @@ namespace MarkdownViewer
     /// Enhanced in v1.3.0 with localization and status bar.
     /// Enhanced in v1.4.0 with navigation and search.
     /// Finalized in v1.5.0 with polish, testing, and documentation.
+    /// Refactored in v2.0.0 for MVP pattern with full UI testability.
     /// Uses WebView2 for HTML rendering with theme support.
+    /// Implements IMainView for presenter communication.
     /// </summary>
-    public class MainForm : Form
+    public class MainForm : Form, IMainView
     {
         private const string Version = "1.5.4";
 
@@ -45,6 +49,113 @@ namespace MarkdownViewer
         private string _currentFilePath;
         private AppSettings _settings;
         private Theme? _currentTheme;
+
+        #region IMainView Implementation
+
+        // IMainView Properties
+        public string CurrentFilePath
+        {
+            get => _currentFilePath;
+            set => _currentFilePath = value;
+        }
+
+        public string WindowTitle
+        {
+            get => this.Text;
+            set => this.Text = value;
+        }
+
+        public bool IsNavigationBarVisible
+        {
+            get => _navigationBar?.Visible ?? false;
+            set
+            {
+                if (_navigationBar != null)
+                    _navigationBar.Visible = value;
+            }
+        }
+
+        public bool IsSearchBarVisible
+        {
+            get => _searchBar?.Visible ?? false;
+            set
+            {
+                if (_searchBar != null)
+                    _searchBar.Visible = value;
+            }
+        }
+
+        // IMainView Events (View -> Presenter)
+        public event EventHandler? ViewLoaded;
+        public event EventHandler<ThemeChangedEventArgs>? ThemeChangeRequested;
+        public event EventHandler<LanguageChangedEventArgs>? LanguageChangeRequested;
+        public event EventHandler<string>? FileLoadRequested;
+        public event EventHandler? RefreshRequested;
+        public event EventHandler? SearchRequested;
+        public event EventHandler? NavigateBackRequested;
+        public event EventHandler? NavigateForwardRequested;
+        public event EventHandler? CloseRequested;
+
+        // IMainView Methods (Presenter -> View)
+        public void DisplayMarkdown(string html)
+        {
+            if (_webView.CoreWebView2 != null)
+            {
+                _webView.CoreWebView2.NavigateToString(html);
+            }
+        }
+
+        public void ShowError(string message, string title)
+        {
+            MessageBox.Show(message, title, MessageBoxButtons.OK, MessageBoxIcon.Error);
+        }
+
+        public void ShowInfo(string message, string title)
+        {
+            MessageBox.Show(message, title, MessageBoxButtons.OK, MessageBoxIcon.Information);
+        }
+
+        public void ShowSuccess(string message, string title)
+        {
+            MessageBox.Show(message, title, MessageBoxButtons.OK, MessageBoxIcon.Information);
+        }
+
+        public void UpdateTheme(Theme theme)
+        {
+            _currentTheme = theme;
+            ApplyThemeToUI(); // Apply theme to WinForms UI
+        }
+
+        public void SetNavigationState(bool canGoBack, bool canGoForward)
+        {
+            // TODO: Update navigation bar state when NavigationBar implements INavigationBarView
+            // _navigationBar?.UpdateNavigationState(canGoBack, canGoForward);
+        }
+
+        public void SetSearchResults(int currentMatch, int totalMatches)
+        {
+            // TODO: Update search results when SearchBar implements ISearchBarView
+            // _searchBar?.UpdateResults(currentMatch, totalMatches);
+        }
+
+        public void ShowSearchBar()
+        {
+            if (_searchBar != null)
+            {
+                _searchBar.Visible = true;
+                _searchBar.Show(); // Use existing Show() method
+            }
+        }
+
+        public void HideSearchBar()
+        {
+            if (_searchBar != null)
+            {
+                _searchBar.Visible = false;
+            }
+        }
+
+        #endregion
 
         /// <summary>
         /// Initializes the main form with a specified Markdown file.
@@ -97,6 +208,18 @@ namespace MarkdownViewer
 
             // Setup file watching for live reload
             SetupFileWatcher(filePath);
+
+            // Wire up Form Load event to trigger ViewLoaded
+            this.Load += OnFormLoad;
+        }
+
+        /// <summary>
+        /// Handles form load event and triggers ViewLoaded for presenter.
+        /// </summary>
+        private void OnFormLoad(object? sender, EventArgs e)
+        {
+            Log.Debug("Form loaded, triggering ViewLoaded event");
+            ViewLoaded?.Invoke(this, EventArgs.Empty);
         }
 
         private void LoadSettings()
@@ -308,15 +431,18 @@ namespace MarkdownViewer
                 // Different file - navigate
                 if (File.Exists(localPath))
                 {
-                    Log.Information("Navigating to file: {FilePath}", localPath);
+                    Log.Information("HandleLocalFileNavigation: File exists | Path: {FilePath} | File size: {Size} bytes",
+                        localPath, new FileInfo(localPath).Length);
                     this.BeginInvoke(new Action(() =>
                     {
                         _currentFilePath = localPath;
                         LoadMarkdownFile(localPath);
                         SetupFileWatcher(localPath);
+                        Log.Information("Successfully navigated to file: {FilePath}", localPath);
 
                         if (!string.IsNullOrEmpty(fragment))
                         {
+                            Log.Information("Scheduling anchor scroll after navigation | Fragment: {Fragment}", fragment);
                             System.Threading.Tasks.Task.Delay(200).ContinueWith(_ =>
                             {
                                 this.Invoke(new Action(() => ScrollToAnchor(fragment)));
@@ -326,9 +452,7 @@ namespace MarkdownViewer
                 }
                 else
                 {
-                    Log.Warning("File not found: {FilePath}", localPath);
-                    MessageBox.Show($"File not found:\n{localPath}", "Error",
-                        MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    Log.Warning("HandleLocalFileNavigation: File not found | Path: {FilePath} | Navigation aborted", localPath);
                 }
             }
         }
@@ -336,9 +460,13 @@ namespace MarkdownViewer
         private void ScrollToAnchor(string fragment)
         {
             string anchorId = fragment.TrimStart('#');
-            _webView.ExecuteScriptAsync(
-                $"document.getElementById('{anchorId}')?.scrollIntoView({{behavior: 'smooth'}}) || " +
-                $"document.querySelector('a[name=\"{anchorId}\"]')?.scrollIntoView({{behavior: 'smooth'}});");
+            Log.Information("ScrollToAnchor: Scrolling to anchor | Fragment: {Fragment} | Anchor ID: {AnchorId}", fragment, anchorId);
+
+            string script = $"document.getElementById('{anchorId}')?.scrollIntoView({{behavior: 'smooth'}}) || " +
+                           $"document.querySelector('a[name=\"{anchorId}\"]')?.scrollIntoView({{behavior: 'smooth'}});";
+
+            _webView.ExecuteScriptAsync(script);
+            Log.Debug("ScrollToAnchor: JavaScript executed for anchor: {AnchorId}", anchorId);
         }
 
         private bool IsInlineResource(string url)
@@ -357,24 +485,20 @@ namespace MarkdownViewer
 
         private void HandleLinkClick(string url)
         {
-            Log.Debug("HandleLinkClick: {Url}", url);
+            Log.Debug("HandleLinkClick called with URL: {Url}", url);
 
             if (string.IsNullOrWhiteSpace(url))
-                return;
-
-            // Check if it's a local .md file
-            if (File.Exists(url) && (url.EndsWith(".md") || url.EndsWith(".markdown")))
             {
-                Log.Information("Opening local file via WebMessage: {FilePath}", url);
-                _currentFilePath = url;
-                LoadMarkdownFile(url);
-                SetupFileWatcher(url);
+                Log.Warning("HandleLinkClick called with null or empty URL");
+                return;
             }
-            else if (url.StartsWith("http://") || url.StartsWith("https://"))
+
+            // Handle external HTTP/HTTPS links
+            if (url.StartsWith("http://") || url.StartsWith("https://"))
             {
                 if (!IsInlineResource(url))
                 {
-                    Log.Information("Opening external link via WebMessage: {Url}", url);
+                    Log.Information("Link type: External HTTP/HTTPS | URL: {Url}", url);
                     try
                     {
                         System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo
@@ -382,12 +506,78 @@ namespace MarkdownViewer
                             FileName = url,
                             UseShellExecute = true
                         });
+                        Log.Information("Successfully opened external link in browser: {Url}", url);
                     }
                     catch (Exception ex)
                     {
-                        Log.Error(ex, "Failed to open link: {Url}", url);
+                        Log.Error(ex, "Failed to open external link: {Url}", url);
                     }
                 }
+                else
+                {
+                    Log.Debug("Skipping inline resource: {Url}", url);
+                }
+                return;
+            }
+
+            // Handle anchor-only links (should be handled by JavaScript, but log if we get them)
+            if (url.StartsWith("#"))
+            {
+                Log.Information("Link type: Anchor | Fragment: {Fragment}", url);
+                ScrollToAnchor(url);
+                return;
+            }
+
+            // Handle local file links (.md or .markdown)
+            if (url.EndsWith(".md", StringComparison.OrdinalIgnoreCase) ||
+                url.EndsWith(".markdown", StringComparison.OrdinalIgnoreCase))
+            {
+                Log.Information("Link type: Local Markdown File | Original path: {Path}", url);
+
+                // Resolve relative paths relative to the current file's directory
+                string resolvedPath = url;
+
+                // Check if path is relative (not rooted)
+                if (!Path.IsPathRooted(url))
+                {
+                    string currentFileDirectory = Path.GetDirectoryName(_currentFilePath) ?? ".";
+                    resolvedPath = Path.GetFullPath(Path.Combine(currentFileDirectory, url));
+                    Log.Information("Path resolution: Relative path detected | Base directory: {BaseDir} | Resolved to: {ResolvedPath}",
+                        currentFileDirectory, resolvedPath);
+                }
+                else
+                {
+                    resolvedPath = Path.GetFullPath(url);
+                    Log.Information("Path resolution: Absolute path detected | Resolved to: {ResolvedPath}", resolvedPath);
+                }
+
+                // Validate file existence BEFORE attempting navigation
+                if (!File.Exists(resolvedPath))
+                {
+                    Log.Warning("File not found: {ResolvedPath} | Original link: {OriginalPath} | Navigation aborted",
+                        resolvedPath, url);
+                    return;
+                }
+
+                Log.Information("File exists: {ResolvedPath} | File size: {Size} bytes",
+                    resolvedPath, new FileInfo(resolvedPath).Length);
+
+                // Navigate to the file
+                try
+                {
+                    _currentFilePath = resolvedPath;
+                    LoadMarkdownFile(resolvedPath);
+                    SetupFileWatcher(resolvedPath);
+                    Log.Information("Successfully navigated to local file: {ResolvedPath}", resolvedPath);
+                }
+                catch (Exception ex)
+                {
+                    Log.Error(ex, "Failed to navigate to local file: {ResolvedPath}", resolvedPath);
+                }
+            }
+            else
+            {
+                Log.Debug("Unhandled link type or extension: {Url}", url);
             }
         }
 
@@ -463,7 +653,22 @@ namespace MarkdownViewer
 
             try
             {
-                _navigationBar = new NavigationBar(_navigationManager, _localizationService);
+                _navigationBar = new NavigationBar(_localizationService);
+
+                // Wire up navigation bar events (MVP pattern)
+                _navigationBar.BackRequested += (s, e) => _navigationManager?.GoBack();
+                _navigationBar.ForwardRequested += (s, e) => _navigationManager?.GoForward();
+
+                // Subscribe to navigation manager state changes
+                if (_navigationManager != null)
+                {
+                    _navigationManager.NavigationChanged += (s, e) =>
+                    {
+                        _navigationBar.UpdateNavigationState(
+                            _navigationManager.CanGoBack,
+                            _navigationManager.CanGoForward);
+                    };
+                }
 
                 // Add to form (docked at top)
                 this.Controls.Add(_navigationBar.Control);
@@ -485,7 +690,37 @@ namespace MarkdownViewer
 
             try
             {
-                _searchBar = new SearchBar(_searchManager, _localizationService);
+                _searchBar = new SearchBar(_localizationService);
+
+                // Wire up search bar events (MVP pattern)
+                _searchBar.SearchRequested += async (s, e) =>
+                {
+                    if (string.IsNullOrWhiteSpace(e.SearchText))
+                    {
+                        await _searchManager?.ClearSearchAsync();
+                    }
+                    else
+                    {
+                        await _searchManager?.SearchAsync(e.SearchText);
+                    }
+                };
+
+                _searchBar.FindNextRequested += async (s, e) => await _searchManager?.NextMatchAsync();
+                _searchBar.FindPreviousRequested += async (s, e) => await _searchManager?.PreviousMatchAsync();
+                _searchBar.CloseRequested += (s, e) =>
+                {
+                    _searchBar?.ClearSearch();
+                    _ = _searchManager?.ClearSearchAsync();
+                };
+
+                // Subscribe to search manager results
+                if (_searchManager != null)
+                {
+                    _searchManager.SearchResultsChanged += (s, e) =>
+                    {
+                        _searchBar?.UpdateResults(e.CurrentMatch, e.TotalMatches);
+                    };
+                }
 
                 // Add to form (docked at top, hidden by default)
                 this.Controls.Add(_searchBar.Control);
@@ -541,14 +776,18 @@ namespace MarkdownViewer
         /// Handles language change from status bar.
         /// Refreshes all UI text.
         /// </summary>
-        private void OnLanguageChanged(object? sender, EventArgs e)
+        private void OnLanguageChanged(object? sender, LanguageChangedEventArgs e)
         {
-            Log.Information("Language changed to: {Language}", _localizationService.GetCurrentLanguage());
+            var newLanguage = e.LanguageCode;
+            Log.Information("Language changed to: {Language}", newLanguage);
+
+            // Trigger IMainView event
+            LanguageChangeRequested?.Invoke(this, new LanguageChangedEventArgs(newLanguage));
 
             try
             {
                 // Update settings with new language
-                _settings.Language = _localizationService.GetCurrentLanguage();
+                _settings.Language = newLanguage;
                 _settingsService.Save(_settings);
 
                 // Refresh status bar text
@@ -567,12 +806,13 @@ namespace MarkdownViewer
         /// Handles theme change from status bar.
         /// Loads and applies the new theme to UI and Markdown rendering.
         /// </summary>
-        private async void OnThemeChanged(object? sender, EventArgs e)
+        private async void OnThemeChanged(object? sender, ThemeChangedEventArgs e)
         {
-            if (_statusBar == null) return;
-
-            var newThemeName = _statusBar.CurrentTheme;
+            var newThemeName = e.ThemeName;
             Log.Information("Theme changed to: {Theme}", newThemeName);
+
+            // Trigger IMainView event
+            ThemeChangeRequested?.Invoke(this, new ThemeChangedEventArgs(newThemeName));
 
             try
             {
@@ -909,6 +1149,7 @@ namespace MarkdownViewer
             if (keyData == (Keys.Alt | Keys.Left))
             {
                 Log.Debug("Alt+Left pressed");
+                NavigateBackRequested?.Invoke(this, EventArgs.Empty); // Trigger IMainView event
                 _navigationManager.GoBack();
                 return true;
             }
@@ -917,6 +1158,7 @@ namespace MarkdownViewer
             if (keyData == (Keys.Alt | Keys.Right))
             {
                 Log.Debug("Alt+Right pressed");
+                NavigateForwardRequested?.Invoke(this, EventArgs.Empty); // Trigger IMainView event
                 _navigationManager.GoForward();
                 return true;
             }
@@ -925,7 +1167,17 @@ namespace MarkdownViewer
             if (keyData == (Keys.Control | Keys.F))
             {
                 Log.Debug("Ctrl+F pressed");
+                SearchRequested?.Invoke(this, EventArgs.Empty); // Trigger IMainView event
                 _searchBar?.Show();
+                return true;
+            }
+
+            // F5: Refresh
+            if (keyData == Keys.F5)
+            {
+                Log.Debug("F5 pressed");
+                RefreshRequested?.Invoke(this, EventArgs.Empty); // Trigger IMainView event
+                LoadMarkdownFile(_currentFilePath); // Reload current file
                 return true;
             }
 

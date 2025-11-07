@@ -333,6 +333,235 @@ Option B: Toggle button with JavaScript
 
 ## Testing
 
+### Test Architecture (v2.0.0 MVP)
+
+MarkdownViewer uses a comprehensive testing strategy with MVP pattern for full testability:
+
+```
+┌──────────────────────────────────────────────┐
+│         Unit Tests (xUnit)                   │
+│  - Test presenters in isolation              │
+│  - No WinForms dependencies                  │
+│  - Fast execution (milliseconds)             │
+│  - 41 tests currently passing                │
+└──────────────────────────────────────────────┘
+┌──────────────────────────────────────────────┐
+│      Integration Tests (Planned)             │
+│  - Test full workflows                       │
+│  - WinForms + Presenters + Services          │
+│  - Settings, themes, localization            │
+└──────────────────────────────────────────────┘
+┌──────────────────────────────────────────────┐
+│    UI Automation Tests (Planned)             │
+│  - Test actual UI interactions (FlaUI)       │
+│  - Keyboard shortcuts, mouse clicks          │
+│  - End-to-end validation                     │
+└──────────────────────────────────────────────┘
+```
+
+### Unit Tests
+
+**Location:** `MarkdownViewer.Tests/`
+
+**Test Framework:** xUnit 2.6.2
+**Mocking:** Manual mocks + Moq 4.20.72
+**Coverage Target:** >= 80% for business logic
+
+#### Running Unit Tests
+
+```bash
+# Navigate to test project
+cd markdown-viewer/MarkdownViewer.Tests
+
+# Run all tests
+dotnet test
+
+# Run with detailed output
+dotnet test --verbosity detailed
+
+# Run specific test class
+dotnet test --filter "FullyQualifiedName~MainPresenterTests"
+
+# Run with coverage (requires coverlet.collector)
+dotnet test --collect:"XPlat Code Coverage"
+```
+
+**Expected Output:**
+```
+Passed!  - Failed:     0, Passed:    41, Skipped:     0, Total:    41, Duration: 2.9 s
+```
+
+#### Test Structure
+
+**Presenter Tests:**
+```
+MarkdownViewer.Tests/Presenters/
+├── MainPresenterTests.cs              (10 tests)
+│   ├── Constructor_ShouldSubscribeToViewEvents
+│   ├── ViewLoaded_ShouldLoadSettings
+│   ├── ThemeChangeRequested_ShouldUpdateThemeAndSaveSettings
+│   ├── ThemeChangeRequested_WhenThemeLoadFails_ShouldShowError
+│   ├── LanguageChangeRequested_ShouldUpdateLanguageAndSaveSettings
+│   ├── SearchRequested_ShouldShowSearchBar
+│   ├── RefreshRequested_WhenFilePathIsEmpty_ShouldNotCrash
+│   ├── CurrentSettings_ShouldReturnLoadedSettings
+│   ├── CurrentTheme_ShouldReturnLoadedTheme
+│   └── WebViewInitialized_ShouldTriggerFileLoad
+├── StatusBarPresenterTests.cs         (planned)
+└── SearchBarPresenterTests.cs         (planned)
+```
+
+**Core Tests:**
+```
+MarkdownViewer.Tests/Core/
+└── LinkNavigationHelperTests.cs       (31 tests)
+    ├── IsMarkdownFile tests (5)
+    ├── IsExternalLink tests (5)
+    ├── IsAnchorLink tests (4)
+    ├── ResolveRelativePath tests (6)
+    ├── NormalizePath tests (4)
+    └── ExtractAnchorFromUrl tests (7)
+```
+
+**Mock Implementations:**
+```
+MarkdownViewer.Tests/Mocks/
+├── MockMainView.cs                    (IMainView mock)
+├── MockWebViewAdapter.cs              (IWebViewAdapter mock)
+├── MockDialogService.cs               (IDialogService mock)
+└── MockServices.cs                    (Service mocks)
+    ├── MockSettingsService
+    ├── MockThemeService
+    └── MockLocalizationService
+```
+
+#### Writing New Tests
+
+**Example: Testing a Presenter**
+
+```csharp
+using Xunit;
+using MarkdownViewer.Presenters;
+using MarkdownViewer.Tests.Mocks;
+
+public class MyPresenterTests : IDisposable
+{
+    private readonly MockMainView _mockView;
+    private readonly MockSettingsService _mockSettings;
+    private readonly MyPresenter _presenter;
+
+    public MyPresenterTests()
+    {
+        // Setup mocks
+        _mockView = new MockMainView();
+        _mockSettings = new MockSettingsService();
+
+        // Create presenter with mocked dependencies
+        _presenter = new MyPresenter(_mockView, _mockSettings);
+    }
+
+    public void Dispose()
+    {
+        // Cleanup if needed
+    }
+
+    [Fact]
+    public void MyFeature_ShouldDoExpectedThing()
+    {
+        // Arrange
+        _mockSettings.MockSettings = new AppSettings { /* ... */ };
+
+        // Act
+        _mockView.TriggerSomeEvent();
+
+        // Assert
+        Assert.Equal(1, _mockSettings.SaveCallCount);
+        Assert.NotNull(_mockView.LastDisplayedData);
+    }
+}
+```
+
+**Benefits of MVP Testing:**
+- ✅ No WinForms initialization (fast tests)
+- ✅ Easy to mock dependencies
+- ✅ Isolated business logic testing
+- ✅ Deterministic results (no UI timing issues)
+
+### Integration Tests (Planned)
+
+**Framework:** xUnit with WinForms TestHost
+
+**Test Scenarios:**
+```csharp
+[Fact]
+public async Task FirstLaunch_ShouldLoadDefaultSettings()
+{
+    // Test that first launch creates default settings.json
+}
+
+[Fact]
+public async Task ThemeSwitch_ShouldPersistToSettings()
+{
+    // Test that theme changes are saved and reloaded
+}
+
+[Fact]
+public async Task LanguageSwitch_ShouldUpdateAllUI()
+{
+    // Test that language changes update all localized strings
+}
+```
+
+**To Run (when implemented):**
+```bash
+dotnet test --filter "Category=Integration"
+```
+
+### UI Automation Tests (Planned)
+
+**Framework:** FlaUI.UIA3 5.0.0
+
+**Test Example:**
+```csharp
+using FlaUI.Core;
+using FlaUI.UIA3;
+using Xunit;
+
+public class MainFormUITests : IDisposable
+{
+    private Application _app;
+    private UIA3Automation _automation;
+
+    public MainFormUITests()
+    {
+        _automation = new UIA3Automation();
+        _app = Application.Launch("MarkdownViewer.exe", "test.md");
+    }
+
+    [Fact]
+    public void ClickThemeSelector_ShouldChangeTheme()
+    {
+        var window = _app.GetMainWindow(_automation);
+        var themeButton = window.FindFirstDescendant(cf => cf.ByAutomationId("ThemeSelector"));
+
+        themeButton.Click();
+
+        // Assert theme changed
+    }
+
+    public void Dispose()
+    {
+        _app?.Close();
+        _automation?.Dispose();
+    }
+}
+```
+
+**To Run (when implemented):**
+```bash
+dotnet test --filter "Category=UIAutomation"
+```
+
 ### Manual Tests
 ```bash
 # Test file open dialog
@@ -361,6 +590,41 @@ Option B: Toggle button with JavaScript
 - [ ] Context menu in Explorer
 - [ ] "Open With" dialog
 - [ ] "Send To" menu
+- [ ] Theme switching (all 4 themes)
+- [ ] Language switching (all 8 languages)
+- [ ] Search functionality (Ctrl+F, F3, Shift+F3)
+- [ ] Navigation (Alt+Left, Alt+Right)
+
+### Test Data
+
+**Test Files:**
+```
+test-diagrams.md         - Mermaid & PlantUML examples
+test-math.md             - Mathematical formulas (KaTeX)
+test-links.md            - Internal/external/anchor links
+samples/                 - Various markdown samples
+```
+
+### Continuous Integration (Future)
+
+**GitHub Actions Workflow:**
+```yaml
+name: CI
+
+on: [push, pull_request]
+
+jobs:
+  test:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: '8.0.x'
+      - run: dotnet restore
+      - run: dotnet build --no-restore
+      - run: dotnet test --no-build --verbosity normal
+```
 
 ## Known Limitations
 

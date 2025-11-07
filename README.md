@@ -2,11 +2,12 @@
 
 Lightweight Windows desktop viewer for Markdown files with themes, localization, navigation, and search. Full Windows Explorer integration included.
 
-![Version](https://img.shields.io/badge/version-1.5.2-blue)
+![Version](https://img.shields.io/badge/version-2.0.0-blue)
 ![.NET](https://img.shields.io/badge/.NET-8.0-purple)
 ![Size](https://img.shields.io/badge/size-2.0_MB-green)
 ![Languages](https://img.shields.io/badge/languages-8-orange)
 ![Themes](https://img.shields.io/badge/themes-4-purple)
+![Tests](https://img.shields.io/badge/tests-41_passing-brightgreen)
 
 ## Features
 
@@ -79,6 +80,7 @@ Lightweight Windows desktop viewer for Markdown files with themes, localization,
 - 🧹 **Clean uninstall**: `--uninstall` removes everything
 - 🌍 **Multi-language**: 8 languages supported
 - 🎨 **Themeable**: 4 built-in themes + custom themes
+- 🧪 **Testable**: MVP architecture with 41 passing unit tests (v2.0.0)
 
 ## Quick Start
 

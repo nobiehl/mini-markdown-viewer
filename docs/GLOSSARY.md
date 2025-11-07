@@ -228,3 +228,93 @@ Async event handler in MainForm that responds to theme selection changes from St
 **Version:** Implemented in v1.5.4
 
 ---
+
+### MVP (Model-View-Presenter) Pattern
+Architectural pattern that separates business logic from UI for testability.
+- **Model:** Data models (AppSettings, Theme, etc.)
+- **View:** UI components implementing view interfaces (MainForm implements IMainView)
+- **Presenter:** Business logic coordinators (MainPresenter, StatusBarPresenter, etc.)
+
+**Benefits:** Full UI testability without requiring actual UI components.
+
+**Files:**
+- Views/: Interface definitions (IMainView.cs, IWebViewAdapter.cs, etc.)
+- Presenters/: Business logic (MainPresenter.cs, etc.)
+- MainForm.cs: Implements IMainView interface
+
+---
+
+### IMainView
+View interface for MainForm. Abstracts all UI interactions for testability.
+
+**Purpose:** Allows MainPresenter to control UI without direct dependency on WinForms.
+
+**Properties:** CurrentFilePath, WindowTitle, IsNavigationBarVisible, IsSearchBarVisible
+
+**Events:** ViewLoaded, ThemeChangeRequested, LanguageChangeRequested, RefreshRequested, etc.
+
+**Methods:** DisplayMarkdown(), ShowError(), UpdateTheme(), SetNavigationState(), etc.
+
+**File:** Views/IMainView.cs
+**Implemented by:** MainForm.cs
+**Used by:** MainPresenter.cs
+
+---
+
+### MainPresenter
+Core presenter managing main window business logic.
+
+**Responsibilities:**
+- Theme and language switching
+- Settings persistence
+- File loading and watching
+- Coordinating view updates
+
+**Dependencies:** IMainView, IWebViewAdapter, ISettingsService, IThemeService, ILocalizationService, IDialogService
+
+**File:** Presenters/MainPresenter.cs (314 lines)
+**Tests:** Presenters/MainPresenterTests.cs (10 tests, all passing)
+
+---
+
+### IWebViewAdapter
+Adapter interface for WebView2 control to enable testing without actual WebView2.
+
+**Purpose:** Wraps WebView2 functionality behind testable interface.
+
+**Properties:** IsInitialized, CanGoBack, CanGoForward
+
+**Methods:** NavigateToStringAsync(), ExecuteScriptAsync(), GoBack(), GoForward(), Reload()
+
+**File:** Views/IWebViewAdapter.cs
+**Implementation:** Views/WebView2Adapter.cs (wraps actual WebView2)
+**Mock:** Mocks/MockWebViewAdapter.cs (for testing)
+
+---
+
+### IDialogService
+Service interface for showing dialogs (MessageBox abstraction).
+
+**Purpose:** Makes dialog calls testable by abstracting MessageBox.
+
+**Methods:** ShowError(), ShowInfo(), ShowWarning(), ShowConfirmation(), ShowYesNo()
+
+**File:** Services/IDialogService.cs
+**Implementation:** Services/WinFormsDialogService.cs (uses MessageBox)
+**Mock:** Mocks/MockDialogService.cs (for testing)
+
+---
+
+### DI Container (Dependency Injection)
+Microsoft.Extensions.DependencyInjection container configured in Program.cs.
+
+**Registered Services:**
+- Singleton: ISettingsService, IThemeService, ILocalizationService, IDialogService
+- Transient: MarkdownRenderer, FileWatcherManager, All Presenters, MainForm
+
+**Configuration:** Program.cs::BuildServiceProvider()
+
+**Benefits:** Loose coupling, easy testing, clear dependencies
+
+---
+

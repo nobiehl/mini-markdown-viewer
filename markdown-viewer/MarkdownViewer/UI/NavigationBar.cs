@@ -1,27 +1,31 @@
 using System;
 using System.Windows.Forms;
-using MarkdownViewer.Core;
 using MarkdownViewer.Services;
+using MarkdownViewer.Views;
 using Serilog;
 
 namespace MarkdownViewer.UI
 {
     /// <summary>
     /// Navigation toolbar with Back/Forward buttons.
-    /// Integrates with NavigationManager for history navigation.
+    /// Implements INavigationBarView for MVP pattern (v2.0.0).
     /// </summary>
-    public class NavigationBar
+    public class NavigationBar : INavigationBarView
     {
         private readonly ToolStrip _toolbar;
         private readonly ToolStripButton _backButton;
         private readonly ToolStripButton _forwardButton;
-        private readonly NavigationManager _navigationManager;
         private readonly ILocalizationService _localization;
+
+        private bool _canGoBack;
+        private bool _canGoForward;
 
         /// <summary>
         /// Gets the underlying ToolStrip control.
         /// </summary>
         public ToolStrip Control => _toolbar;
+
+        #region INavigationBarView Implementation
 
         /// <summary>
         /// Gets or sets whether the navigation bar is visible.
@@ -33,13 +37,45 @@ namespace MarkdownViewer.UI
         }
 
         /// <summary>
+        /// Gets or sets whether the back button is enabled.
+        /// </summary>
+        public bool CanGoBack
+        {
+            get => _canGoBack;
+            set
+            {
+                _canGoBack = value;
+                _backButton.Enabled = value;
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets whether the forward button is enabled.
+        /// </summary>
+        public bool CanGoForward
+        {
+            get => _canGoForward;
+            set
+            {
+                _canGoForward = value;
+                _forwardButton.Enabled = value;
+            }
+        }
+
+        // Events (View → Presenter)
+        public event EventHandler? BackRequested;
+        public event EventHandler? ForwardRequested;
+        public event EventHandler? RefreshRequested;
+        public event EventHandler? HomeRequested;
+
+        #endregion
+
+        /// <summary>
         /// Initializes a new instance of the NavigationBar.
         /// </summary>
-        /// <param name="navigationManager">Navigation manager for history tracking</param>
         /// <param name="localization">Localization service for tooltips</param>
-        public NavigationBar(NavigationManager navigationManager, ILocalizationService localization)
+        public NavigationBar(ILocalizationService localization)
         {
-            _navigationManager = navigationManager ?? throw new ArgumentNullException(nameof(navigationManager));
             _localization = localization ?? throw new ArgumentNullException(nameof(localization));
 
             // Create back button
@@ -78,40 +114,42 @@ namespace MarkdownViewer.UI
             _toolbar.Items.Add(new ToolStripSeparator());
             _toolbar.Items.Add(_forwardButton);
 
-            // Subscribe to navigation state changes
-            _navigationManager.NavigationChanged += OnNavigationChanged;
-
-            // Initialize button states
-            UpdateButtonStates();
-
-            Log.Debug("NavigationBar initialized");
+            Log.Debug("NavigationBar initialized (MVP pattern)");
         }
 
         private void OnBackButtonClick(object? sender, EventArgs e)
         {
-            Log.Debug("Back button clicked");
-            _navigationManager.GoBack();
+            Log.Debug("Back button clicked, raising BackRequested event");
+            BackRequested?.Invoke(this, EventArgs.Empty);
         }
 
         private void OnForwardButtonClick(object? sender, EventArgs e)
         {
-            Log.Debug("Forward button clicked");
-            _navigationManager.GoForward();
+            Log.Debug("Forward button clicked, raising ForwardRequested event");
+            ForwardRequested?.Invoke(this, EventArgs.Empty);
         }
 
-        private void OnNavigationChanged(object? sender, EventArgs e)
+        /// <summary>
+        /// Updates the navigation state (button enabled/disabled state).
+        /// Called by presenter when navigation state changes.
+        /// </summary>
+        public void UpdateNavigationState(bool canGoBack, bool canGoForward)
         {
-            Log.Debug("Navigation state changed, updating button states");
-            UpdateButtonStates();
+            CanGoBack = canGoBack;
+            CanGoForward = canGoForward;
+
+            Log.Debug("Navigation state updated: CanGoBack={CanGoBack}, CanGoForward={CanGoForward}",
+                canGoBack, canGoForward);
         }
 
-        private void UpdateButtonStates()
+        /// <summary>
+        /// Sets the current file path (for display purposes).
+        /// </summary>
+        public void SetCurrentPath(string filePath)
         {
-            _backButton.Enabled = _navigationManager.CanGoBack;
-            _forwardButton.Enabled = _navigationManager.CanGoForward;
-
-            Log.Debug("Button states updated: Back={BackEnabled}, Forward={ForwardEnabled}",
-                _backButton.Enabled, _forwardButton.Enabled);
+            // Currently not displayed in UI, but interface requires it
+            // Could be implemented as a label in the toolbar in future
+            Log.Debug("Current path set: {FilePath}", filePath);
         }
 
         /// <summary>
