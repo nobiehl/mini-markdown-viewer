@@ -18,7 +18,8 @@
       "Bash(nul)",
       "Bash(tasklist)",
       "Bash(findstr:*)",
-      "Bash(cat:*)"
+      "Bash(cat:*)",
+      "Bash(\"C:\\Program Files\\GitHub CLI\\gh.exe\" release list --limit 5)"
     ],
     "deny": [],
     "ask": []
