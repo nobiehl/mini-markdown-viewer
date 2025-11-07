@@ -183,6 +183,9 @@ namespace MarkdownViewer
             // Initialize UI components
             InitializeComponents();
 
+            // Apply theme to UI immediately (after form is initialized)
+            ApplyThemeToUI();
+
             // Initialize core managers (require WebView2)
             _navigationManager = new NavigationManager(_webView);
             _searchManager = new SearchManager(_webView);
@@ -341,12 +344,25 @@ namespace MarkdownViewer
             }
         }
 
-        private void ApplyThemeToUI()
+        private async void ApplyThemeToUI()
         {
             try
             {
-                // Apply theme to WinForms (will be more comprehensive in v1.3.0 with StatusBar)
+                Log.Information("Applying theme to Form: {ThemeName}", _currentTheme?.Name ?? "null");
+
+                // Apply theme to WinForms
                 this.BackColor = System.Drawing.ColorTranslator.FromHtml(_currentTheme.UI.FormBackground);
+
+                // Apply theme to WebView2 background (visible while loading)
+                if (_webView != null)
+                {
+                    _webView.BackColor = System.Drawing.ColorTranslator.FromHtml(_currentTheme.UI.FormBackground);
+                }
+
+                // Apply theme to all UI components (StatusBar, etc.) using ThemeService
+                await _themeService.ApplyThemeAsync(_currentTheme, this, _webView);
+
+                Log.Information("Theme applied to Form successfully: BackColor={BackColor}", _currentTheme.UI.FormBackground);
             }
             catch (Exception ex)
             {

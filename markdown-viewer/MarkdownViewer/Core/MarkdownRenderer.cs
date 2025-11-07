@@ -21,7 +21,7 @@ namespace MarkdownViewer.Core
         public MarkdownRenderer()
         {
             _pipeline = new MarkdownPipelineBuilder()
-                .UseAdvancedExtensions()
+                .UseAdvancedExtensions() // Includes AutoIdentifiers for heading IDs
                 .UseMathematics()
                 .Build();
         }
@@ -270,9 +270,9 @@ namespace MarkdownViewer.Core
             if (target && target.tagName === 'A') {{
                 const href = target.getAttribute('href');
 
-                // Ignore anchor-only links (handled by browser)
-                if (!href || href.startsWith('#')) {{
-                    return; // Let browser handle it
+                // Ignore empty hrefs
+                if (!href) {{
+                    return;
                 }}
 
                 // Ignore data: URIs
@@ -280,10 +280,10 @@ namespace MarkdownViewer.Core
                     return;
                 }}
 
-                // Prevent default navigation
+                // Prevent default navigation (including anchor links)
                 e.preventDefault();
 
-                // Send to C# for handling
+                // Send to C# for handling (including anchor links)
                 console.log('Intercepted link click:', href);
                 window.chrome.webview.postMessage(href);
             }}
