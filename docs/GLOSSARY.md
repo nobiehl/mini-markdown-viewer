@@ -144,3 +144,87 @@ Core component for live-reload functionality. Watches a single file for changes 
 **Anti-flicker:** 100ms delay to avoid multiple editor save triggers
 
 ---
+
+### Embedded Resources (.NET)
+Resources (files) embedded into the compiled assembly at build time, rather than copied as external files. Accessed at runtime using Assembly.GetManifestResourceStream().
+
+**Configuration:** `<EmbeddedResource Include="path/to/file" />` in .csproj
+**Benefits:** Single-file deployment, resources always available, no external dependencies
+**Used for:** Theme JSON files (Themes/*.json), Icons (Icons/*.svg)
+**Naming pattern:** `"MarkdownViewer.Themes.dark.json"` → `"dark"`
+**Version:** Implemented in v1.5.4
+
+---
+
+### Assembly.GetManifestResourceStream()
+.NET method to load embedded resources from a compiled assembly. Returns a Stream to read the resource data.
+
+**Usage:** `_assembly.GetManifestResourceStream("MarkdownViewer.Themes.dark.json")`
+**Returns:** Stream or null if resource not found
+**Pattern:** `using (Stream stream = ...) { using (StreamReader reader = ...) { } }`
+**Location:** ThemeService.LoadTheme()
+**Version:** Implemented in v1.5.4
+
+---
+
+### Theme Selector (StatusBar)
+UI component in the StatusBar that allows instant theme switching via dropdown menu. Positioned on right side, left of language selector.
+
+**Component:** WinForms ToolStripDropDownButton
+**Location:** StatusBarControl.cs (_themeSelector field)
+**Event:** ThemeChanged (raised when user selects new theme)
+**Property:** CurrentTheme (string) - currently selected theme name
+**Display names:** Dark, Standard, Solarized, Dräger
+**Version:** Implemented in v1.5.4
+
+---
+
+### Resource Naming Convention
+Pattern for naming embedded resources in .NET assemblies. Format: `{Namespace}.{Folder}.{Filename}.{Extension}`
+
+**Example:** `"MarkdownViewer.Themes.dark.json"`
+**Parsing:** Split by '.', extract second-to-last part ("dark")
+**Discovery:** `Assembly.GetManifestResourceNames()` returns all embedded resource names
+**Used by:** ThemeService.GetAvailableThemes()
+**Version:** Implemented in v1.5.4
+
+---
+
+### GetAvailableThemes()
+Method in ThemeService that discovers all available themes by scanning embedded resources.
+
+**Location:** ThemeService.cs
+**Returns:** List<string> of theme names (e.g., "dark", "standard")
+**Logic:** Scans Assembly.GetManifestResourceNames() for "MarkdownViewer.Themes.*.json" pattern
+**Parsing:** Extracts theme name from resource name
+**Used by:** StatusBarControl.PopulateThemeDropdown(), MainForm.InitializeThemeContextMenu()
+**Version:** Refactored in v1.5.4 from file system scanning to embedded resource scanning
+
+---
+
+### PopulateThemeDropdown()
+Method in StatusBarControl that fills the theme selector dropdown with available themes.
+
+**Location:** StatusBarControl.cs
+**Parameters:** List<string> availableThemes, string currentTheme
+**Actions:** Clears dropdown, adds ToolStripMenuItem for each theme, sets checkmark on current theme
+**Called by:** MainForm.InitializeStatusBar()
+**Version:** Implemented in v1.5.4
+
+---
+
+### OnThemeChanged()
+Async event handler in MainForm that responds to theme selection changes from StatusBar.
+
+**Location:** MainForm.cs
+**Signature:** `private async void OnThemeChanged(object? sender, EventArgs e)`
+**Actions:**
+1. Reads new theme name from _statusBar.CurrentTheme
+2. Loads theme from embedded resources via ThemeService
+3. Saves theme to settings.json
+4. Applies theme to UI and WebView2
+5. Shows error dialog on failure
+
+**Version:** Implemented in v1.5.4
+
+---

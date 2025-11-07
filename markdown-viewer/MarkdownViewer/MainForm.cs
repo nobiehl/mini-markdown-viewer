@@ -21,7 +21,7 @@ namespace MarkdownViewer
     /// </summary>
     public class MainForm : Form
     {
-        private const string Version = "1.5.3";
+        private const string Version = "1.5.4";
 
         // UI Components
         private WebView2 _webView;
@@ -511,6 +511,7 @@ namespace MarkdownViewer
 
                 // Wire up event handlers
                 _statusBar.LanguageChanged += OnLanguageChanged;
+                _statusBar.ThemeChanged += OnThemeChanged;  // NEW
                 _statusBar.UpdateClicked += OnUpdateClicked;
                 _statusBar.ExplorerClicked += OnExplorerClicked;
                 _statusBar.InfoClicked += OnInfoClicked;
@@ -518,6 +519,11 @@ namespace MarkdownViewer
 
                 // Add to form
                 this.Controls.Add(_statusBar);
+
+                // Initialize theme dropdown with available themes
+                var availableThemes = _themeService.GetAvailableThemes();
+                var currentTheme = _currentTheme?.Name ?? "standard";
+                _statusBar.PopulateThemeDropdown(availableThemes, currentTheme);
 
                 // Check initial statuses
                 _statusBar.CheckExplorerRegistration();
@@ -554,6 +560,43 @@ namespace MarkdownViewer
             catch (Exception ex)
             {
                 Log.Error(ex, "Failed to handle language change");
+            }
+        }
+
+        /// <summary>
+        /// Handles theme change from status bar.
+        /// Loads and applies the new theme to UI and Markdown rendering.
+        /// </summary>
+        private async void OnThemeChanged(object? sender, EventArgs e)
+        {
+            if (_statusBar == null) return;
+
+            var newThemeName = _statusBar.CurrentTheme;
+            Log.Information("Theme changed to: {Theme}", newThemeName);
+
+            try
+            {
+                // Load the new theme
+                var newTheme = _themeService.LoadTheme(newThemeName);
+                _currentTheme = newTheme;
+
+                // Update settings with new theme
+                _settings.Theme = newThemeName;
+                _settingsService.Save(_settings);
+
+                // Apply theme to UI and WebView2
+                await _themeService.ApplyThemeAsync(newTheme, this, _webView);
+
+                Log.Information("Theme applied successfully: {Theme}", newThemeName);
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex, "Failed to apply theme: {Theme}", newThemeName);
+                MessageBox.Show(
+                    $"Failed to apply theme '{newThemeName}':\n{ex.Message}",
+                    "Theme Error",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Error);
             }
         }
 

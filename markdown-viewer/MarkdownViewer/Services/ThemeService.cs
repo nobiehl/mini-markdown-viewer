@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Text.Json;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -23,7 +24,7 @@ namespace MarkdownViewer.Services
         Theme GetCurrentTheme();
 
         /// <summary>
-        /// Loads a theme by name from the Themes folder
+        /// Loads a theme by name from embedded resources
         /// </summary>
         Theme LoadTheme(string themeName);
 
@@ -40,12 +41,13 @@ namespace MarkdownViewer.Services
 
     /// <summary>
     /// Theme service implementation.
-    /// Loads themes from JSON files in Themes/ folder and applies them to UI.
+    /// Loads themes from embedded JSON resources and applies them to UI.
+    /// Themes are embedded at compile time, no external files needed.
     /// </summary>
     public class ThemeService : IThemeService
     {
         private Theme _currentTheme;
-        private readonly string _themesPath;
+        private readonly Assembly _assembly;
         private static readonly JsonSerializerOptions _jsonOptions = new()
         {
             PropertyNameCaseInsensitive = true
@@ -53,25 +55,11 @@ namespace MarkdownViewer.Services
 
         public ThemeService()
         {
-            // Themes folder next to executable
-            var exePath = Application.ExecutablePath;
-            var exeDir = Path.GetDirectoryName(exePath);
-            _themesPath = Path.Combine(exeDir, "Themes");
-
-            Log.Information("ThemeService initialized. Themes path: {Path}", _themesPath);
+            _assembly = Assembly.GetExecutingAssembly();
+            Log.Information("ThemeService initialized. Loading themes from embedded resources");
 
             // Load default theme
             _currentTheme = LoadTheme("standard");
-        }
-
-        /// <summary>
-        /// Constructor for testing with custom path
-        /// </summary>
-        internal ThemeService(string customThemesPath)
-        {
-            _themesPath = customThemesPath;
-            _currentTheme = new Theme { Name = "standard", DisplayName = "Standard" };
-            Log.Information("ThemeService initialized with custom path: {Path}", _themesPath);
         }
 
         public Theme GetCurrentTheme()
@@ -83,34 +71,40 @@ namespace MarkdownViewer.Services
         {
             try
             {
-                var themeFile = Path.Combine(_themesPath, $"{themeName}.json");
+                var resourceName = $"MarkdownViewer.Themes.{themeName}.json";
 
-                if (!File.Exists(themeFile))
+                using (Stream? stream = _assembly.GetManifestResourceStream(resourceName))
                 {
-                    Log.Warning("Theme file not found: {File}, falling back to standard", themeFile);
-
-                    // If standard theme doesn't exist, return default theme object
-                    if (themeName == "standard")
+                    if (stream == null)
                     {
-                        Log.Warning("Standard theme not found, using built-in defaults");
-                        return CreateDefaultTheme();
+                        Log.Warning("Theme resource not found: {ResourceName}, falling back to standard", resourceName);
+
+                        // If standard theme doesn't exist, return default theme object
+                        if (themeName == "standard")
+                        {
+                            Log.Warning("Standard theme not found, using built-in defaults");
+                            return CreateDefaultTheme();
+                        }
+
+                        return LoadTheme("standard");
                     }
 
-                    return LoadTheme("standard");
+                    using (var reader = new StreamReader(stream))
+                    {
+                        var json = reader.ReadToEnd();
+                        var theme = JsonSerializer.Deserialize<Theme>(json, _jsonOptions);
+
+                        if (theme == null)
+                        {
+                            Log.Warning("Failed to deserialize theme: {ResourceName}", resourceName);
+                            return LoadTheme("standard");
+                        }
+
+                        _currentTheme = theme;
+                        Log.Information("Theme loaded: {Name} ({DisplayName})", theme.Name, theme.DisplayName);
+                        return theme;
+                    }
                 }
-
-                var json = File.ReadAllText(themeFile);
-                var theme = JsonSerializer.Deserialize<Theme>(json, _jsonOptions);
-
-                if (theme == null)
-                {
-                    Log.Warning("Failed to deserialize theme: {File}", themeFile);
-                    return LoadTheme("standard");
-                }
-
-                _currentTheme = theme;
-                Log.Information("Theme loaded: {Name} ({DisplayName})", theme.Name, theme.DisplayName);
-                return theme;
             }
             catch (Exception ex)
             {
@@ -123,19 +117,25 @@ namespace MarkdownViewer.Services
         {
             try
             {
-                if (!Directory.Exists(_themesPath))
-                {
-                    Log.Warning("Themes directory not found: {Path}", _themesPath);
-                    return new List<string> { "standard" };
-                }
+                // Get all embedded theme resources
+                var resourceNames = _assembly.GetManifestResourceNames()
+                    .Where(name => name.StartsWith("MarkdownViewer.Themes.") && name.EndsWith(".json"))
+                    .ToList();
 
-                var themeFiles = Directory.GetFiles(_themesPath, "*.json");
-                var themeNames = themeFiles
-                    .Select(f => Path.GetFileNameWithoutExtension(f))
+                var themeNames = resourceNames
+                    .Select(name =>
+                    {
+                        // Extract theme name from resource name
+                        // "MarkdownViewer.Themes.dark.json" -> "dark"
+                        var parts = name.Split('.');
+                        return parts.Length >= 3 ? parts[parts.Length - 2] : null;
+                    })
+                    .Where(name => name != null)
+                    .Cast<string>()
                     .OrderBy(n => n)
                     .ToList();
 
-                Log.Information("Found {Count} themes", themeNames.Count);
+                Log.Information("Found {Count} embedded themes: {Themes}", themeNames.Count, string.Join(", ", themeNames));
                 return themeNames;
             }
             catch (Exception ex)

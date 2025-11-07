@@ -20,11 +20,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <!-- Theme JSON files must be copied to output directory -->
-    <Content Include="Themes\*.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
-    </Content>
+    <!-- Theme JSON files as embedded resources (no longer copied to output) -->
+    <EmbeddedResource Include="Themes\*.json" />
   </ItemGroup>
 
   <ItemGroup>

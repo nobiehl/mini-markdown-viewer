@@ -7,12 +7,14 @@ using MarkdownViewer.Services;
 namespace MarkdownViewer.UI
 {
     /// <summary>
-    /// Status bar control with 5 sections:
+    /// Status bar control with 7 sections:
     /// 1. Update status (icon with tooltip)
     /// 2. Explorer registration status (icon with tooltip)
-    /// 3. Language selector (dropdown)
-    /// 4. Info (clickable label)
-    /// 5. Help (clickable label)
+    /// 3. Spring (pushes items to the right)
+    /// 4. Theme selector (dropdown) - NEW
+    /// 5. Language selector (dropdown)
+    /// 6. Info (clickable label)
+    /// 7. Help (clickable label)
     ///
     /// StatusBar is hidden by default according to settings.
     /// </summary>
@@ -24,6 +26,7 @@ namespace MarkdownViewer.UI
         // Status items
         private readonly ToolStripStatusLabel _updateStatus;
         private readonly ToolStripStatusLabel _explorerStatus;
+        private readonly ToolStripDropDownButton _themeSelector;  // NEW
         private readonly ToolStripDropDownButton _languageSelector;
         private readonly ToolStripStatusLabel _infoLabel;
         private readonly ToolStripStatusLabel _helpLabel;
@@ -39,6 +42,7 @@ namespace MarkdownViewer.UI
 
         // Events
         public event EventHandler? LanguageChanged;
+        public event EventHandler? ThemeChanged;  // NEW
         public event EventHandler? UpdateClicked;
         public event EventHandler? ExplorerClicked;
         public event EventHandler? InfoClicked;
@@ -53,6 +57,11 @@ namespace MarkdownViewer.UI
         /// Gets or sets the current explorer registration status.
         /// </summary>
         public bool IsExplorerRegistered { get; private set; } = false;
+
+        /// <summary>
+        /// Gets or sets the current theme name.
+        /// </summary>
+        public string CurrentTheme { get; private set; } = "standard";
 
         /// <summary>
         /// Initializes a new instance of the StatusBarControl.
@@ -102,6 +111,20 @@ namespace MarkdownViewer.UI
 
             _explorerStatus.Click += (s, e) => ExplorerClicked?.Invoke(this, EventArgs.Empty);
 
+            // NEW: Theme selector
+            _themeSelector = new ToolStripDropDownButton
+            {
+                Text = "Theme: Standard",
+                ToolTipText = "Select theme for Markdown rendering and UI",
+                DisplayStyle = ToolStripItemDisplayStyle.Text,
+                AutoSize = true,
+                ShowDropDownArrow = true,
+                Padding = new Padding(5, 0, 5, 0)
+            };
+
+            // Populate theme dropdown (will be populated from MainForm)
+            // Empty for now, will be filled via PopulateThemeDropdown()
+
             _languageSelector = new ToolStripDropDownButton
             {
                 Image = _iconGlobe,
@@ -146,12 +169,16 @@ namespace MarkdownViewer.UI
             this.Items.Add(_explorerStatus);
             this.Items.Add(new ToolStripSeparator());
 
-            // Add spring to push language selector to the center-right
+            // Add spring to push theme/language selector to the center-right
             var spring = new ToolStripStatusLabel
             {
                 Spring = true
             };
             this.Items.Add(spring);
+
+            // NEW: Add theme selector (right side, before language)
+            this.Items.Add(_themeSelector);
+            this.Items.Add(new ToolStripSeparator());
 
             this.Items.Add(_languageSelector);
             this.Items.Add(new ToolStripSeparator());
@@ -161,6 +188,71 @@ namespace MarkdownViewer.UI
 
             // Initialize status
             CheckExplorerRegistration();
+        }
+
+        /// <summary>
+        /// Populates the theme dropdown with available themes.
+        /// </summary>
+        /// <param name="availableThemes">List of theme names (e.g., "dark", "standard")</param>
+        /// <param name="currentTheme">Currently selected theme name</param>
+        public void PopulateThemeDropdown(System.Collections.Generic.List<string> availableThemes, string currentTheme)
+        {
+            _themeSelector.DropDownItems.Clear();
+            CurrentTheme = currentTheme;
+
+            foreach (string themeName in availableThemes)
+            {
+                string displayName = GetThemeDisplayName(themeName);
+                var item = new ToolStripMenuItem(displayName)
+                {
+                    Tag = themeName,
+                    Checked = themeName == currentTheme
+                };
+
+                item.Click += OnThemeItemClick;
+                _themeSelector.DropDownItems.Add(item);
+            }
+
+            // Update theme selector text
+            _themeSelector.Text = $"Theme: {GetThemeDisplayName(currentTheme)}";
+        }
+
+        /// <summary>
+        /// Handles theme selection from dropdown.
+        /// </summary>
+        private void OnThemeItemClick(object? sender, EventArgs e)
+        {
+            if (sender is ToolStripMenuItem item && item.Tag is string themeName)
+            {
+                // Update current theme
+                CurrentTheme = themeName;
+
+                // Update UI
+                foreach (ToolStripMenuItem menuItem in _themeSelector.DropDownItems)
+                {
+                    menuItem.Checked = menuItem.Tag as string == themeName;
+                }
+
+                _themeSelector.Text = $"Theme: {GetThemeDisplayName(themeName)}";
+
+                // Raise event for MainForm to handle
+                ThemeChanged?.Invoke(this, EventArgs.Empty);
+            }
+        }
+
+        /// <summary>
+        /// Gets the display name for a theme name.
+        /// </summary>
+        private string GetThemeDisplayName(string themeName)
+        {
+            return themeName switch
+            {
+                "dark" => "Dark",
+                "standard" => "Standard",
+                "solarized" => "Solarized",
+                "draeger" => "Dräger",
+                _ => char.ToUpper(themeName[0]) + themeName.Substring(1)
+            };
         }
 
         /// <summary>

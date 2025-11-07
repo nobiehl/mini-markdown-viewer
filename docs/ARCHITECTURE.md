@@ -192,19 +192,24 @@ public class SettingsService : ISettingsService
 public interface IThemeService
 {
     Theme LoadTheme(string name);
-    void ApplyTheme(Theme theme, Form form, WebView2 webView);
+    Task ApplyThemeAsync(Theme theme, Form form, WebView2 webView);
     List<string> GetAvailableThemes();
 }
 
 public class ThemeService : IThemeService
 {
-    // Loads from Themes/*.json
+    private readonly Assembly _assembly;
+
+    // v1.5.4: Loads from embedded resources (no file system!)
+    // Uses Assembly.GetManifestResourceStream()
+    // Resource pattern: "MarkdownViewer.Themes.{name}.json"
     // Applies colors to UI + injects CSS to WebView2
 }
 ```
 
-**Dependencies:** File system, WinForms, WebView2
-**Tests:** Mock file system, test CSS generation
+**Dependencies:** Assembly (reflection), WinForms, WebView2 (no file system!)
+**Tests:** Mock assembly resources, test CSS generation
+**Version:** v1.5.4 - Refactored from file system to embedded resources
 
 #### UpdateService
 ```csharp
@@ -525,14 +530,18 @@ AppSettings (Model)
     ↓
 ThemeService.LoadTheme(settings.Theme)
     ↓
-Themes/{theme}.json
+Assembly.GetManifestResourceStream("MarkdownViewer.Themes.{theme}.json")
+    ↓
+Embedded Resource (compiled into .exe)
     ↓
 Theme (Model)
     ↓
-ThemeService.ApplyTheme()
+ThemeService.ApplyThemeAsync()
     ↓
 UI Updated + WebView2 CSS Injected
 ```
+
+**Note (v1.5.4):** Themes are now loaded from embedded resources, not external files.
 
 ### Markdown Rendering
 ```
@@ -740,19 +749,22 @@ public interface IMarkdownViewerPlugin
 
 ### Single-File Executable
 ```
-MarkdownViewer.exe (1.9 MB)
+MarkdownViewer.exe (~2.0 MB)
     ↓
 Contains:
 - .NET 8 Runtime libraries
 - All application code
-- Embedded resources (.resx)
-- Icon
+- Embedded resources (.resx for localization)
+- Embedded themes (Themes/*.json) [v1.5.4]
+- Embedded icons (Icons/*.svg)
+- Application icon
 
 External files:
-- Themes/*.json (4 files)
 - Settings: %APPDATA%/MarkdownViewer/settings.json
 - Logs: ./logs/
 ```
+
+**Note (v1.5.4):** Themes are now embedded at compile time. No external Themes/ folder needed.
 
 ### Update Process
 ```
