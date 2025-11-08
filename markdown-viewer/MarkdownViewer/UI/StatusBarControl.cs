@@ -69,8 +69,8 @@ namespace MarkdownViewer.UI
         }
 
         // Events required by IStatusBarView
-        public new event EventHandler<ThemeChangedEventArgs>? ThemeChanged;
-        public new event EventHandler<LanguageChangedEventArgs>? LanguageChanged;
+        public event EventHandler<ThemeChangedEventArgs>? ThemeChanged;
+        public event EventHandler<LanguageChangedEventArgs>? LanguageChanged;
 
         #endregion
 

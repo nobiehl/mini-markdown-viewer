@@ -263,7 +263,7 @@ namespace MarkdownViewer.UI
         /// Focuses the search text box.
         /// Called by presenter.
         /// </summary>
-        public new void Focus()
+        public void Focus()
         {
             _searchTextBox.Focus();
             _searchTextBox.SelectAll();

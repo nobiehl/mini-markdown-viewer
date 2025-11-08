@@ -289,11 +289,11 @@ Log Levels:
             try
             {
                 // Use IWshRuntimeLibrary to create shortcut
-                Type shellType = Type.GetTypeFromProgID("WScript.Shell");
+                Type? shellType = Type.GetTypeFromProgID("WScript.Shell");
                 if (shellType == null) return;
 
-                dynamic shell = Activator.CreateInstance(shellType);
-                var shortcut = shell.CreateShortcut(shortcutPath);
+                dynamic? shell = Activator.CreateInstance(shellType);
+                var shortcut = shell!.CreateShortcut(shortcutPath);
                 shortcut.TargetPath = targetPath;
                 shortcut.Save();
 
@@ -359,7 +359,7 @@ Log Levels:
                     return args[i + 1];
                 }
             }
-            return null;
+            return null!;
         }
 
         /// <summary>
@@ -485,7 +485,7 @@ Log Levels:
 
                         // Download update
                         string updatePath = Path.Combine(
-                            Path.GetDirectoryName(Application.ExecutablePath),
+                            Path.GetDirectoryName(Application.ExecutablePath)!,
                             "pending-update.exe"
                         );
 

@@ -28,7 +28,7 @@ namespace MarkdownViewer
         private const string Version = "1.6.1";
 
         // UI Components
-        private WebView2 _webView;
+        private WebView2 _webView = null!;
         private StatusBarControl? _statusBar;
         private NavigationBar? _navigationBar;
         private SearchBar? _searchBar;
@@ -46,8 +46,8 @@ namespace MarkdownViewer
         private readonly ThemeService _themeService;
 
         // State
-        private string _currentFilePath;
-        private AppSettings _settings;
+        private string _currentFilePath = null!;
+        private AppSettings _settings = null!;
         private Theme? _currentTheme;
 
         #region IMainView Implementation
@@ -89,12 +89,16 @@ namespace MarkdownViewer
         public event EventHandler? ViewLoaded;
         public event EventHandler<ThemeChangedEventArgs>? ThemeChangeRequested;
         public event EventHandler<LanguageChangedEventArgs>? LanguageChangeRequested;
+#pragma warning disable CS0067 // Event is declared but never used (part of interface)
         public event EventHandler<string>? FileLoadRequested;
+#pragma warning restore CS0067
         public event EventHandler? RefreshRequested;
         public event EventHandler? SearchRequested;
         public event EventHandler? NavigateBackRequested;
         public event EventHandler? NavigateForwardRequested;
+#pragma warning disable CS0067 // Event is declared but never used (part of interface)
         public event EventHandler? CloseRequested;
+#pragma warning restore CS0067
 
         // IMainView Methods (Presenter -> View)
         public void DisplayMarkdown(string html)
@@ -178,7 +182,7 @@ namespace MarkdownViewer
             LoadSettings();
 
             // Initialize localization service with language from settings
-            _localizationService = new LocalizationService(_settings.Language);
+            _localizationService = new LocalizationService(_settings.Language!);
 
             // Initialize UI components
             InitializeComponents();
@@ -187,8 +191,8 @@ namespace MarkdownViewer
             ApplyThemeToUI();
 
             // Initialize core managers (require WebView2)
-            _navigationManager = new NavigationManager(_webView);
-            _searchManager = new SearchManager(_webView);
+            _navigationManager = new NavigationManager(_webView!);
+            _searchManager = new SearchManager(_webView!);
 
             // Initialize NavigationBar if enabled
             if (_settings.UI.NavigationBar.Visible)
@@ -305,7 +309,7 @@ namespace MarkdownViewer
             _webView.CoreWebView2InitializationCompleted += OnWebView2Initialized;
         }
 
-        private void OnWebView2Initialized(object sender, Microsoft.Web.WebView2.Core.CoreWebView2InitializationCompletedEventArgs e)
+        private void OnWebView2Initialized(object? sender, Microsoft.Web.WebView2.Core.CoreWebView2InitializationCompletedEventArgs e)
         {
             if (e.IsSuccess)
             {
@@ -351,7 +355,7 @@ namespace MarkdownViewer
                 Log.Information("Applying theme to Form: {ThemeName}", _currentTheme?.Name ?? "null");
 
                 // Apply theme to WinForms
-                this.BackColor = System.Drawing.ColorTranslator.FromHtml(_currentTheme.UI.FormBackground);
+                this.BackColor = System.Drawing.ColorTranslator.FromHtml(_currentTheme!.UI.FormBackground);
 
                 // Apply theme to WebView2 background (visible while loading)
                 if (_webView != null)
@@ -360,7 +364,7 @@ namespace MarkdownViewer
                 }
 
                 // Apply theme to all UI components (StatusBar, etc.) using ThemeService
-                await _themeService.ApplyThemeAsync(_currentTheme, this, _webView);
+                await _themeService.ApplyThemeAsync(_currentTheme, this, _webView!);
 
                 Log.Information("Theme applied to Form successfully: BackColor={BackColor}", _currentTheme.UI.FormBackground);
             }
@@ -370,7 +374,7 @@ namespace MarkdownViewer
             }
         }
 
-        private void OnNavigationStarting(object sender, Microsoft.Web.WebView2.Core.CoreWebView2NavigationStartingEventArgs args)
+        private void OnNavigationStarting(object? sender, Microsoft.Web.WebView2.Core.CoreWebView2NavigationStartingEventArgs args)
         {
             Log.Debug("NavigationStarting: {Uri}", args.Uri);
 
@@ -625,7 +629,7 @@ namespace MarkdownViewer
                         if (e.IsSuccess)
                         {
                             Log.Debug("WebView2 ready, navigating to queued HTML");
-                            _webView.CoreWebView2.NavigateToString(html);
+                            _webView.CoreWebView2!.NavigateToString(html);
                         }
                     };
                 }
@@ -650,7 +654,7 @@ namespace MarkdownViewer
             _fileWatcher.Watch(filePath);
         }
 
-        private void OnFileChanged(object sender, string filePath)
+        private void OnFileChanged(object? sender, string filePath)
         {
             // File changed - reload (already on UI thread via Invoke in FileWatcherManager)
             this.Invoke(new Action(() =>
@@ -713,16 +717,16 @@ namespace MarkdownViewer
                 {
                     if (string.IsNullOrWhiteSpace(e.SearchText))
                     {
-                        await _searchManager?.ClearSearchAsync();
+                        await _searchManager!.ClearSearchAsync();
                     }
                     else
                     {
-                        await _searchManager?.SearchAsync(e.SearchText);
+                        await _searchManager!.SearchAsync(e.SearchText);
                     }
                 };
 
-                _searchBar.FindNextRequested += async (s, e) => await _searchManager?.NextMatchAsync();
-                _searchBar.FindPreviousRequested += async (s, e) => await _searchManager?.PreviousMatchAsync();
+                _searchBar.FindNextRequested += async (s, e) => await _searchManager!.NextMatchAsync();
+                _searchBar.FindPreviousRequested += async (s, e) => await _searchManager!.PreviousMatchAsync();
                 _searchBar.CloseRequested += (s, e) =>
                 {
                     _searchBar?.ClearSearch();

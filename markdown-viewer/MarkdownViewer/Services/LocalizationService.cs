@@ -50,7 +50,7 @@ namespace MarkdownViewer.Services
     public class LocalizationService : ILocalizationService
     {
         private readonly ResourceManager _resourceManager;
-        private CultureInfo _currentCulture;
+        private CultureInfo _currentCulture = CultureInfo.InvariantCulture;
 
         private static readonly string[] SupportedLanguages = new[]
         {
@@ -92,7 +92,7 @@ namespace MarkdownViewer.Services
             try
             {
                 // Try to get string in current culture
-                string value = _resourceManager.GetString(key, _currentCulture);
+                string? value = _resourceManager.GetString(key, _currentCulture);
 
                 if (!string.IsNullOrEmpty(value))
                     return value;

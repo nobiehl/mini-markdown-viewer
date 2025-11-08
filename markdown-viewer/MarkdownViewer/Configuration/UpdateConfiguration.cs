@@ -58,12 +58,12 @@ namespace MarkdownViewer.Configuration
         /// <summary>
         /// Path to test data directory (only used in test mode)
         /// </summary>
-        public string TestDataPath { get; private set; } = string.Empty;
+        public string? TestDataPath { get; private set; }
 
         /// <summary>
         /// Test scenario name (only used in test mode)
         /// </summary>
-        public string TestScenario { get; private set; } = string.Empty;
+        public string? TestScenario { get; private set; }
 
         /// <summary>
         /// Private constructor - loads configuration from environment variables

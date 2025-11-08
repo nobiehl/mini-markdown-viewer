@@ -11,14 +11,14 @@ namespace MarkdownViewer.Core
     /// </summary>
     public class FileWatcherManager : IDisposable
     {
-        private FileSystemWatcher _watcher;
+        private FileSystemWatcher? _watcher;
         private bool _disposed = false;
 
         /// <summary>
         /// Event raised when the watched file changes.
         /// Provides the full path to the changed file.
         /// </summary>
-        public event EventHandler<string> FileChanged;
+        public event EventHandler<string>? FileChanged;
 
         /// <summary>
         /// Starts watching a file for changes.
@@ -31,13 +31,13 @@ namespace MarkdownViewer.Core
 
             try
             {
-                string directory = Path.GetDirectoryName(filePath);
+                string? directory = Path.GetDirectoryName(filePath);
                 string fileName = Path.GetFileName(filePath);
 
                 // Dispose old watcher if exists
                 _watcher?.Dispose();
 
-                _watcher = new FileSystemWatcher(directory)
+                _watcher = new FileSystemWatcher(directory!)
                 {
                     Filter = fileName,
                     NotifyFilter = NotifyFilters.LastWrite | NotifyFilters.Size

@@ -33,7 +33,7 @@ namespace MarkdownViewer.Core
         /// <param name="currentFilePath">Path to current file (for relative link resolution)</param>
         /// <param name="theme">Optional theme for styling (uses default if null)</param>
         /// <returns>Complete HTML document as string</returns>
-        public string RenderToHtml(string markdown, string currentFilePath, Theme theme = null)
+        public string RenderToHtml(string markdown, string currentFilePath, Theme? theme = null)
         {
             string content = Markdown.ToHtml(markdown, _pipeline);
 
