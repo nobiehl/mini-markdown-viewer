@@ -46,6 +46,10 @@ namespace MarkdownViewer
             // This must be done before logging is initialized
             UpdateChecker.ApplyPendingUpdate();
 
+            // SECOND: Clean up old backup from previous update (if any)
+            // This is safe to do even if there's no backup
+            UpdateChecker.CleanupOldBackup();
+
             // Parse log level from command line (default: Information)
             LogEventLevel logLevel = LogEventLevel.Information;
             for (int i = 0; i < args.Length - 1; i++)

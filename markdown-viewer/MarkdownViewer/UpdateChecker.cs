@@ -364,11 +364,8 @@ namespace MarkdownViewer
                 Log.Information("Moving update to exe location");
                 File.Move(updatePath, exePath);
 
-                // Delete backup on success
-                Log.Information("Deleting backup");
-                File.Delete(backupPath);
-
-                Log.Information("Update applied successfully!");
+                // DON'T delete backup immediately - will be cleaned up on next startup
+                Log.Information("Update applied successfully! Backup remains as safety net: {BackupPath}", backupPath);
 
                 // Restart application with same arguments
                 var args = Environment.GetCommandLineArgs().Skip(1);
@@ -477,6 +474,35 @@ namespace MarkdownViewer
             catch
             {
                 // Ignore deletion errors
+            }
+        }
+
+        /// <summary>
+        /// Cleans up old backup file from previous update.
+        /// Called on application startup - silently removes backup if both EXE and backup exist.
+        /// If backup cannot be deleted (locked, permissions), it will be retried on next startup.
+        /// </summary>
+        public static void CleanupOldBackup()
+        {
+            try
+            {
+                string exePath = Application.ExecutablePath;
+                string backupPath = exePath + ".backup";
+
+                if (File.Exists(backupPath) && File.Exists(exePath))
+                {
+                    // Both files exist - update was successful
+                    // Safe to delete backup
+                    Log.Debug("Cleaning up old backup: {BackupPath}", backupPath);
+                    File.Delete(backupPath);
+                    Log.Information("Old backup deleted successfully");
+                }
+            }
+            catch (Exception ex)
+            {
+                // Silently ignore - backup cleanup is not critical
+                // Will retry on next startup
+                Log.Debug(ex, "Could not delete old backup (will retry next time)");
             }
         }
     }
