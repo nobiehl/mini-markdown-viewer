@@ -7,7 +7,7 @@ Lightweight Windows desktop viewer for Markdown files with themes, localization,
 ![Size](https://img.shields.io/badge/size-2.0_MB-green)
 ![Languages](https://img.shields.io/badge/languages-8-orange)
 ![Themes](https://img.shields.io/badge/themes-4-purple)
-![Tests](https://img.shields.io/badge/tests-41_passing-brightgreen)
+![Tests](https://img.shields.io/badge/tests-231_total-blue)
 
 ## Features
 
@@ -18,6 +18,7 @@ Lightweight Windows desktop viewer for Markdown files with themes, localization,
   - Inline math: `$E = mc^2$`
   - Display math: `$$\int_{-\infty}^{\infty} e^{-x^2} dx = \sqrt{\pi}$$`
   - Full LaTeX support: matrices, Greek letters, fractions, summations, integrals, etc.
+- ✅ **Charts** - Chart.js for data visualization (line, bar, pie, doughnut, radar, polar area)
 - ✅ **Mermaid Diagrams** (flowcharts, sequence, class, state, gantt, ER, etc.)
 - ✅ **PlantUML Diagrams** (class, sequence, use case, activity, component, etc.)
 - ✅ **Images** (including base64-embedded)
@@ -80,7 +81,7 @@ Lightweight Windows desktop viewer for Markdown files with themes, localization,
 - 🧹 **Clean uninstall**: `--uninstall` removes everything
 - 🌍 **Multi-language**: 8 languages supported
 - 🎨 **Themeable**: 4 built-in themes + custom themes
-- 🧪 **Testable**: MVP architecture with 41 passing unit tests (v2.0.0)
+- 🧪 **Testable**: MVP architecture with 43 passing unit tests (v2.0.0)
 
 ## Quick Start
 
@@ -302,9 +303,10 @@ MarkdownViewer.exe document.md --log-level Debug
 - **Math Rendering**: KaTeX 0.16.9 (CDN)
 - **Logging**: Serilog 4.0.0 with rolling file sink
 - **Syntax Highlighting**: Highlight.js 11.9.0 (CDN)
-- **Diagrams**:
+- **Diagrams & Charts**:
   - Mermaid.js 10 (CDN)
   - PlantUML Server (plantuml.com)
+  - Chart.js 4.4.1 (CDN)
 - **Build**: Single-file deployment (.NET 8 Runtime required)
 
 ## Project Structure
@@ -368,7 +370,7 @@ Markdig (with advanced extensions + Mathematics)
   ↓
 HTML String
   ↓
-Embedded CSS + Scripts (KaTeX, Highlight.js, Mermaid.js)
+Embedded CSS + Scripts (KaTeX, Highlight.js, Mermaid.js, Chart.js)
   ↓
 WebView2.NavigateToString()
   ↓
@@ -376,6 +378,7 @@ Client-side processing:
   - KaTeX: Renders mathematical formulas ($...$ and $$...$$)
   - Mermaid: Renders diagrams directly in browser
   - PlantUML: Replaces code block with <img> from server
+  - Chart.js: Renders interactive charts from JSON config
   - Highlight.js: Syntax highlighting for code
   - Copy buttons: Dynamically added to code blocks
 ```

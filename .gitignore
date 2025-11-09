@@ -69,3 +69,6 @@ $RECYCLE.BIN/
 
 # Compiled executable (will be in GitHub Releases instead)
 bin-single/
+**/bin-single*/
+**/publish-*/
+publish/
