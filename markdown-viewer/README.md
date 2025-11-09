@@ -2,7 +2,7 @@
 
 A lightweight, feature-rich Windows desktop application for viewing Markdown files with live preview, syntax highlighting, and more.
 
-![Version](https://img.shields.io/badge/version-1.7.1-blue)
+![Version](https://img.shields.io/badge/version-1.7.2-blue)
 ![.NET](https://img.shields.io/badge/.NET-8.0-purple)
 ![Platform](https://img.shields.io/badge/platform-Windows-lightgrey)
 ![License](https://img.shields.io/badge/license-MIT-green)
@@ -22,6 +22,8 @@ A lightweight, feature-rich Windows desktop application for viewing Markdown fil
 - **📎 Windows Integration** - Open .md files from Explorer
 - **📱 Status Bar** - Language selector, theme switcher, update checker
 - **🆕 Update Checker** - Automatic update notifications
+- **📋 MarkdownDialog** - Beautiful info & release notes display with scrollbar
+- **ℹ️ App Info** - Comprehensive application information via info button
 
 ## 🚀 Installation
 
@@ -185,7 +187,8 @@ Current test coverage: **69%** (730/1057 lines)
 - **Lines of Code**: ~10,000+
 - **Test Coverage**: 69%
 - **Unit Tests**: 209
-- **UI Tests**: 16
+- **UI Tests**: 19
+- **Total Tests**: 228
 - **Languages**: 8
 - **Themes**: 4
 
