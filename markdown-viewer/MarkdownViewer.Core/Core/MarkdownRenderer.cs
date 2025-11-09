@@ -11,6 +11,7 @@ namespace MarkdownViewer.Core
     /// - Math formulas (KaTeX)
     /// - Mermaid diagrams
     /// - PlantUML diagrams
+    /// - Chart.js charts
     /// - Copy buttons for code blocks
     /// - Theme support
     /// </summary>
@@ -35,6 +36,9 @@ namespace MarkdownViewer.Core
         /// <returns>Complete HTML document as string</returns>
         public string RenderToHtml(string markdown, string currentFilePath, Theme? theme = null)
         {
+            ArgumentNullException.ThrowIfNull(markdown);
+            ArgumentNullException.ThrowIfNull(currentFilePath);
+
             string content = Markdown.ToHtml(markdown, _pipeline);
 
             // Generate base URL for relative link resolution
@@ -181,6 +185,7 @@ namespace MarkdownViewer.Core
     <script src='https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js'></script>
     <script defer src='https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js' integrity='sha384-XjKyOOlGwcjNTAIQHIpgOno0Hl1YQqzUOEleOLALmuqehneUG+vnGctmUb0ZY0l8' crossorigin='anonymous'></script>
     <script defer src='https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js' integrity='sha384-+VBxd3r6XgURycqtZ117nYw44OOcIax56Z4dCRWbxyPt0Koah1uHoK0o4+/RRE05' crossorigin='anonymous'></script>
+    <script src='https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js'></script>
     <script type='module'>
         import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
         mermaid.initialize({{ startOnLoad: true, theme: 'default' }});
@@ -240,10 +245,49 @@ namespace MarkdownViewer.Core
             pre.replaceWith(img);
         }});
 
-        // Add copy buttons to code blocks (except mermaid and plantuml)
+        // Process Chart.js charts
+        document.querySelectorAll('code.language-chart').forEach((block) => {{
+            const pre = block.parentElement;
+            const code = block.textContent;
+
+            try {{
+                // Parse JSON configuration
+                const config = JSON.parse(code);
+
+                // Create container div for the chart
+                const container = document.createElement('div');
+                container.style.margin = '1rem 0';
+                container.style.padding = '1rem';
+                container.style.border = '1px solid #ddd';
+                container.style.borderRadius = '4px';
+                container.style.backgroundColor = '#fff';
+                container.style.maxWidth = '100%';
+
+                // Create canvas element
+                const canvas = document.createElement('canvas');
+                container.appendChild(canvas);
+
+                // Replace code block with container
+                pre.replaceWith(container);
+
+                // Render chart
+                new Chart(canvas, config);
+            }} catch (error) {{
+                // Display error message
+                const errorDiv = document.createElement('div');
+                errorDiv.style.border = '1px solid #f00';
+                errorDiv.style.padding = '10px';
+                errorDiv.style.backgroundColor = '#fee';
+                errorDiv.style.borderRadius = '4px';
+                errorDiv.innerHTML = `<strong>Chart.js Error:</strong> ${{error.message}}`;
+                pre.replaceWith(errorDiv);
+            }}
+        }});
+
+        // Add copy buttons to code blocks (except mermaid, plantuml, and chart)
         document.querySelectorAll('pre code').forEach((block) => {{
-            if (block.className.includes('language-mermaid') || block.className.includes('language-plantuml')) {{
-                return; // Skip diagram blocks
+            if (block.className.includes('language-mermaid') || block.className.includes('language-plantuml') || block.className.includes('language-chart')) {{
+                return; // Skip diagram and chart blocks
             }}
 
             const pre = block.parentElement;
