@@ -6,6 +6,17 @@ Dieses Dokument beschreibt das Vorgehensmodell für die strukturierte Weiterentw
 
 Saubere, testbare, wartbare Architektur mit klarer Dokumentation und nachvollziehbarem Fortschritt.
 
+### Neu: Parallele Implementierung mit Agenten
+
+Ab v1.7.0 nutzen wir **parallele Agenten** für schnellere Feature-Entwicklung:
+- ✅ **3x schnellere Implementierung** bei unabhängigen Tasks
+- ✅ **Keine Merge-Konflikte** durch klare Aufgabentrennung
+- ✅ **Bessere Code-Qualität** durch fokussierte Agent-Aufgaben
+
+**Kernprinzip:** Features werden in unabhängige Teilaufgaben zerlegt, die parallel von mehreren Agenten implementiert werden. Jeder Agent arbeitet an eigenen Dateien mit eigenen Tests.
+
+**Voraussetzung:** Saubere Planung und Dokumentation BEVOR Agenten gestartet werden (siehe Phase 1.4).
+
 ## Phasen
 
 ### Phase 1: Planung & Dokumentation
@@ -29,19 +40,172 @@ Saubere, testbare, wartbare Architektur mit klarer Dokumentation und nachvollzie
 - Dependencies klären
 - In `ARCHITECTURE.md` festhalten
 
+#### 1.4 Parallelisierungsanalyse & Agent-Planung
+**REGEL:** Bevor du implementierst, überlege ob parallele Agenten die Arbeit beschleunigen können!
+
+##### 1.4.1 Feature-Analyse
+1. **Feature in Teilaufgaben zerlegen**
+   - Welche logischen Komponenten gibt es?
+   - Welche Dateien/Klassen müssen angelegt/geändert werden?
+   - Welche Tests sind nötig?
+
+2. **Abhängigkeiten identifizieren**
+   - Welche Tasks sind **unabhängig** voneinander?
+   - Welche Tasks **bauen aufeinander auf**?
+   - Welche Tasks teilen **gemeinsame Ressourcen**?
+
+3. **Parallelisierbarkeit bewerten**
+   - Können Tasks gleichzeitig bearbeitet werden?
+   - Gibt es Merge-Konflikte?
+   - Ist die Koordination aufwändiger als sequentielle Arbeit?
+
+##### 1.4.2 Agent-Aufgaben definieren
+Wenn Parallelisierung sinnvoll ist, definiere für jeden Agent:
+
+```markdown
+## Agent 1: [Kurze Beschreibung]
+**Ziel:** [Was soll erreicht werden?]
+**Dateien:** [Welche Dateien werden erstellt/geändert?]
+**Tests:** [Welche Tests sollen geschrieben werden?]
+**Keine Abhängigkeiten zu:** Agent 2, Agent 3
+**Geschätzte Dauer:** [X Minuten]
+
+## Agent 2: [Kurze Beschreibung]
+...
+```
+
+##### 1.4.3 Kriterien für Parallelisierung
+
+**✅ Parallelisierung ist sinnvoll wenn:**
+- 3+ unabhängige Teilaufgaben existieren
+- Jede Teilaufgabe > 5 Minuten Arbeit benötigt
+- Keine oder minimale Code-Überschneidungen
+- Klare Schnittstellen zwischen Komponenten
+- Tasks sind gut dokumentiert und verständlich
+
+**❌ Parallelisierung vermeiden wenn:**
+- Tasks stark voneinander abhängen
+- Gemeinsame Dateien intensiv bearbeitet werden
+- Aufgabe zu klein (< 15 Minuten gesamt)
+- Koordinationsaufwand > Zeitersparnis
+- Unklare Anforderungen oder Design
+
+##### 1.4.4 Beispiele aus der Praxis
+
+**Gutes Beispiel: MarkdownDialog Feature (v1.7.1)**
+```
+Agent 1: MarkdownDialog erstellen
+- UI/MarkdownDialog.cs implementieren
+- WebView2 mit Scrollbar
+- Tests: MarkdownDialogTests.cs
+
+Agent 2: StatusBar Info Handler
+- MainForm.cs: OnInfoClicked implementieren
+- BuildApplicationInfoMarkdown() erstellen
+- Tests: MainFormTests.cs (Info-Button)
+
+Agent 3: UI Text Cleanup
+- StatusBarControl.cs: Tooltips bereinigen
+- Language/Theme ComboBox cleanup
+- AutomationId properties hinzufügen
+- Tests: StatusBarControlTests.cs
+```
+**Ergebnis:** 3x schnellere Implementierung, keine Merge-Konflikte
+
+**Gutes Beispiel: Chart.js Integration (v1.7.3)**
+```
+Agent 1: Chart.js in MarkdownRenderer
+- MarkdownRenderer.cs: CDN + Rendering-Logik
+- Tests: MarkdownRendererTests.cs
+
+Agent 2: Sample Files erstellen
+- samples/charts-overview.md
+- samples/charts-business.md
+- samples/charts-data-science.md
+- samples/charts-realtime.md
+
+Agent 3: Dokumentation & Tests
+- README.md updaten
+- UI-Tests für Chart-Rendering
+```
+**Ergebnis:** Parallele Entwicklung möglich, Agent 2 + 3 komplett unabhängig von Agent 1
+
+**Schlechtes Beispiel: Theme Refactoring (hypothetisch)**
+```
+❌ NICHT parallelisieren:
+Agent 1: ThemeService erstellen
+Agent 2: MainForm auf ThemeService umstellen
+Agent 3: StatusBar auf ThemeService umstellen
+```
+**Problem:** Agent 2 + 3 benötigen die Interfaces von Agent 1 → Sequentiell arbeiten!
+
 ### Phase 2: Implementierung
 **REGEL:** Nach jedem Abschnitt dokumentieren!
 
+#### 2.0 Implementierungsmodus wählen
+
+**Sequentielle Implementierung:** Ein Task nach dem anderen
+- Verwende für kleine Features (< 15 Min)
+- Verwende bei starken Abhängigkeiten
+- Verwende bei unkomplexen Änderungen
+
+**Parallele Implementierung:** Mehrere Agenten gleichzeitig
+- Verwende für große Features (> 30 Min)
+- Verwende bei unabhängigen Teilaufgaben
+- **WICHTIG:** Erstelle ZUERST einen Implementierungsplan (siehe Phase 1.4)
+
 #### 2.1 Vor der Implementierung
+
+**Sequentielle Implementierung:**
 - Aktuellen Abschnitt aus ROADMAP.md lesen
 - Verstehen was zu tun ist
 - Testfälle überlegen
+
+**Parallele Implementierung:**
+1. **Implementierungsplan schreiben:**
+   ```markdown
+   # Implementierungsplan: [Feature Name]
+
+   ## Agent 1: [Name]
+   - [ ] Task 1
+   - [ ] Task 2
+   - [ ] Tests schreiben
+
+   ## Agent 2: [Name]
+   - [ ] Task 1
+   - [ ] Task 2
+   - [ ] Tests schreiben
+
+   ## Agent 3: [Name]
+   - [ ] Task 1
+   - [ ] Task 2
+   - [ ] Tests schreiben
+
+   ## Integration (sequentiell nach Agenten)
+   - [ ] Merge durchführen
+   - [ ] Integration Tests
+   - [ ] Build & Test
+   ```
+
+2. **Agenten starten mit Task Tool:**
+   ```
+   - Verwende EINEN Message-Block mit MEHREREN Task-Tool-Aufrufen
+   - Jeder Agent bekommt seinen spezifischen Auftrag aus dem Plan
+   - Agenten arbeiten parallel und unabhängig
+   ```
+
+3. **Nach Agent-Completion:**
+   - Alle Agent-Ergebnisse reviewen
+   - Merge-Konflikte auflösen (falls vorhanden)
+   - Integration Tests durchführen
+   - Build & Test
 
 #### 2.2 Während der Implementierung
 - Code schreiben
 - Unit Tests schreiben (parallel!)
 - Refactoring durchführen
 - Build erfolgreich durchführen
+- **Bei parallelen Agenten:** Regelmäßig Fortschritt prüfen
 
 #### 2.3 Nach der Implementierung
 - **SOFORT:** Progress in `impl_progress.md` festhalten (via printf)
@@ -212,6 +376,8 @@ mini-markdown-viewer/
 
 ## Workflow pro Feature
 
+### Sequentielle Implementierung
+
 ```mermaid
 graph TD
     A[Feature identifizieren] --> B[In ROADMAP.md eintragen]
@@ -231,6 +397,42 @@ graph TD
     M -->|Nein| N[Glossar konsolidieren]
     N --> O[Doku synchronisieren]
     O --> P[Release]
+```
+
+### Parallele Implementierung mit Agenten
+
+```mermaid
+graph TD
+    A[Feature identifizieren] --> B[In ROADMAP.md eintragen]
+    B --> C[Architektur planen]
+    C --> D[In ARCHITECTURE.md dokumentieren]
+    D --> E[Parallelisierungsanalyse]
+    E --> F{Parallelisierung sinnvoll?}
+    F -->|Nein| G[Sequentiell arbeiten]
+    F -->|Ja| H[Implementierungsplan erstellen]
+    H --> I[Aufgaben definieren Agent 1-N]
+    I --> J[Agenten parallel starten]
+    J --> K1[Agent 1: Code + Tests]
+    J --> K2[Agent 2: Code + Tests]
+    J --> K3[Agent 3: Code + Tests]
+    K1 --> L[Agent-Ergebnisse reviewen]
+    K2 --> L
+    K3 --> L
+    L --> M[Merge & Integration]
+    M --> N[Integration Tests]
+    N --> O[Build & Test]
+    O --> P{Tests OK?}
+    P -->|Nein| Q[Fehler beheben]
+    Q --> O
+    P -->|Ja| R[Progress in impl_progress.md]
+    R --> S[Glossar-Einträge hinzufügen]
+    S --> T[Doku aktualisieren]
+    T --> U[Git Commit]
+    U --> V{Mehr Features?}
+    V -->|Ja| A
+    V -->|Nein| W[Glossar konsolidieren]
+    W --> X[Doku synchronisieren]
+    X --> Y[Release]
 ```
 
 ## Best Practices
@@ -256,6 +458,14 @@ graph TD
 - Akronym → Sofort ins Glossar
 - Service-Name → Sofort ins Glossar
 - Nicht sammeln, sondern sofort eintragen (via printf)
+
+### Parallel Implementation
+- **Plane BEVOR du parallelisierst:** Erstelle Implementierungsplan mit klaren Agent-Aufgaben
+- **Unabhängigkeit ist King:** Agenten sollten KEINE gemeinsamen Dateien bearbeiten
+- **Ein Message = Alle Agenten:** Starte alle Agenten gleichzeitig in einem einzigen Message-Block
+- **Review nach Completion:** Prüfe alle Agent-Ergebnisse bevor du mergst
+- **Integration Tests:** Nach Merge immer Integration Tests durchführen
+- **Wenn unklar → Sequentiell:** Bei Zweifeln lieber sequentiell arbeiten
 
 ## Quality Gates
 
@@ -307,6 +517,10 @@ dotnet test /p:CollectCoverage=true /p:CoverletOutputFormat=lcov
 - ✅ Tests parallel zum Code
 - ✅ Sofortiges Dokumentieren (nicht aufschieben)
 - ✅ Glossar via printf (schnell und einfach)
+- ✅ **Parallele Agenten für unabhängige Tasks** (3x schneller!)
+- ✅ **Implementierungsplan vor Agenten-Start** (verhindert Chaos)
+- ✅ **Ein Message mit mehreren Task-Aufrufen** (echte Parallelität)
+- ✅ **Klare Agent-Aufgaben mit spezifischen Dateien** (keine Überschneidungen)
 
 ### Was vermeiden:
 - ❌ "Ich dokumentiere später" (wird vergessen)
@@ -316,6 +530,63 @@ dotnet test /p:CollectCoverage=true /p:CoverletOutputFormat=lcov
 - ❌ **Mit Compiler-Warnungen releasen** (Code Quality!)
 - ❌ Nullable Reference Warnings ignorieren
 - ❌ "Die Warnungen sind nicht schlimm" Mentalität
+- ❌ **Agenten ohne Plan starten** (führt zu Merge-Konflikten)
+- ❌ **Abhängige Tasks parallel ausführen** (Agent 2 braucht Ergebnis von Agent 1)
+- ❌ **Agenten sequentiell starten** (verliert Geschwindigkeitsvorteil)
+- ❌ **Gemeinsame Dateien von mehreren Agenten bearbeiten** (Merge-Hölle)
+
+## Quick Reference: Soll ich parallelisieren?
+
+Nutze diese Checkliste um schnell zu entscheiden ob parallele Agenten sinnvoll sind:
+
+### ✅ JA - Parallelisiere wenn:
+```
+[ ] Feature hat 3+ logisch getrennte Komponenten
+[ ] Jede Komponente benötigt > 5 Minuten Arbeit
+[ ] Komponenten arbeiten in verschiedenen Dateien
+[ ] Keine zirkulären Abhängigkeiten zwischen Komponenten
+[ ] Schnittstellen zwischen Komponenten sind klar definiert
+[ ] Gesamt-Aufwand > 30 Minuten
+```
+
+### ❌ NEIN - Arbeite sequentiell wenn:
+```
+[ ] Feature ist klein (< 15 Minuten total)
+[ ] Komponenten teilen viele gemeinsame Dateien
+[ ] Starke Abhängigkeiten: Component B braucht Output von A
+[ ] Unklare Anforderungen oder Design
+[ ] Unsicher über Aufgabentrennung
+```
+
+### 📋 Workflow bei Parallelisierung:
+
+1. **Plan erstellen** (5 Min)
+   ```markdown
+   Agent 1: [Komponente] - Dateien: [X, Y] - Tests: [Z]
+   Agent 2: [Komponente] - Dateien: [A, B] - Tests: [C]
+   Agent 3: [Komponente] - Dateien: [D, E] - Tests: [F]
+   ```
+
+2. **Agenten starten** (1 Message mit 3 Task-Calls)
+   - Alle gleichzeitig in EINEM Message-Block!
+
+3. **Nach Completion**
+   - Review aller Ergebnisse
+   - Merge durchführen
+   - Integration Tests
+   - Build & Test
+
+### 💡 Beispiel aus v1.7.1:
+```
+Feature: MarkdownDialog mit Info-Button
+
+✅ PARALLELISIERT:
+- Agent 1: MarkdownDialog.cs erstellen (neue Datei)
+- Agent 2: Info-Button Handler (MainForm.cs)
+- Agent 3: UI Cleanup (StatusBarControl.cs)
+
+Ergebnis: 3x schneller, 0 Konflikte
+```
 
 ## Nächste Schritte
 
@@ -328,6 +599,7 @@ Nach diesem Dokument:
 
 ---
 
-**Version:** 1.0
+**Version:** 2.0 (Mit Parallelisierungs-Support)
 **Erstellt:** 2025-11-05
+**Aktualisiert:** 2025-11-09
 **Status:** Active
