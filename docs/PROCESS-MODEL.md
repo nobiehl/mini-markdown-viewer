@@ -355,10 +355,47 @@ cat logs/viewer-YYYYMMDD.log | grep "File not found:"
 - DEPLOYMENT-GUIDE.md prüfen
 
 #### 4.3 Release vorbereiten
-- Version bump
-- CHANGELOG.md erstellen
+
+**KRITISCH: Alle Tests MÜSSEN vor Release ausgeführt werden!**
+
+**1. Unit Tests ausführen:**
+```bash
+cd markdown-viewer/MarkdownViewer.Tests
+dotnet test --verbosity normal
+```
+- Alle Tests müssen grün sein (0 failed)
+- Test Coverage >= 80%
+- Bei Fehlern: Release NICHT erstellen!
+
+**2. UI Automation Tests ausführen:**
+```bash
+cd markdown-viewer/MarkdownViewer.Tests
+dotnet test --filter "FullyQualifiedName~UIAutomation" --verbosity normal
+```
+- **WICHTIG**: UI Tests verifizieren dass die Anwendung tatsächlich startet
+- Würde Fehler wie "138 KB broken binary" sofort erkennen
+- Bei Fehlern: Release NICHT erstellen!
+
+**3. Publish Build erstellen und testen:**
+```bash
+cd markdown-viewer/MarkdownViewer
+dotnet publish -c Release -r win-x64 --self-contained false \
+  -p:PublishSingleFile=true \
+  -p:IncludeNativeLibrariesForSelfExtract=true -o publish
+
+# WICHTIG: Verifiziere Dateigröße (sollte ~3.3 MB sein, NICHT 138 KB!)
+ls -lh publish/MarkdownViewer.exe
+```
+- **Dateigröße prüfen**: ~3.3 MB ist korrekt, 138 KB ist FALSCH (Managed DLL statt EXE)
+- **Binary manuell testen**: Doppelklick, öffnet Datei, keine Crashes, UI funktioniert
+
+**4. Version bump, Dokumentation, Release Notes:**
+- Version bump in Program.cs und MainForm.cs
+- CHANGELOG.md aktualisieren
 - Release Notes schreiben
-- Build testen
+- README.md Badge aktualisieren
+
+**5. Erst nach erfolgreichen Tests: Build testen und Release erstellen**
 
 ## Dokumentationsstruktur
 
@@ -478,6 +515,15 @@ graph TD
 - [ ] Relevante Doku angepasst
 
 ### Vor jedem Release:
+- [ ] **Alle Unit Tests ausgeführt und bestanden** (dotnet test) - KRITISCH!
+- [ ] **Alle UI Automation Tests ausgeführt und bestanden** - KRITISCH!
+  - UI Tests verifizieren dass die App tatsächlich startet
+  - Würde broken binaries (138 KB statt 3.3 MB) sofort erkennen
+- [ ] **Publish Build erstellt mit dotnet publish** (NICHT dotnet build!) - KRITISCH!
+  - Befehl: `dotnet publish -c Release -r win-x64 --self-contained false -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true`
+  - Output aus `publish/` Ordner verwenden, NICHT aus `bin/Release/`
+- [ ] **Binary Größe verifiziert** (~3.3 MB korrekt, 138 KB = FEHLER!) - KRITISCH!
+- [ ] **Published Binary manuell getestet** (startet, öffnet Dateien, keine Crashes, UI funktioniert) - KRITISCH!
 - [ ] **Code kompiliert mit 0 Errors und 0 Warnings** (KRITISCH!)
 - [ ] Test Coverage >= 80%
 - [ ] Alle Features dokumentiert
@@ -485,7 +531,6 @@ graph TD
 - [ ] Doku synchronisiert
 - [ ] Manual Testing durchgeführt
 - [ ] CHANGELOG.md vollständig
-- [ ] Binary getestet (kein Crash, alle Features funktionieren)
 
 ### Code Quality Standards:
 - **NIEMALS** mit Warnungen releasen
@@ -534,6 +579,10 @@ dotnet test /p:CollectCoverage=true /p:CoverletOutputFormat=lcov
 - ❌ **Abhängige Tasks parallel ausführen** (Agent 2 braucht Ergebnis von Agent 1)
 - ❌ **Agenten sequentiell starten** (verliert Geschwindigkeitsvorteil)
 - ❌ **Gemeinsame Dateien von mehreren Agenten bearbeiten** (Merge-Hölle)
+- ❌ **Release ohne UI Automation Tests erstellen** (würde broken binaries erkennen!)
+- ❌ **dotnet build statt dotnet publish verwenden** (erzeugt 138 KB DLL statt 3.3 MB EXE)
+- ❌ **Binary-Größe nicht prüfen vor Upload** (138 KB ist offensichtlich falsch, sollte ~3.3 MB sein)
+- ❌ **Binary aus bin/Release/ statt publish/ verwenden** (Managed DLL statt Self-Contained EXE)
 
 ## Quick Reference: Soll ich parallelisieren?
 
@@ -599,7 +648,13 @@ Nach diesem Dokument:
 
 ---
 
-**Version:** 2.0 (Mit Parallelisierungs-Support)
+**Version:** 2.1 (Mit verpflichtenden Test-Anforderungen vor Releases)
 **Erstellt:** 2025-11-05
 **Aktualisiert:** 2025-11-09
 **Status:** Active
+
+**Änderungen in v2.1:**
+- Phase 4.3: Detaillierte Test-Schritte vor Release (Unit Tests, UI Automation, Publish Build)
+- Quality Gates: Erweiterte Checkliste mit verpflichtenden Tests
+- Lessons Learned: Dokumentation des "138 KB broken binary" Fehlers
+- Prävention: UI Automation Tests würden solche Fehler sofort erkennen
