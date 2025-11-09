@@ -25,7 +25,7 @@ namespace MarkdownViewer
     static class Program
     {
         private const string AppName = "MarkdownViewer";
-        private const string Version = "1.7.0";
+        private const string Version = "1.7.1";
 
         /// <summary>
         /// Main entry point for the application.
@@ -73,8 +73,8 @@ namespace MarkdownViewer
             // Handle --test-update mode (for testing update mechanism)
             if (testUpdateMode)
             {
-                string scenario = GetArgValue(args, "--test-scenario") ?? "update-available";
-                RunUpdateTest(scenario, logLevel);
+                string? scenario = GetArgValue(args, "--test-scenario");
+                RunUpdateTest(scenario ?? "update-available", logLevel);
                 return;
             }
 
@@ -294,10 +294,25 @@ Log Levels:
                 Type? shellType = Type.GetTypeFromProgID("WScript.Shell");
                 if (shellType == null) return;
 
-                dynamic? shell = Activator.CreateInstance(shellType);
-                var shortcut = shell!.CreateShortcut(shortcutPath);
-                shortcut.TargetPath = targetPath;
-                shortcut.Save();
+                object? shell = Activator.CreateInstance(shellType);
+                if (shell == null) return;
+
+                dynamic shortcut = shell.GetType().InvokeMember(
+                    "CreateShortcut",
+                    System.Reflection.BindingFlags.InvokeMethod,
+                    null,
+                    shell,
+                    new object[] { shortcutPath })!;
+
+                var targetPathProperty = shortcut.GetType().GetProperty("TargetPath");
+                targetPathProperty?.SetValue(shortcut, targetPath);
+
+                shortcut.GetType().InvokeMember(
+                    "Save",
+                    System.Reflection.BindingFlags.InvokeMethod,
+                    null,
+                    shortcut,
+                    null);
 
                 System.Runtime.InteropServices.Marshal.ReleaseComObject(shortcut);
                 System.Runtime.InteropServices.Marshal.ReleaseComObject(shell);
@@ -352,7 +367,7 @@ Log Levels:
         /// Gets the value of a command-line argument.
         /// Example: --test-scenario update-available returns "update-available"
         /// </summary>
-        private static string GetArgValue(string[] args, string argName)
+        private static string? GetArgValue(string[] args, string argName)
         {
             for (int i = 0; i < args.Length - 1; i++)
             {
@@ -361,7 +376,7 @@ Log Levels:
                     return args[i + 1];
                 }
             }
-            return null!;
+            return null;
         }
 
         /// <summary>
@@ -470,12 +485,26 @@ Log Levels:
                 // Show update dialog on UI thread
                 form.Invoke(new Action(async () =>
                 {
+                    // Show release notes in MarkdownDialog
+                    string releaseNotesMarkdown = $@"# Update verfügbar: v{updateInfo.LatestVersion}
+
+**Aktuelle Version:** v{Version}
+**Größe:** {updateInfo.FileSize / 1024.0 / 1024.0:F1} MB
+
+## Release Notes
+
+{updateInfo.ReleaseNotes}
+
+---
+
+**Möchten Sie das Update jetzt herunterladen?**";
+
+                    var renderer = new MarkdownRenderer();
+                    MarkdownViewer.UI.MarkdownDialog.ShowDialog(form, "Update verfügbar", releaseNotesMarkdown, renderer);
+
+                    // Ask for confirmation
                     var result = MessageBox.Show(
-                        $"Update verfügbar: {updateInfo.LatestVersion}\n\n" +
-                        $"Aktuelle Version: {Version}\n" +
-                        $"Größe: {updateInfo.FileSize / 1024.0 / 1024.0:F1} MB\n\n" +
-                        $"Release Notes:\n{TruncateString(updateInfo.ReleaseNotes, 300)}\n\n" +
-                        $"Jetzt herunterladen?",
+                        "Jetzt herunterladen?",
                         "Update verfügbar",
                         MessageBoxButtons.YesNo,
                         MessageBoxIcon.Question
@@ -486,10 +515,8 @@ Log Levels:
                         Log.Information("User accepted update download");
 
                         // Download update
-                        string updatePath = Path.Combine(
-                            Path.GetDirectoryName(Application.ExecutablePath)!,
-                            "pending-update.exe"
-                        );
+                        string exeDir = Path.GetDirectoryName(Application.ExecutablePath) ?? Environment.CurrentDirectory;
+                        string updatePath = Path.Combine(exeDir, "pending-update.exe");
 
                         bool downloaded = await checker.DownloadUpdateAsync(updateInfo.DownloadUrl);
 
@@ -575,7 +602,7 @@ Log Levels:
             {
                 var settingsService = sp.GetRequiredService<ISettingsService>();
                 var settings = settingsService.Load();
-                return new LocalizationService(settings.Language);
+                return new LocalizationService(settings.Language ?? "en");
             });
             services.AddSingleton<IDialogService, WinFormsDialogService>();
 

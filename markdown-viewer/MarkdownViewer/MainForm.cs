@@ -26,7 +26,7 @@ namespace MarkdownViewer
     /// </summary>
     public class MainForm : Form, IMainView
     {
-        private const string Version = "1.7.0";
+        private const string Version = "1.7.1";
 
         // UI Components
         private WebView2 _webView = null!;
@@ -90,16 +90,10 @@ namespace MarkdownViewer
         public event EventHandler? ViewLoaded;
         public event EventHandler<ThemeChangedEventArgs>? ThemeChangeRequested;
         public event EventHandler<LanguageChangedEventArgs>? LanguageChangeRequested;
-#pragma warning disable CS0067 // Event is declared but never used (part of interface)
-        public event EventHandler<string>? FileLoadRequested;
-#pragma warning restore CS0067
         public event EventHandler? RefreshRequested;
         public event EventHandler? SearchRequested;
         public event EventHandler? NavigateBackRequested;
         public event EventHandler? NavigateForwardRequested;
-#pragma warning disable CS0067 // Event is declared but never used (part of interface)
-        public event EventHandler? CloseRequested;
-#pragma warning restore CS0067
 
         // IMainView Methods (Presenter -> View)
         public void DisplayMarkdown(string html)
@@ -183,7 +177,7 @@ namespace MarkdownViewer
             LoadSettings();
 
             // Initialize localization service with language from settings
-            _localizationService = new LocalizationService(_settings.Language!);
+            _localizationService = new LocalizationService(_settings.Language ?? "en");
 
             // Initialize UI components
             InitializeComponents();
@@ -253,7 +247,7 @@ namespace MarkdownViewer
         {
             try
             {
-                string exeFolder = Path.GetDirectoryName(Application.ExecutablePath) ?? ".";
+                string exeFolder = Path.GetDirectoryName(Application.ExecutablePath) ?? Environment.CurrentDirectory;
                 string logsFolder = Path.Combine(exeFolder, "logs");
 
                 if (!Directory.Exists(logsFolder))
@@ -296,7 +290,7 @@ namespace MarkdownViewer
             this.Controls.Add(_webView);
 
             // Set WebView2 data folder to .cache next to EXE
-            string exeFolder = Path.GetDirectoryName(Application.ExecutablePath) ?? ".";
+            string exeFolder = Path.GetDirectoryName(Application.ExecutablePath) ?? Environment.CurrentDirectory;
             string userDataFolder = Path.Combine(exeFolder, ".cache");
 
             var env = Microsoft.Web.WebView2.Core.CoreWebView2Environment.CreateAsync(
@@ -356,7 +350,13 @@ namespace MarkdownViewer
                 Log.Information("Applying theme to Form: {ThemeName}", _currentTheme?.Name ?? "null");
 
                 // Apply theme to WinForms
-                this.BackColor = System.Drawing.ColorTranslator.FromHtml(_currentTheme!.UI.FormBackground);
+                if (_currentTheme == null)
+                {
+                    Log.Warning("Theme is null, cannot apply theme to UI");
+                    return;
+                }
+
+                this.BackColor = System.Drawing.ColorTranslator.FromHtml(_currentTheme.UI.FormBackground);
 
                 // Apply theme to WebView2 background (visible while loading)
                 if (_webView != null)
@@ -365,7 +365,10 @@ namespace MarkdownViewer
                 }
 
                 // Apply theme to all UI components (StatusBar, etc.) using ThemeService
-                await _themeService.ApplyThemeAsync(_currentTheme, this, _webView!);
+                if (_webView != null)
+                {
+                    await _themeService.ApplyThemeAsync(_currentTheme, this, _webView);
+                }
 
                 Log.Information("Theme applied to Form successfully: BackColor={BackColor}", _currentTheme.UI.FormBackground);
             }
@@ -561,7 +564,7 @@ namespace MarkdownViewer
                 // Check if path is relative (not rooted)
                 if (!Path.IsPathRooted(url))
                 {
-                    string currentFileDirectory = Path.GetDirectoryName(_currentFilePath) ?? ".";
+                    string currentFileDirectory = Path.GetDirectoryName(_currentFilePath) ?? Environment.CurrentDirectory;
                     resolvedPath = Path.GetFullPath(Path.Combine(currentFileDirectory, url));
                     Log.Information("Path resolution: Relative path detected | Base directory: {BaseDir} | Resolved to: {ResolvedPath}",
                         currentFileDirectory, resolvedPath);
@@ -869,12 +872,98 @@ namespace MarkdownViewer
         {
             Log.Debug("Info button clicked");
 
-            string info = $"Markdown Viewer v{Version}\n\n" +
-                          $"Language: {_localizationService.GetCurrentLanguage().ToUpper()}\n" +
-                          $"Theme: {_settings.Theme}\n" +
-                          $"Settings: {Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\\MarkdownViewer\\settings.json";
+            string appInfo = BuildApplicationInfoMarkdown();
 
-            MessageBox.Show(info, "Info", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            // Show in MarkdownDialog for beautiful formatting
+            using var dialog = new MarkdownDialog("About Markdown Viewer", appInfo, _renderer);
+            dialog.ShowDialog(this);
+        }
+
+        /// <summary>
+        /// Builds comprehensive application information in Markdown format.
+        /// This will be displayed in the MarkdownDialog once available.
+        /// </summary>
+        private string BuildApplicationInfoMarkdown()
+        {
+            string markdown = $@"# Markdown Viewer v{Version}
+
+## About
+
+A lightweight, fast Windows application for viewing Markdown files with live preview and advanced rendering capabilities.
+
+## Features
+
+- **Live File Reload** - Automatically updates when file changes
+- **Syntax Highlighting** - Code blocks with language-specific highlighting
+- **Math Support** - Render mathematical formulas using KaTeX
+- **Mermaid Diagrams** - Flowcharts, sequence diagrams, and more
+- **PlantUML Support** - UML diagrams and technical drawings
+- **Multiple Themes** - Choose from 4 beautiful themes (Dark, Standard, Solarized, Dräger)
+- **Multi-Language** - Supports 8 languages (EN, DE, MN, FR, ES, JA, ZH, RU)
+- **Navigation** - Back/forward navigation through document history
+- **Search** - Find text within documents (Ctrl+F)
+- **Windows Integration** - Double-click .md files, context menu, Send To
+
+## Current Configuration
+
+- **Version**: {Version}
+- **Language**: {_localizationService.GetCurrentLanguage().ToUpper()}
+- **Theme**: {char.ToUpper(_settings.Theme[0]) + _settings.Theme.Substring(1)}
+- **Settings**: `{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\MarkdownViewer\settings.json`
+
+## Keyboard Shortcuts
+
+| Shortcut | Action |
+|----------|--------|
+| `F5` | Reload current file |
+| `Ctrl+F` | Open search |
+| `F3` | Next search result |
+| `Shift+F3` | Previous search result |
+| `Alt+Left` | Navigate back |
+| `Alt+Right` | Navigate forward |
+| `Ctrl+Mouse Wheel` | Zoom in/out |
+| `Esc` | Close search |
+
+## Credits
+
+Developed with:
+- **Markdig** - Markdown parsing and rendering
+- **KaTeX** - Mathematical formula rendering
+- **Mermaid** - Diagram generation
+- **Highlight.js** - Syntax highlighting for code blocks
+- **WebView2** - Modern web rendering engine
+- **Feather Icons** - Beautiful UI icons
+
+## Links
+
+- **GitHub Repository**: [github.com/nobiehl/mini-markdown-viewer](https://github.com/nobiehl/mini-markdown-viewer)
+- **Report Issues**: [github.com/nobiehl/mini-markdown-viewer/issues](https://github.com/nobiehl/mini-markdown-viewer/issues)
+- **Documentation**: View README.md on GitHub
+
+---
+
+*Built with care for the Markdown community*
+";
+            return markdown;
+        }
+
+        /// <summary>
+        /// Converts Markdown to plain text for MessageBox display.
+        /// This is a temporary helper until MarkdownDialog is available.
+        /// </summary>
+        private string ConvertMarkdownToPlainText(string markdown)
+        {
+            // Simple conversion: remove markdown formatting for MessageBox
+            string text = markdown
+                .Replace("# ", "")
+                .Replace("## ", "")
+                .Replace("**", "")
+                .Replace("- ", "• ")
+                .Replace("`", "\"")
+                .Replace("---", "")
+                .Replace("*", "");
+
+            return text.Trim();
         }
 
         /// <summary>
@@ -929,14 +1018,27 @@ namespace MarkdownViewer
                 {
                     _statusBar?.SetUpdateStatus(UpdateStatus.UpdateAvailable, updateInfo.LatestVersion);
 
+                    // Show release notes in MarkdownDialog
+                    string releaseNotesMarkdown = $@"# Update Available: v{updateInfo.LatestVersion}
+
+**Current version:** v{Version}
+
+## Release Notes
+
+{updateInfo.ReleaseNotes}
+
+---
+
+**Would you like to download and install this update now?**";
+
+                    MarkdownDialog.ShowDialog(this, "Update Available", releaseNotesMarkdown, _renderer);
+
+                    // Ask for confirmation
                     var result = MessageBox.Show(
-                        $"Update available: v{updateInfo.LatestVersion}\n\n" +
-                        $"Current version: v{Version}\n\n" +
-                        $"Release notes:\n{updateInfo.ReleaseNotes}\n\n" +
                         "Download and install now?",
                         "Update Available",
                         MessageBoxButtons.YesNo,
-                        MessageBoxIcon.Information);
+                        MessageBoxIcon.Question);
 
                     if (result == DialogResult.Yes)
                     {
