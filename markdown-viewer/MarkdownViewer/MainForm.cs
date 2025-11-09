@@ -289,19 +289,41 @@ namespace MarkdownViewer
             };
             this.Controls.Add(_webView);
 
-            // Set WebView2 data folder to .cache next to EXE
-            string exeFolder = Path.GetDirectoryName(Application.ExecutablePath) ?? Environment.CurrentDirectory;
-            string userDataFolder = Path.Combine(exeFolder, ".cache");
-
-            var env = Microsoft.Web.WebView2.Core.CoreWebView2Environment.CreateAsync(
-                null,
-                userDataFolder
-            ).Result;
-
-            _webView.EnsureCoreWebView2Async(env);
-
             // Setup WebView2 event handlers
             _webView.CoreWebView2InitializationCompleted += OnWebView2Initialized;
+
+            // Initialize WebView2 asynchronously with separate user data folder
+            string exeFolder = Path.GetDirectoryName(Application.ExecutablePath) ?? Environment.CurrentDirectory;
+            string userDataFolder = Path.Combine(exeFolder, ".cache");
+            Directory.CreateDirectory(userDataFolder);
+
+            InitializeWebView2Async(userDataFolder);
+        }
+
+        /// <summary>
+        /// Initializes WebView2 asynchronously with a separate user data folder.
+        /// </summary>
+        private async void InitializeWebView2Async(string userDataFolder)
+        {
+            try
+            {
+                Log.Debug("Starting WebView2 initialization with user data folder: {UserDataFolder}", userDataFolder);
+                var environment = await Microsoft.Web.WebView2.Core.CoreWebView2Environment.CreateAsync(
+                    browserExecutableFolder: null,
+                    userDataFolder: userDataFolder
+                );
+                await _webView!.EnsureCoreWebView2Async(environment);
+                Log.Debug("WebView2 environment created successfully");
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex, "Failed to initialize WebView2 environment");
+                MessageBox.Show(
+                    $"Failed to initialize WebView2:\n{ex.Message}\n\nPlease ensure Microsoft Edge WebView2 Runtime is installed.",
+                    "Initialization Error",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Error);
+            }
         }
 
         private void OnWebView2Initialized(object? sender, Microsoft.Web.WebView2.Core.CoreWebView2InitializationCompletedEventArgs e)
