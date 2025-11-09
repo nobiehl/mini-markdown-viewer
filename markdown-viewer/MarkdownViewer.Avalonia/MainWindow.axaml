@@ -1,0 +1,44 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d" d:DesignWidth="1024" d:DesignHeight="768"
+        x:Class="MarkdownViewer.Avalonia.MainWindow"
+        Width="1024" Height="768"
+        Title="Markdown Viewer (Avalonia PoC)">
+
+    <DockPanel>
+        <!-- StatusBar -->
+        <StackPanel DockPanel.Dock="Bottom"
+                    Orientation="Horizontal"
+                    Height="30"
+                    Background="#2D2D30">
+            <TextBlock Text="Ready"
+                       Foreground="White"
+                       VerticalAlignment="Center"
+                       Margin="10,0"/>
+        </StackPanel>
+
+        <!-- Menu -->
+        <Menu DockPanel.Dock="Top">
+            <MenuItem Header="_File">
+                <MenuItem Header="_Open" Click="OnOpenFile"/>
+                <MenuItem Header="E_xit" Click="OnExit"/>
+            </MenuItem>
+            <MenuItem Header="_Theme">
+                <MenuItem Header="Standard" Click="OnThemeStandard"/>
+                <MenuItem Header="Dark" Click="OnThemeDark"/>
+            </MenuItem>
+        </Menu>
+
+        <!-- Content Area -->
+        <ScrollViewer>
+            <!-- HTML Preview as Text (Fallback until WebView is available) -->
+            <TextBlock Name="HtmlPreview"
+                       TextWrapping="Wrap"
+                       Margin="20"
+                       FontFamily="Consolas"
+                       FontSize="12"/>
+        </ScrollViewer>
+    </DockPanel>
+</Window>

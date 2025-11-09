@@ -5,11 +5,12 @@ using Microsoft.Web.WebView2.WinForms;
 using Serilog;
 using Serilog.Events;
 using MarkdownViewer.Core;
-using MarkdownViewer.Models;
+using MarkdownViewer.Core.Models;
+using MarkdownViewer.Core.Services;
+using MarkdownViewer.Core.Views;
+using MarkdownViewer.Core.Presenters;
 using MarkdownViewer.Services;
 using MarkdownViewer.UI;
-using MarkdownViewer.Views;
-using MarkdownViewer.Presenters;
 
 namespace MarkdownViewer
 {

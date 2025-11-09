@@ -7,12 +7,14 @@ using Microsoft.Win32;
 using Serilog;
 using Serilog.Events;
 using Microsoft.Extensions.DependencyInjection;
-using MarkdownViewer.Configuration;
-using MarkdownViewer.Models;
+using MarkdownViewer.Core;
+using MarkdownViewer.Core.Configuration;
+using MarkdownViewer.Core.Models;
+using MarkdownViewer.Core.Services;
+using MarkdownViewer.Core.Views;
+using MarkdownViewer.Core.Presenters;
 using MarkdownViewer.Services;
 using MarkdownViewer.Views;
-using MarkdownViewer.Presenters;
-using MarkdownViewer.Core;
 
 namespace MarkdownViewer
 {

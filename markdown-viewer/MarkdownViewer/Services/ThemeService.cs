@@ -8,36 +8,12 @@ using System.Text.Json;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using Microsoft.Web.WebView2.WinForms;
-using MarkdownViewer.Models;
+using MarkdownViewer.Core.Models;
+using MarkdownViewer.Core.Services;
 using Serilog;
 
 namespace MarkdownViewer.Services
 {
-    /// <summary>
-    /// Interface for theme management operations
-    /// </summary>
-    public interface IThemeService
-    {
-        /// <summary>
-        /// Gets the currently loaded theme
-        /// </summary>
-        Theme GetCurrentTheme();
-
-        /// <summary>
-        /// Loads a theme by name from embedded resources
-        /// </summary>
-        Theme LoadTheme(string themeName);
-
-        /// <summary>
-        /// Gets list of available theme names
-        /// </summary>
-        List<string> GetAvailableThemes();
-
-        /// <summary>
-        /// Applies a theme to the WinForms UI and WebView2 content
-        /// </summary>
-        Task ApplyThemeAsync(Theme theme, Form form, WebView2 webView);
-    }
 
     /// <summary>
     /// Theme service implementation.

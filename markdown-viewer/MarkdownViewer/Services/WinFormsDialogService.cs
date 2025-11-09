@@ -1,4 +1,5 @@
 using System.Windows.Forms;
+using MarkdownViewer.Core.Services;
 
 namespace MarkdownViewer.Services
 {

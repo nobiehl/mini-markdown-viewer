@@ -4,8 +4,9 @@ using System.Drawing;
 using System.Linq;
 using System.Windows.Forms;
 using Microsoft.Win32;
+using MarkdownViewer.Core.Views;
+using MarkdownViewer.Core.Services;
 using MarkdownViewer.Services;
-using MarkdownViewer.Views;
 
 namespace MarkdownViewer.UI
 {
@@ -505,7 +506,7 @@ namespace MarkdownViewer.UI
         /// Reloads all icons with the foreground color from the theme.
         /// </summary>
         /// <param name="theme">Theme to apply</param>
-        public void ApplyTheme(Models.Theme theme)
+        public void ApplyTheme(Core.Models.Theme theme)
         {
             try
             {

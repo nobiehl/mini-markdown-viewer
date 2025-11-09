@@ -1,7 +1,7 @@
 using System;
 using System.Windows.Forms;
-using MarkdownViewer.Services;
-using MarkdownViewer.Views;
+using MarkdownViewer.Core.Services;
+using MarkdownViewer.Core.Views;
 using Serilog;
 
 namespace MarkdownViewer.UI

@@ -7,8 +7,8 @@ using System.Text.Json;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using Serilog;
-using MarkdownViewer.Configuration;
-using MarkdownViewer.Models;
+using MarkdownViewer.Core.Configuration;
+using MarkdownViewer.Core.Models;
 
 namespace MarkdownViewer
 {

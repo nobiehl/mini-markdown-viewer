@@ -1,6 +1,7 @@
 using Microsoft.Web.WebView2.WinForms;
 using Microsoft.Web.WebView2.Core;
 using Serilog;
+using MarkdownViewer.Core.Views;
 
 namespace MarkdownViewer.Views
 {
