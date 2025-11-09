@@ -2,7 +2,7 @@
 
 A lightweight, feature-rich Windows desktop application for viewing Markdown files with live preview, syntax highlighting, and more.
 
-![Version](https://img.shields.io/badge/version-1.7.3-blue)
+![Version](https://img.shields.io/badge/version-1.7.4-blue)
 ![.NET](https://img.shields.io/badge/.NET-8.0-purple)
 ![Platform](https://img.shields.io/badge/platform-Windows-lightgrey)
 ![License](https://img.shields.io/badge/license-MIT-green)
