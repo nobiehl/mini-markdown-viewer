@@ -25,7 +25,7 @@ namespace MarkdownViewer
     static class Program
     {
         private const string AppName = "MarkdownViewer";
-        private const string Version = "1.7.2";
+        private const string Version = "1.7.3";
 
         /// <summary>
         /// Main entry point for the application.
