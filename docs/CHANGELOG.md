@@ -62,6 +62,140 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.7.2] - 2025-11-08
+
+### Added
+- **UI Automation Tests**: Comprehensive test suite for MarkdownDialog
+  - Tests for Info button functionality
+  - Verification of Markdown rendering in dialogs
+  - Automated UI testing with FlaUI
+
+### Fixed
+- **MarkdownDialog WebView2 Isolation**: Separate user data folder for dialogs
+  - Prevents conflicts with main WebView2 instance
+  - Each dialog gets isolated cache directory
+  - Improved stability when showing multiple dialogs
+
+### Technical
+- FlaUI integration for UI automation
+- WebView2 environment separation
+- Comprehensive test coverage for dialog functionality
+
+---
+
+## [1.7.1] - 2025-11-08
+
+### Changed
+- **Code Cleanup**: Removed experimental Avalonia cross-platform code
+  - Deleted leftover test files from cross-platform experiments
+  - Focus on Windows-only WinForms architecture
+  - Cleaner codebase without unused dependencies
+
+---
+
+## [1.7.0] - 2025-11-08
+
+### Changed
+- **🏗️ Architecture Refactoring**: Shared library architecture
+  - **MarkdownViewer.Core**: Shared business logic library
+    - Core rendering engine
+    - File watching
+    - Settings management
+    - Platform-independent code
+  - **MarkdownViewer**: WinForms UI layer
+    - Thin UI wrapper around Core
+    - Windows-specific functionality
+  - **Benefits**: Better testability, code reuse, cleaner separation of concerns
+
+### Technical
+- New project structure with Core library
+- Dependency injection preparation
+- Improved unit test coverage
+- Build configuration for multi-project solution
+
+---
+
+## [1.6.2] - 2025-11-07
+
+### Fixed
+- **Compiler Warnings**: Clean build with 0 warnings
+  - Fixed all 49 nullable reference warnings
+  - Proper null handling throughout codebase
+  - Code quality improvements
+
+### Changed
+- Enhanced code quality standards
+- Stricter null safety enforcement
+
+---
+
+## [1.6.1] - 2025-11-07
+
+### Fixed
+- **Update Backup Cleanup**: Improved backup file handling
+  - Removed immediate backup deletion to prevent errors
+  - Better error handling during update process
+  - More robust rollback mechanism
+
+---
+
+## [1.6.0] - 2025-11-07
+
+### Added
+- **🎨 Theme-aware StatusBar Icons**: Dynamic icon generation
+  - Icons automatically adapt to current theme
+  - Proper contrast on all backgrounds (dark/light)
+  - SVG-based icon rendering
+  - No more invisible icons on dark themes
+
+### Changed
+- StatusBar visual improvements
+- Better icon visibility across all themes
+- Enhanced user experience with themed UI elements
+
+---
+
+## [1.5.4] - 2025-11-06
+
+### Changed
+- **Theme Integration**: Embedded theme resources
+  - Theme files bundled with executable
+  - StatusBar theme selector with dropdown
+  - No external theme file dependencies
+  - Improved theme loading performance
+
+### Fixed
+- Theme loading from embedded resources
+- StatusBar theme dropdown functionality
+
+---
+
+## [1.5.3] - 2025-11-06
+
+### Fixed
+- **StatusBar Icons**: Added tooltips for all icons
+  - Clear descriptions for Update, Explorer, Info, Help icons
+  - Better user guidance
+- **Compiler Warnings**: Clean build with 0 warnings
+
+---
+
+## [1.5.1] - 2025-11-06
+
+### Added
+- **F11 Shortcut**: Toggle StatusBar visibility
+  - Quick keyboard shortcut for showing/hiding StatusBar
+  - Settings persistence for StatusBar state
+  - Default: StatusBar visible
+
+### Changed
+- **StatusBar Default**: Always visible by default
+  - Better discoverability of features
+  - Users can hide with F11 if desired
+  - Setting saved to `settings.json`
+
+---
+
 ## [1.5.2] - 2025-11-06
 
 ### Fixed
@@ -291,7 +425,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 |---------|------|------|--------------|
 | 1.8.0 | 2025-01-10 | Feature | TOC, Emoji, Diff, Admonitions |
 | 1.7.4 | 2025-11-09 | Bugfix | WebView2 resource error fix |
+| 1.7.2 | 2025-11-08 | Technical | UI Automation Tests, MarkdownDialog isolation |
+| 1.7.1 | 2025-11-08 | Cleanup | Remove Avalonia experiments |
+| 1.7.0 | 2025-11-08 | Refactor | Shared library architecture (Core + UI) |
+| 1.6.2 | 2025-11-07 | Quality | Clean build (0 warnings) |
+| 1.6.1 | 2025-11-07 | Bugfix | Update backup cleanup |
+| 1.6.0 | 2025-11-07 | Feature | Theme-aware StatusBar icons |
+| 1.5.4 | 2025-11-06 | Feature | Embedded theme resources |
+| 1.5.3 | 2025-11-06 | Polish | StatusBar icon tooltips |
 | 1.5.2 | 2025-11-06 | Bugfix | Update retry logic fix |
+| 1.5.1 | 2025-11-06 | Feature | F11 StatusBar toggle |
 | 1.5.0 | 2025-11-06 | Polish | Testing + Documentation |
 | 1.4.0 | 2025-11-06 | Feature | Navigation + Search |
 | 1.3.0 | 2025-11-05 | Feature | Localization + StatusBar |

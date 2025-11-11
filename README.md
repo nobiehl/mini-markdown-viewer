@@ -38,13 +38,14 @@ Lightweight Windows desktop viewer for Markdown files with themes, localization,
   - Safe installation with backup and rollback
   - Test mode for development
 
-### Advanced Features (v1.2.0 - v1.5.0)
+### Advanced Features
 
 #### 🎨 Themes (v1.2.0)
 - **4 Built-in Themes**: Dark, Solarized Light, Dräger, Standard
-- **Theme Switcher**: Right-click → select theme
+- **Theme Switcher**: StatusBar dropdown or right-click context menu
 - **Instant Application**: No restart required
 - **Settings Persistence**: Theme saved to `settings.json`
+- **Theme-aware Icons** (v1.6.0): Dynamic icon generation adapts to theme
 - **Custom Themes**: Add your own in `Themes/` folder
 
 #### 🌍 Localization (v1.3.0)
@@ -77,6 +78,12 @@ Lightweight Windows desktop viewer for Markdown files with themes, localization,
 - ✅ **"Open With" dialog** integration
 - ✅ **"Send To" menu** integration
 - ✅ **File open dialog** when started without arguments
+
+### Architecture (v1.7.0)
+- 🏗️ **Layered Architecture**: Clean separation of concerns
+  - **MarkdownViewer.Core**: Business logic library (rendering, file watching, settings)
+  - **MarkdownViewer**: WinForms UI layer (thin wrapper)
+  - **Benefits**: Better testability, code reuse, maintainability
 
 ### Properties
 - 🚀 **Fast**: 3.3 MB single-file executable
