@@ -25,7 +25,10 @@ namespace MarkdownViewer.Tests.UIAutomation
     ///
     /// Tests are skipped by default to avoid interference with unit/integration tests.
     /// To run UI tests: dotnet test --filter "FullyQualifiedName~UIAutomation"
+    ///
+    /// WICHTIG: Läuft sequentiell (nicht parallel) um UI Automation Konflikte zu vermeiden.
     /// </summary>
+    [Collection("Sequential UI Tests")]
     public class MainFormUITests : IDisposable
     {
         private Process? _process;
