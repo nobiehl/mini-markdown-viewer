@@ -223,138 +223,64 @@ Agent 3: StatusBar auf ThemeService umstellen
 
 ### Phase 3: Testing & Validation
 
-#### 3.1 Unit Tests
-- Alle neuen Services haben Tests
-- Test Coverage >= 80%
-- Tests laufen erfolgreich: `dotnet test`
+#### 3.1 Alle Tests ausführen
 
-##### 3.1.1 Link Navigation Tests (LinkNavigationHelperTests.cs - 30 Tests)
-
-**ResolveRelativePath Tests (8 Tests):**
-- [ ] ResolveRelativePath_WithAbsolutePath_ReturnsNormalizedPath
-- [ ] ResolveRelativePath_WithRelativePath_ResolvesRelativeToCurrentFileDirectory
-- [ ] ResolveRelativePath_WithRelativePathGoingUp_ResolvesCorrectly
-- [ ] ResolveRelativePath_WithDeepRelativePath_ResolvesCorrectly
-- [ ] ResolveRelativePath_WithNullLinkPath_ThrowsArgumentException
-- [ ] ResolveRelativePath_WithEmptyLinkPath_ThrowsArgumentException
-- [ ] ResolveRelativePath_WithNullCurrentFile_ThrowsArgumentException
-- [ ] Integration_ResolveAndValidateLocalMarkdownLink_Success
-
-**GetLinkType Tests (8 Tests):**
-- [ ] GetLinkType_WithHttpUrl_ReturnsExternalHttp
-- [ ] GetLinkType_WithHttpsUrl_ReturnsExternalHttp
-- [ ] GetLinkType_WithAnchorLink_ReturnsAnchor
-- [ ] GetLinkType_WithMarkdownFile_ReturnsLocalMarkdown
-- [ ] GetLinkType_WithMarkdownExtension_ReturnsLocalMarkdown
-- [ ] GetLinkType_WithUnknownLink_ReturnsUnknown
-- [ ] GetLinkType_WithNullLink_ReturnsUnknown
-- [ ] GetLinkType_WithEmptyLink_ReturnsUnknown
-
-**ValidateFileExists Tests (4 Tests):**
-- [ ] ValidateFileExists_WithExistingFile_ReturnsTrue
-- [ ] ValidateFileExists_WithNonExistentFile_ReturnsFalse
-- [ ] ValidateFileExists_WithNullPath_ReturnsFalse
-- [ ] ValidateFileExists_WithEmptyPath_ReturnsFalse
-
-**IsInlineResource Tests (8 Tests):**
-- [ ] IsInlineResource_WithPlantUmlUrl_ReturnsTrue
-- [ ] IsInlineResource_WithCdnUrl_ReturnsTrue
-- [ ] IsInlineResource_WithImageUrl_ReturnsTrue
-- [ ] IsInlineResource_WithJpgUrl_ReturnsTrue
-- [ ] IsInlineResource_WithSvgUrl_ReturnsTrue
-- [ ] IsInlineResource_WithRegularWebPage_ReturnsFalse
-- [ ] IsInlineResource_WithNullUrl_ReturnsFalse
-- [ ] IsInlineResource_WithEmptyUrl_ReturnsFalse
-
-**Integration Tests (2 Tests):**
-- [ ] Integration_ResolveAndValidateLocalMarkdownLink_Success
-- [ ] Integration_ResolveAndValidateMissingFile_Fails
-
-**Kommando zum Ausführen:**
+**Unit Tests:**
 ```bash
 cd markdown-viewer/MarkdownViewer.Tests
 dotnet test --verbosity normal
 ```
 
-#### 3.2 Integration Tests
+**Anforderungen:**
+- [ ] Alle Tests müssen bestehen (0 failed)
+- [ ] Test Coverage >= 80%
+- [ ] Build: 0 Errors, 0 Warnings
 
-##### 3.2.1 Link Navigation Integration Tests
-**Manual Testing durchführen mit test-links.md:**
+**Manuelle Integration Tests:**
+Siehe `docs/TESTING-CHECKLIST.md` für detaillierte manuelle Test-Szenarien.
 
-**External Links:**
-- [ ] HTTP Link (http://www.google.com) öffnet im Browser
-- [ ] HTTPS Link (https://github.com) öffnet im Browser
-- [ ] PlantUML inline resources werden NICHT im Browser geöffnet
-- [ ] CDN resources (jsdelivr, cloudflare) werden NICHT im Browser geöffnet
+**Wichtige Test-Bereiche:**
+- Link Navigation (intern, extern, anchors)
+- Theme Switching
+- Localization
+- File Watching
+- Search & Navigation
+- Markdown Rendering (alle Extensions)
 
-**Local File Links:**
-- [ ] Relative Link zu existierender Datei (test.md) funktioniert
-- [ ] Relative Link mit Verzeichnis (docs/file.md) funktioniert
-- [ ] Relative Link nach oben (../README.md) funktioniert
-- [ ] Absolute Pfad Link funktioniert
-- [ ] Link zu nicht-existierender Datei wird geloggt (KEIN MessageBox!)
-- [ ] FileWatcher crasht NICHT bei relativen Pfaden
+### Phase 4: Dokumentation & Release
 
-**Anchor Links:**
-- [ ] Anchor Link (#external-links) scrollt zur Section
-- [ ] Anchor Link (#local-links) scrollt zur Section
-- [ ] Anchor Link zu nicht-existierender Section scrollt nicht (aber crasht nicht)
+#### 4.1 Dokumentation konsolidieren & synchronisieren (parallel mit 3 Agents)
 
-**Logging:**
-- [ ] Alle Link-Klicks werden geloggt (Link-Typ, Quelle, Ziel)
-- [ ] Pfad-Auflösung wird geloggt (relativ → absolut)
-- [ ] File-Existenz-Checks werden geloggt
-- [ ] Fehlgeschlagene Navigationen werden geloggt
-- [ ] KEINE MessageBox-Dialoge bei fehlenden Dateien!
+**REGEL:** Nur Dateien aus der [Dokumentationsstruktur](#dokumentationsstruktur) sind erlaubt!
 
-**Test-Kommando:**
-```bash
-# Starte App mit test-links.md
-cd markdown-viewer/MarkdownViewer/bin/Release/net8.0-windows
-./MarkdownViewer.exe "C:\develop\workspace\misc\test-links.md"
+**Agent 1: Core Documentation**
+- [ ] `CHANGELOG.md`: Release-Eintrag für vX.Y.Z erstellen mit Feature-Liste
+  - Feature-Konzept-Dokumentation verlinken (z.B. UPDATE-MECHANISMUS-DOKUMENTATION.md)
+- [ ] `README.md`: Version Badge, Test Badge, Download-Links aktualisieren
+- [ ] `ARCHITECTURE.md`: Neue Komponenten/Services/Schichten dokumentieren
+- [ ] `impl_progress.md`: Session-Eintrag mit Metriken hinzufügen
 
-# Prüfe Logs
-cat logs/viewer-YYYYMMDD.log | grep "Link type:"
-cat logs/viewer-YYYYMMDD.log | grep "Path resolution:"
-cat logs/viewer-YYYYMMDD.log | grep "File not found:"
-```
+**Agent 2: Developer Documentation**
+- [ ] `DEVELOPMENT.md`: Neue Setup-Schritte, Dependencies, Build-Anforderungen
+- [ ] `DEPLOYMENT-GUIDE.md`: Build-Prozess-Änderungen dokumentieren
+- [ ] `TESTING-CHECKLIST.md`: Neue manuelle Test-Szenarien hinzufügen
+- [ ] `ROADMAP.md`: Abgeschlossene Features als ✅ markieren, neue Features hinzufügen
 
-#### 3.3 Theme Tests
-- [ ] Theme wird beim Start korrekt angewendet (kein "Mischmasch")
-- [ ] Statusbar hat korrekte Theme-Farben beim Start
-- [ ] Icons sind sichtbar auf allen Themes (dark, light, solarized, draeger)
-- [ ] Theme-Wechsel zur Laufzeit funktioniert
-- [ ] Icons werden bei Theme-Wechsel regeneriert
-- [ ] Settings werden gespeichert
+**Agent 3: Reference Documentation & Cleanup**
+- [ ] `GLOSSARY.md`: Neue Begriffe/Services/Klassen alphabetisch einsortieren
+  - Duplikate entfernen
+  - Cross-References zu anderen Docs hinzufügen
+- [ ] `USER-GUIDE.md`: Neue Features mit Screenshots/Beispielen dokumentieren
+- [ ] **Cleanup:** Obsolete Dateien löschen (nicht in Whitelist)
+- [ ] **Cleanup:** Temporäre `implementation-plan-*.md` Dateien löschen
 
-#### 3.4 File Watching Tests
-- [ ] File Watcher funktioniert mit absoluten Pfaden
-- [ ] File Watcher funktioniert mit relativen Pfaden (nach Auflösung!)
-- [ ] File Watcher crasht NICHT bei fehlenden Verzeichnissen
-- [ ] Änderungen an Datei triggern Reload
-- [ ] File Watcher wird korrekt disposed
+**Integration (nach Agent-Completion):**
+- [ ] Alle Änderungen reviewen
+- [ ] Cross-References prüfen (Links zwischen Dokumenten funktionieren)
+- [ ] Konsistenz sicherstellen (Versionsnummern, Terminologie, Formatierung)
+- [ ] Rechtschreibung prüfen
 
-#### 3.5 Dokumentation prüfen
-- [ ] Alle neuen Features dokumentiert?
-- [ ] Code-Kommentare vorhanden?
-- [ ] GLOSSARY.md vollständig?
-- [ ] impl_progress.md aktualisiert?
-
-### Phase 4: Konsolidierung
-
-#### 4.1 Glossar konsolidieren
-- Duplikate entfernen
-- Alphabetisch sortieren
-- Cross-References hinzufügen
-- Mit Dokumentation abgleichen
-
-#### 4.2 Dokumentation synchronisieren
-- ARCHITECTURE.md mit aktuellem Code abgleichen
-- DEVELOPMENT.md aktualisieren
-- README.md bei Bedarf anpassen
-- DEPLOYMENT-GUIDE.md prüfen
-
-#### 4.3 Release vorbereiten
+#### 4.2 Release vorbereiten
 
 **KRITISCH: Alle Tests MÜSSEN vor Release ausgeführt werden!**
 
@@ -435,26 +361,75 @@ printf "\n## [$(date +%Y-%m-%d)] Session - Feature Name\n\n**Status:** ✅ Compl
 
 ## Dokumentationsstruktur
 
+**REGEL:** Nur diese Dateien sind offiziell erlaubt! Alles andere muss gelöscht werden.
+
+### Projektebene
 ```
 mini-markdown-viewer/
-├── README.md                 # User Docs (Features, Quick Start, Installation)
-├── docs/
-│   ├── CHANGELOG.md          # ⭐ SINGLE SOURCE OF TRUTH für alle Releases!
-│   ├── PROCESS-MODEL.md      # Dieses Dokument - Entwicklungsprozess
-│   ├── ROADMAP.md            # Detaillierter Fahrplan
-│   ├── ARCHITECTURE.md       # Architektur-Übersicht
-│   ├── impl_progress.md      # Implementierungs-Fortschritt (chronologisch)
-│   ├── GLOSSARY.md           # Begriffe & Definitionen
-│   ├── DEVELOPMENT.md        # Developer Docs
-│   ├── DEPLOYMENT-GUIDE.md   # Deployment Process
-│   └── USER-GUIDE.md         # Ausführliche Benutzer-Dokumentation
+├── README.md                 # User-facing: Features, Quick Start, Installation, Badges
 ```
 
-**WICHTIG:**
-- **CHANGELOG.md** ist die einzige Quelle für Release-Informationen
-- **KEINE RELEASE-NOTES-vX.Y.Z.md Dateien** mehr erstellen!
-- GitHub Release Notes werden aus CHANGELOG.md kopiert
-- README.md enthält nur Quickstart und Feature-Übersicht, keine detaillierten Release Notes
+### Core Documentation (docs/)
+```
+docs/
+├── CHANGELOG.md              # ⭐ SINGLE SOURCE OF TRUTH für alle Releases!
+│                             # Verlinkt Feature-Konzept-Dokumentation
+├── PROCESS-MODEL.md          # Entwicklungsprozess (dieses Dokument)
+├── ROADMAP.md                # Feature-Planung, Priorisierung, Status
+├── ARCHITECTURE.md           # System-Architektur, Komponenten, Schichten, MVP Pattern
+├── impl_progress.md          # Chronologische Implementierungs-Historie mit Metriken
+```
+
+### Developer Documentation (docs/)
+```
+docs/
+├── DEVELOPMENT.md            # Developer Setup, Build, Dependencies, lokale Entwicklung
+├── DEPLOYMENT-GUIDE.md       # Release-Prozess, Publishing, Binary-Erstellung
+├── TESTING-CHECKLIST.md      # Manuelle Integration/E2E Test-Szenarien
+```
+
+### Reference Documentation (docs/)
+```
+docs/
+├── GLOSSARY.md               # Begriffe, Klassen, Services (alphabetisch sortiert)
+├── USER-GUIDE.md             # Ausführliche Benutzer-Dokumentation mit Screenshots
+```
+
+### Feature-Konzept-Dokumentation (docs/)
+**Spezielle technische Dokumentation für komplexe Features.**
+**MUSS in CHANGELOG.md verlinkt sein!**
+
+```
+docs/
+├── UPDATE-MECHANISMUS-DOKUMENTATION.md    # Update-System mit Mermaid-Diagrammen
+├── UPDATE-INTERVALL-FIX.md                # Bugfix-Dokumentation (v1.5.2)
+├── GITHUB-TOKEN-SUPPORT.md                # Optionales Feature (Token Auth)
+```
+
+### Temporäre Dateien (während Entwicklung)
+**MÜSSEN nach Feature-Completion gelöscht werden!**
+
+```
+docs/
+├── implementation-plan-*.md   # Agent-Implementierungspläne (NUR während Entwicklung)
+├── TEST-*.md                  # Temporäre Test-Pläne (in impl_progress.md integrieren!)
+```
+
+---
+
+## Wichtige Regeln
+
+**✅ DO:**
+- Feature-Konzept-Dokumentation in `CHANGELOG.md` verlinken
+- Temporäre Dateien nach Completion löschen
+- Alle Dokumente in der Whitelist aktuell halten
+- Cross-References zwischen Dokumenten pflegen
+
+**❌ DON'T:**
+- Separate `RELEASE-NOTES-vX.Y.Z.md` Dateien erstellen (→ CHANGELOG.md)
+- Dokumentation außerhalb der Whitelist erstellen
+- Temporäre Dateien vergessen zu löschen
+- Feature-Dokumentation ohne CHANGELOG-Link
 
 ## Workflow pro Feature
 
@@ -693,13 +668,15 @@ Nach diesem Dokument:
 
 ---
 
-**Version:** 2.1 (Mit verpflichtenden Test-Anforderungen vor Releases)
+**Version:** 2.2 (Dokumentations-Whitelist und Agent-Parallelisierung)
 **Erstellt:** 2025-11-05
-**Aktualisiert:** 2025-11-09
+**Aktualisiert:** 2025-01-10
 **Status:** Active
 
-**Änderungen in v2.1:**
-- Phase 4.3: Detaillierte Test-Schritte vor Release (Unit Tests, UI Automation, Publish Build)
-- Quality Gates: Erweiterte Checkliste mit verpflichtenden Tests
-- Lessons Learned: Dokumentation des "138 KB broken binary" Fehlers
-- Prävention: UI Automation Tests würden solche Fehler sofort erkennen
+**Änderungen in v2.2:**
+- Phase 3: Tests generalisiert (keine konkreten Test-Namen mehr, Verweis auf TESTING-CHECKLIST.md)
+- Phase 4: Komplett überarbeitet mit Agent-Parallelisierung für Dokumentation
+- Dokumentationsstruktur: Klare Whitelist mit Kategorien und Zweckbeschreibung
+- Feature-Konzept-Dokumentation: Muss in CHANGELOG.md verlinkt sein
+- Temporäre Dateien: Explizite Regel zum Löschen nach Feature-Completion
+- Wichtige Regeln: DO/DON'T Sektion hinzugefügt
