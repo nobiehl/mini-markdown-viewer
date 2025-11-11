@@ -33,6 +33,7 @@ namespace MarkdownViewer
         private StatusBarControl? _statusBar;
         private NavigationBar? _navigationBar;
         private SearchBar? _searchBar;
+        private UpdateNotificationBar? _updateNotificationBar;
         private ContextMenuStrip? _themeContextMenu;
 
         // Core Services
@@ -198,8 +199,12 @@ namespace MarkdownViewer
             // Initialize SearchBar (always available via Ctrl+F, hidden by default)
             InitializeSearchBar();
 
-            // Initialize StatusBar (always visible)
+            // Initialize StatusBar first (always visible, at bottom)
             InitializeStatusBar();
+
+            // Initialize UpdateNotificationBar after StatusBar (hidden by default, shown above StatusBar when update available)
+            // IMPORTANT: Must be initialized AFTER StatusBar so it appears above it (both use DockStyle.Bottom)
+            InitializeUpdateNotificationBar();
 
             // Initialize Theme Context Menu
             InitializeThemeContextMenu();
@@ -391,6 +396,10 @@ namespace MarkdownViewer
                 {
                     await _themeService.ApplyThemeAsync(_currentTheme, this, _webView);
                 }
+
+                // Apply theme to UpdateNotificationBar
+                bool isDarkTheme = _currentTheme.Name.ToLower().Contains("dark");
+                _updateNotificationBar?.ApplyTheme(isDarkTheme);
 
                 Log.Information("Theme applied to Form successfully: BackColor={BackColor}", _currentTheme.UI.FormBackground);
             }
@@ -780,6 +789,40 @@ namespace MarkdownViewer
         }
 
         /// <summary>
+        /// Initializes and configures the update notification bar.
+        /// </summary>
+        private void InitializeUpdateNotificationBar()
+        {
+            Log.Debug("Initializing UpdateNotificationBar");
+
+            try
+            {
+                _updateNotificationBar = new UpdateNotificationBar(_localizationService);
+
+                // Wire up event handlers
+                _updateNotificationBar.ShowRequested += OnShowReleaseNotes;
+                _updateNotificationBar.UpdateRequested += OnUpdateNow;
+                _updateNotificationBar.IgnoreRequested += OnIgnoreUpdate;
+
+                // Add to form (docked at bottom, above StatusBar)
+                this.Controls.Add(_updateNotificationBar);
+
+                // Force UpdateNotificationBar to be above StatusBar
+                _updateNotificationBar.BringToFront();
+
+                // Apply initial theme
+                bool isDarkTheme = _currentTheme?.Name.ToLower().Contains("dark") ?? false;
+                _updateNotificationBar.ApplyTheme(isDarkTheme);
+
+                Log.Information("UpdateNotificationBar initialized successfully");
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex, "Failed to initialize UpdateNotificationBar");
+            }
+        }
+
+        /// <summary>
         /// Initializes and configures the status bar.
         /// </summary>
         private void InitializeStatusBar()
@@ -872,6 +915,10 @@ namespace MarkdownViewer
 
                 // Apply theme to UI and WebView2
                 await _themeService.ApplyThemeAsync(newTheme, this, _webView);
+
+                // Apply theme to UpdateNotificationBar
+                bool isDarkTheme = newThemeName.ToLower().Contains("dark");
+                _updateNotificationBar?.ApplyTheme(isDarkTheme);
 
                 Log.Information("Theme applied successfully: {Theme}", newThemeName);
             }
@@ -1020,8 +1067,133 @@ Developed with:
         }
 
         /// <summary>
+        /// Handles "Show Release Notes" request from UpdateNotificationBar.
+        /// Saves release notes to temporary file and loads in main viewer.
+        /// </summary>
+        private void OnShowReleaseNotes(object? sender, ReleaseNotesEventArgs e)
+        {
+            Log.Information("Showing release notes for version {Version}", e.Version);
+
+            try
+            {
+                // Create temporary file for release notes
+                string tempFolder = Path.Combine(Path.GetTempPath(), "MarkdownViewer");
+                Directory.CreateDirectory(tempFolder);
+
+                // Version might already have 'v' prefix, avoid duplicating it
+                string versionDisplay = e.Version.StartsWith("v", StringComparison.OrdinalIgnoreCase)
+                    ? e.Version
+                    : $"v{e.Version}";
+
+                string tempFile = Path.Combine(tempFolder, $"ReleaseNotes-{versionDisplay}.md");
+
+                // Write release notes with title
+                string markdown = $"# Release Notes - {versionDisplay}\n\n{e.ReleaseNotes}";
+                File.WriteAllText(tempFile, markdown);
+
+                // Load in main viewer (navigation history works automatically)
+                LoadMarkdownFile(tempFile);
+
+                Log.Information("Release notes loaded successfully: {TempFile}", tempFile);
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex, "Failed to show release notes");
+                MessageBox.Show(
+                    string.Format(_localizationService.GetString("UpdateShowReleaseNotesError"), ex.Message),
+                    _localizationService.GetString("ErrorTitle"),
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Error);
+            }
+        }
+
+        /// <summary>
+        /// Handles "Update Now" request from UpdateNotificationBar.
+        /// Downloads update and asks for restart confirmation.
+        /// </summary>
+        private async void OnUpdateNow(object? sender, UpdateEventArgs e)
+        {
+            Log.Information("Update Now requested for version {Version}", e.Version);
+
+            try
+            {
+                // Hide notification bar during download
+                _updateNotificationBar?.Hide();
+
+                // Download update
+                var checker = new UpdateChecker();
+                var updateInfo = await checker.CheckForUpdatesAsync(Version);
+
+                if (updateInfo.UpdateAvailable)
+                {
+                    bool success = await checker.DownloadUpdateAsync(updateInfo.DownloadUrl);
+
+                    if (success)
+                    {
+                        Log.Information("Update downloaded successfully");
+
+                        // Ask for restart
+                        var result = MessageBox.Show(
+                            _localizationService.GetString("UpdateDownloadedMessage"),
+                            _localizationService.GetString("UpdateDownloadedTitle"),
+                            MessageBoxButtons.YesNo,
+                            MessageBoxIcon.Question);
+
+                        if (result == DialogResult.Yes)
+                        {
+                            Log.Information("User confirmed restart, restarting application");
+                            Application.Restart();
+                        }
+                        else
+                        {
+                            MessageBox.Show(
+                                _localizationService.GetString("UpdatePostponedMessage"),
+                                _localizationService.GetString("UpdatePostponedTitle"),
+                                MessageBoxButtons.OK,
+                                MessageBoxIcon.Information);
+                        }
+                    }
+                    else
+                    {
+                        Log.Error("Failed to download update");
+                        MessageBox.Show(
+                            _localizationService.GetString("UpdateDownloadFailedMessage"),
+                            _localizationService.GetString("UpdateDownloadFailedTitle"),
+                            MessageBoxButtons.OK,
+                            MessageBoxIcon.Error);
+
+                        // Show notification bar again
+                        _updateNotificationBar?.Show(e.Version, "");
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex, "Failed to download update");
+                MessageBox.Show(
+                    string.Format(_localizationService.GetString("UpdateDownloadError"), ex.Message),
+                    _localizationService.GetString("ErrorTitle"),
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Error);
+
+                // Show notification bar again
+                _updateNotificationBar?.Show(e.Version, "");
+            }
+        }
+
+        /// <summary>
+        /// Handles "Ignore" request from UpdateNotificationBar.
+        /// Hides the notification bar until next update check.
+        /// </summary>
+        private void OnIgnoreUpdate(object? sender, EventArgs e)
+        {
+            Log.Information("Update notification ignored by user");
+            _updateNotificationBar?.Hide();
+        }
+
+        /// <summary>
         /// Handles update status icon click in status bar.
-        /// Triggers manual update check.
+        /// Triggers manual update check and shows UpdateNotificationBar if update available.
         /// </summary>
         private async void OnUpdateClicked(object? sender, EventArgs e)
         {
@@ -1040,59 +1212,18 @@ Developed with:
                 {
                     _statusBar?.SetUpdateStatus(UpdateStatus.UpdateAvailable, updateInfo.LatestVersion);
 
-                    // Show release notes in MarkdownDialog
-                    string releaseNotesMarkdown = $@"# Update Available: v{updateInfo.LatestVersion}
+                    // Show UpdateNotificationBar with release notes
+                    _updateNotificationBar?.Show(updateInfo.LatestVersion, updateInfo.ReleaseNotes);
 
-**Current version:** v{Version}
-
-## Release Notes
-
-{updateInfo.ReleaseNotes}
-
----
-
-**Would you like to download and install this update now?**";
-
-                    MarkdownDialog.ShowDialog(this, "Update Available", releaseNotesMarkdown, _renderer);
-
-                    // Ask for confirmation
-                    var result = MessageBox.Show(
-                        "Download and install now?",
-                        "Update Available",
-                        MessageBoxButtons.YesNo,
-                        MessageBoxIcon.Question);
-
-                    if (result == DialogResult.Yes)
-                    {
-                        // Download update
-                        var success = await checker.DownloadUpdateAsync(updateInfo.DownloadUrl);
-
-                        if (success)
-                        {
-                            MessageBox.Show(
-                                "Update downloaded successfully!\n\n" +
-                                "The update will be installed when you restart the application.",
-                                "Update Downloaded",
-                                MessageBoxButtons.OK,
-                                MessageBoxIcon.Information);
-                        }
-                        else
-                        {
-                            _statusBar?.SetUpdateStatus(UpdateStatus.Error);
-                            MessageBox.Show(
-                                "Failed to download update.\n\nPlease try again later or download manually from GitHub.",
-                                "Download Failed",
-                                MessageBoxButtons.OK,
-                                MessageBoxIcon.Error);
-                        }
-                    }
+                    Log.Information("Update available: v{LatestVersion}, showing UpdateNotificationBar",
+                        updateInfo.LatestVersion);
                 }
                 else
                 {
                     _statusBar?.SetUpdateStatus(UpdateStatus.UpToDate);
                     MessageBox.Show(
-                        $"You are running the latest version (v{Version}).",
-                        "Up to Date",
+                        string.Format(_localizationService.GetString("UpdateCheckUpToDateMessage"), Version),
+                        _localizationService.GetString("UpdateCheckUpToDateTitle"),
                         MessageBoxButtons.OK,
                         MessageBoxIcon.Information);
                 }
@@ -1102,8 +1233,8 @@ Developed with:
                 Log.Error(ex, "Failed to check for updates");
                 _statusBar?.SetUpdateStatus(UpdateStatus.Error);
                 MessageBox.Show(
-                    $"Failed to check for updates:\n\n{ex.Message}",
-                    "Error",
+                    string.Format(_localizationService.GetString("UpdateCheckFailedMessage"), ex.Message),
+                    _localizationService.GetString("UpdateCheckFailedTitle"),
                     MessageBoxButtons.OK,
                     MessageBoxIcon.Error);
             }

@@ -191,13 +191,6 @@ Tous les points d'intégration ont été supprimés.</value>
   </data>
 
   <!-- Updates -->
-  <data name="UpdateCheckFailedMessage" xml:space="preserve">
-    <value>Échec de la vérification de mise à jour :
-{0}</value>
-  </data>
-  <data name="UpdateCheckFailedTitle" xml:space="preserve">
-    <value>Erreur de mise à jour</value>
-  </data>
   <data name="NoUpdateAvailableMessage" xml:space="preserve">
     <value>Vous utilisez déjà la dernière version ({0}).</value>
   </data>
@@ -218,23 +211,6 @@ Télécharger maintenant ?</value>
   <data name="UpdateAvailableTitle" xml:space="preserve">
     <value>Mise à jour disponible</value>
   </data>
-  <data name="UpdateDownloadFailedMessage" xml:space="preserve">
-    <value>Échec du téléchargement.
-Veuillez réessayer plus tard.</value>
-  </data>
-  <data name="UpdateDownloadFailedTitle" xml:space="preserve">
-    <value>Erreur de téléchargement</value>
-  </data>
-  <data name="UpdateDownloadedMessage" xml:space="preserve">
-    <value>La mise à jour a été téléchargée.
-
-La mise à jour sera installée au prochain démarrage.
-
-Redémarrer maintenant ?</value>
-  </data>
-  <data name="UpdateDownloadedTitle" xml:space="preserve">
-    <value>Mise à jour téléchargée</value>
-  </data>
   <data name="UpdateCheckUnexpectedError" xml:space="preserve">
     <value>Erreur inattendue lors de la vérification de mise à jour :
 {0}</value>
@@ -254,7 +230,16 @@ Redémarrer maintenant ?</value>
     <value>Intégration Explorer inactive</value>
   </data>
   <data name="StatusBarLanguage" xml:space="preserve">
-    <value>Langue : {0}</value>
+    <value>Sélectionner la langue</value>
+  </data>
+  <data name="StatusBarChecking" xml:space="preserve">
+    <value>Recherche de mises à jour...</value>
+  </data>
+  <data name="StatusBarUpdateError" xml:space="preserve">
+    <value>Échec de la vérification des mises à jour</value>
+  </data>
+  <data name="StatusBarCheckForUpdates" xml:space="preserve">
+    <value>Rechercher des mises à jour</value>
   </data>
   <data name="StatusBarInfo" xml:space="preserve">
     <value>Info</value>
@@ -304,5 +289,68 @@ Redémarrer maintenant ?</value>
   </data>
   <data name="LanguageRussian" xml:space="preserve">
     <value>Русский</value>
+  </data>
+
+  <!-- UpdateNotificationBar Strings (French) -->
+  <data name="UpdateAvailable" xml:space="preserve">
+    <value>Mise à jour v{0} disponible</value>
+  </data>
+  <data name="UpdateShowReleaseNotes" xml:space="preserve">
+    <value>Afficher les notes de version</value>
+  </data>
+  <data name="UpdateInstall" xml:space="preserve">
+    <value>Installer la mise à jour</value>
+  </data>
+  <data name="UpdateIgnore" xml:space="preserve">
+    <value>Ignorer</value>
+  </data>
+  <data name="UpdateReleaseNotesTitle" xml:space="preserve">
+    <value>Notes de Version - {0}</value>
+  </data>
+  <data name="UpdateShowReleaseNotesError" xml:space="preserve">
+    <value>Impossible d'afficher les notes de version:
+
+{0}</value>
+  </data>
+  <data name="UpdateDownloadedTitle" xml:space="preserve">
+    <value>Mise à Jour Prête</value>
+  </data>
+  <data name="UpdateDownloadedMessage" xml:space="preserve">
+    <value>Mise à jour téléchargée avec succès!
+
+Voulez-vous redémarrer l'application maintenant pour installer la mise à jour?</value>
+  </data>
+  <data name="UpdatePostponedTitle" xml:space="preserve">
+    <value>Mise à Jour Reportée</value>
+  </data>
+  <data name="UpdatePostponedMessage" xml:space="preserve">
+    <value>La mise à jour sera installée au prochain redémarrage.</value>
+  </data>
+  <data name="UpdateDownloadFailedTitle" xml:space="preserve">
+    <value>Échec du Téléchargement</value>
+  </data>
+  <data name="UpdateDownloadFailedMessage" xml:space="preserve">
+    <value>Impossible de télécharger la mise à jour.
+
+Veuillez réessayer plus tard.</value>
+  </data>
+  <data name="UpdateDownloadError" xml:space="preserve">
+    <value>Erreur de téléchargement:
+
+{0}</value>
+  </data>
+  <data name="UpdateCheckUpToDateTitle" xml:space="preserve">
+    <value>À Jour</value>
+  </data>
+  <data name="UpdateCheckUpToDateMessage" xml:space="preserve">
+    <value>Vous utilisez la dernière version (v{0}).</value>
+  </data>
+  <data name="UpdateCheckFailedTitle" xml:space="preserve">
+    <value>Erreur</value>
+  </data>
+  <data name="UpdateCheckFailedMessage" xml:space="preserve">
+    <value>Échec de la vérification de mise à jour:
+
+{0}</value>
   </data>
 </root>

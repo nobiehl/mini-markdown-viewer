@@ -191,13 +191,6 @@
   </data>
 
   <!-- Updates -->
-  <data name="UpdateCheckFailedMessage" xml:space="preserve">
-    <value>更新の確認に失敗しました：
-{0}</value>
-  </data>
-  <data name="UpdateCheckFailedTitle" xml:space="preserve">
-    <value>更新エラー</value>
-  </data>
   <data name="NoUpdateAvailableMessage" xml:space="preserve">
     <value>既に最新バージョン（{0}）を使用しています。</value>
   </data>
@@ -218,23 +211,6 @@
   <data name="UpdateAvailableTitle" xml:space="preserve">
     <value>更新が利用可能</value>
   </data>
-  <data name="UpdateDownloadFailedMessage" xml:space="preserve">
-    <value>ダウンロードに失敗しました。
-後でもう一度お試しください。</value>
-  </data>
-  <data name="UpdateDownloadFailedTitle" xml:space="preserve">
-    <value>ダウンロードエラー</value>
-  </data>
-  <data name="UpdateDownloadedMessage" xml:space="preserve">
-    <value>更新がダウンロードされました。
-
-次回起動時に更新がインストールされます。
-
-今すぐ再起動しますか？</value>
-  </data>
-  <data name="UpdateDownloadedTitle" xml:space="preserve">
-    <value>更新がダウンロード済み</value>
-  </data>
   <data name="UpdateCheckUnexpectedError" xml:space="preserve">
     <value>更新確認中に予期しないエラーが発生しました：
 {0}</value>
@@ -254,7 +230,16 @@
     <value>エクスプローラー統合非アクティブ</value>
   </data>
   <data name="StatusBarLanguage" xml:space="preserve">
-    <value>言語：{0}</value>
+    <value>言語を選択</value>
+  </data>
+  <data name="StatusBarChecking" xml:space="preserve">
+    <value>更新を確認中...</value>
+  </data>
+  <data name="StatusBarUpdateError" xml:space="preserve">
+    <value>更新確認失敗</value>
+  </data>
+  <data name="StatusBarCheckForUpdates" xml:space="preserve">
+    <value>更新を確認</value>
   </data>
   <data name="StatusBarInfo" xml:space="preserve">
     <value>情報</value>
@@ -304,5 +289,68 @@
   </data>
   <data name="LanguageRussian" xml:space="preserve">
     <value>Русский</value>
+  </data>
+
+  <!-- UpdateNotificationBar Strings (Japanese) -->
+  <data name="UpdateAvailable" xml:space="preserve">
+    <value>アップデート v{0} が利用可能です</value>
+  </data>
+  <data name="UpdateShowReleaseNotes" xml:space="preserve">
+    <value>リリースノートを表示</value>
+  </data>
+  <data name="UpdateInstall" xml:space="preserve">
+    <value>アップデートをインストール</value>
+  </data>
+  <data name="UpdateIgnore" xml:space="preserve">
+    <value>無視</value>
+  </data>
+  <data name="UpdateReleaseNotesTitle" xml:space="preserve">
+    <value>リリースノート - {0}</value>
+  </data>
+  <data name="UpdateShowReleaseNotesError" xml:space="preserve">
+    <value>リリースノートを表示できませんでした:
+
+{0}</value>
+  </data>
+  <data name="UpdateDownloadedTitle" xml:space="preserve">
+    <value>アップデート準備完了</value>
+  </data>
+  <data name="UpdateDownloadedMessage" xml:space="preserve">
+    <value>アップデートのダウンロードが完了しました！
+
+今すぐアプリケーションを再起動してアップデートをインストールしますか？</value>
+  </data>
+  <data name="UpdatePostponedTitle" xml:space="preserve">
+    <value>アップデートを延期</value>
+  </data>
+  <data name="UpdatePostponedMessage" xml:space="preserve">
+    <value>次回起動時にアップデートがインストールされます。</value>
+  </data>
+  <data name="UpdateDownloadFailedTitle" xml:space="preserve">
+    <value>ダウンロード失敗</value>
+  </data>
+  <data name="UpdateDownloadFailedMessage" xml:space="preserve">
+    <value>アップデートをダウンロードできませんでした。
+
+後でもう一度お試しください。</value>
+  </data>
+  <data name="UpdateDownloadError" xml:space="preserve">
+    <value>ダウンロードエラー:
+
+{0}</value>
+  </data>
+  <data name="UpdateCheckUpToDateTitle" xml:space="preserve">
+    <value>最新版です</value>
+  </data>
+  <data name="UpdateCheckUpToDateMessage" xml:space="preserve">
+    <value>最新バージョン (v{0}) を使用しています。</value>
+  </data>
+  <data name="UpdateCheckFailedTitle" xml:space="preserve">
+    <value>エラー</value>
+  </data>
+  <data name="UpdateCheckFailedMessage" xml:space="preserve">
+    <value>アップデート確認に失敗しました:
+
+{0}</value>
   </data>
 </root>

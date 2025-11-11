@@ -191,13 +191,6 @@
   </data>
 
   <!-- Updates -->
-  <data name="UpdateCheckFailedMessage" xml:space="preserve">
-    <value>Не удалось проверить обновления:
-{0}</value>
-  </data>
-  <data name="UpdateCheckFailedTitle" xml:space="preserve">
-    <value>Ошибка обновления</value>
-  </data>
   <data name="NoUpdateAvailableMessage" xml:space="preserve">
     <value>Вы уже используете последнюю версию ({0}).</value>
   </data>
@@ -218,23 +211,6 @@
   <data name="UpdateAvailableTitle" xml:space="preserve">
     <value>Доступно обновление</value>
   </data>
-  <data name="UpdateDownloadFailedMessage" xml:space="preserve">
-    <value>Ошибка загрузки.
-Пожалуйста, попробуйте позже.</value>
-  </data>
-  <data name="UpdateDownloadFailedTitle" xml:space="preserve">
-    <value>Ошибка загрузки</value>
-  </data>
-  <data name="UpdateDownloadedMessage" xml:space="preserve">
-    <value>Обновление загружено.
-
-Обновление будет установлено при следующем запуске.
-
-Перезапустить сейчас?</value>
-  </data>
-  <data name="UpdateDownloadedTitle" xml:space="preserve">
-    <value>Обновление загружено</value>
-  </data>
   <data name="UpdateCheckUnexpectedError" xml:space="preserve">
     <value>Неожиданная ошибка при проверке обновлений:
 {0}</value>
@@ -254,7 +230,16 @@
     <value>Интеграция с Проводником неактивна</value>
   </data>
   <data name="StatusBarLanguage" xml:space="preserve">
-    <value>Язык: {0}</value>
+    <value>Выбрать язык</value>
+  </data>
+  <data name="StatusBarChecking" xml:space="preserve">
+    <value>Проверка обновлений...</value>
+  </data>
+  <data name="StatusBarUpdateError" xml:space="preserve">
+    <value>Ошибка проверки обновлений</value>
+  </data>
+  <data name="StatusBarCheckForUpdates" xml:space="preserve">
+    <value>Проверить обновления</value>
   </data>
   <data name="StatusBarInfo" xml:space="preserve">
     <value>Информация</value>
@@ -304,5 +289,52 @@
   </data>
   <data name="LanguageRussian" xml:space="preserve">
     <value>Русский</value>
+  </data>
+
+  <!-- UpdateNotificationBar Strings (Russian) -->
+  <data name="UpdateAvailable" xml:space="preserve">
+    <value>Доступно обновление v{0}</value>
+  </data>
+  <data name="UpdateShowReleaseNotes" xml:space="preserve">
+    <value>Показать примечания к выпуску</value>
+  </data>
+  <data name="UpdateInstall" xml:space="preserve">
+    <value>Установить обновление</value>
+  </data>
+  <data name="UpdateIgnore" xml:space="preserve">
+    <value>Игнорировать</value>
+  </data>
+  <data name="UpdateReleaseNotesTitle" xml:space="preserve">
+    <value>Примечания к Выпуску - {0}</value>
+  </data>
+  <data name="UpdateShowReleaseNotesError" xml:space="preserve">
+    <value>Не удалось показать примечания к выпуску:
+
+{0}</value>
+  </data>
+  <data name="UpdateDownloadedTitle" xml:space="preserve">
+    <value>Обновление Готово</value>
+  </data>
+  <data name="UpdateDownloadedMessage" xml:space="preserve">
+    <value>Обновление успешно загружено!
+
+Хотите перезапустить приложение сейчас, чтобы установить обновление?</value>
+  </data>
+  <data name="UpdatePostponedTitle" xml:space="preserve">
+    <value>Обновление Отложено</value>
+  </data>
+  <data name="UpdatePostponedMessage" xml:space="preserve">
+    <value>Обновление будет установлено при следующем запуске.</value>
+  </data>
+  <data name="UpdateDownloadError" xml:space="preserve">
+    <value>Ошибка загрузки:
+
+{0}</value>
+  </data>
+  <data name="UpdateCheckUpToDateTitle" xml:space="preserve">
+    <value>Актуально</value>
+  </data>
+  <data name="UpdateCheckUpToDateMessage" xml:space="preserve">
+    <value>Вы используете последнюю версию (v{0}).</value>
   </data>
 </root>

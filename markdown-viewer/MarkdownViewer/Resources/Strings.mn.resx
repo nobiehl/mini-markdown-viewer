@@ -191,50 +191,6 @@
   </data>
 
   <!-- Updates -->
-  <data name="UpdateCheckFailedMessage" xml:space="preserve">
-    <value>Шинэчлэл шалгах амжилтгүй боллоо:
-{0}</value>
-  </data>
-  <data name="UpdateCheckFailedTitle" xml:space="preserve">
-    <value>Шинэчлэлийн алдаа</value>
-  </data>
-  <data name="NoUpdateAvailableMessage" xml:space="preserve">
-    <value>Та хамгийн сүүлийн хувилбарыг ({0}) ашиглаж байна.</value>
-  </data>
-  <data name="NoUpdateAvailableTitle" xml:space="preserve">
-    <value>Шинэчлэл байхгүй</value>
-  </data>
-  <data name="UpdateAvailableMessage" xml:space="preserve">
-    <value>Шинэчлэл бэлэн байна: {0}
-
-Одоогийн хувилбар: {1}
-Хэмжээ: {2} МБ
-
-Мэдээлэл:
-{3}
-
-Татаж авах уу?</value>
-  </data>
-  <data name="UpdateAvailableTitle" xml:space="preserve">
-    <value>Шинэчлэл бэлэн байна</value>
-  </data>
-  <data name="UpdateDownloadFailedMessage" xml:space="preserve">
-    <value>Татаж авалт амжилтгүй боллоо.
-Дараа дахин оролдоно уу.</value>
-  </data>
-  <data name="UpdateDownloadFailedTitle" xml:space="preserve">
-    <value>Татах алдаа</value>
-  </data>
-  <data name="UpdateDownloadedMessage" xml:space="preserve">
-    <value>Шинэчлэл татаж авсан.
-
-Дараагийн ажиллуулалтад суулгагдана.
-
-Одоо дахин эхлүүлэх үү?</value>
-  </data>
-  <data name="UpdateDownloadedTitle" xml:space="preserve">
-    <value>Шинэчлэл татагдсан</value>
-  </data>
   <data name="UpdateCheckUnexpectedError" xml:space="preserve">
     <value>Шинэчлэл шалгах үед санамсаргүй алдаа гарлаа:
 {0}</value>
@@ -254,7 +210,16 @@
     <value>Explorer интеграци идэвхгүй</value>
   </data>
   <data name="StatusBarLanguage" xml:space="preserve">
-    <value>Хэл: {0}</value>
+    <value>Хэл сонгох</value>
+  </data>
+  <data name="StatusBarChecking" xml:space="preserve">
+    <value>Шинэчлэл шалгаж байна...</value>
+  </data>
+  <data name="StatusBarUpdateError" xml:space="preserve">
+    <value>Шинэчлэл шалгалт амжилтгүй</value>
+  </data>
+  <data name="StatusBarCheckForUpdates" xml:space="preserve">
+    <value>Шинэчлэл шалгах</value>
   </data>
   <data name="StatusBarInfo" xml:space="preserve">
     <value>Мэдээлэл</value>
@@ -304,5 +269,68 @@
   </data>
   <data name="LanguageRussian" xml:space="preserve">
     <value>Русский</value>
+  </data>
+
+  <!-- UpdateNotificationBar Strings (Mongolian) -->
+  <data name="UpdateAvailable" xml:space="preserve">
+    <value>Шинэчлэлт v{0} боломжтой</value>
+  </data>
+  <data name="UpdateShowReleaseNotes" xml:space="preserve">
+    <value>Хувилбарын тэмдэглэл харах</value>
+  </data>
+  <data name="UpdateInstall" xml:space="preserve">
+    <value>Шинэчлэлт суулгах</value>
+  </data>
+  <data name="UpdateIgnore" xml:space="preserve">
+    <value>Үл тоох</value>
+  </data>
+  <data name="UpdateReleaseNotesTitle" xml:space="preserve">
+    <value>Хувилбарын Тэмдэглэл - {0}</value>
+  </data>
+  <data name="UpdateShowReleaseNotesError" xml:space="preserve">
+    <value>Хувилбарын тэмдэглэл харуулж чадсангүй:
+
+{0}</value>
+  </data>
+  <data name="UpdateDownloadedTitle" xml:space="preserve">
+    <value>Шинэчлэлт Бэлэн</value>
+  </data>
+  <data name="UpdateDownloadedMessage" xml:space="preserve">
+    <value>Шинэчлэлтийг амжилттай татаж авлаа!
+
+Шинэчлэлтийг суулгахын тулд аппликэйшнийг одоо дахин эхлүүлэх үү?</value>
+  </data>
+  <data name="UpdatePostponedTitle" xml:space="preserve">
+    <value>Шинэчлэлт Хойшлогдсон</value>
+  </data>
+  <data name="UpdatePostponedMessage" xml:space="preserve">
+    <value>Шинэчлэлт дараагийн эхлүүлэлтэд суугдана.</value>
+  </data>
+  <data name="UpdateDownloadFailedTitle" xml:space="preserve">
+    <value>Татаж Авалт Амжилтгүй</value>
+  </data>
+  <data name="UpdateDownloadFailedMessage" xml:space="preserve">
+    <value>Шинэчлэлтийг татаж чадсангүй.
+
+Дараа дахин оролдоно уу.</value>
+  </data>
+  <data name="UpdateDownloadError" xml:space="preserve">
+    <value>Татаж авах алдаа:
+
+{0}</value>
+  </data>
+  <data name="UpdateCheckUpToDateTitle" xml:space="preserve">
+    <value>Шинэчлэгдсэн</value>
+  </data>
+  <data name="UpdateCheckUpToDateMessage" xml:space="preserve">
+    <value>Та хамгийн сүүлийн хувилбарыг (v{0}) ашиглаж байна.</value>
+  </data>
+  <data name="UpdateCheckFailedTitle" xml:space="preserve">
+    <value>Алдаа</value>
+  </data>
+  <data name="UpdateCheckFailedMessage" xml:space="preserve">
+    <value>Шинэчлэлт шалгаж чадсангүй:
+
+{0}</value>
   </data>
 </root>

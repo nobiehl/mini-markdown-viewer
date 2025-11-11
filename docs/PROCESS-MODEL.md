@@ -203,6 +203,7 @@ Agent 3: StatusBar auf ThemeService umstellen
 #### 2.2 Während der Implementierung
 - Code schreiben
 - Unit Tests schreiben (parallel!)
+- **Lokalisierung beachten:** Bei UI-Strings SOFORT Resource-Strings verwenden (siehe Phase 2.4)
 - Refactoring durchführen
 - Build erfolgreich durchführen
 - **Bei parallelen Agenten:** Regelmäßig Fortschritt prüfen
@@ -219,7 +220,122 @@ Agent 3: StatusBar auf ThemeService umstellen
   ```
 
 - Relevante Dokumentation aktualisieren (ARCHITECTURE.md, DEVELOPMENT.md)
+- **Lokalisierung prüfen:** (siehe Phase 2.4)
 - Git Commit mit aussagekräftiger Message
+
+#### 2.4 Lokalisierung (KRITISCH - Nicht vergessen!)
+
+**REGEL:** Alle UI-Strings MÜSSEN lokalisiert werden! Keine Hardcoded Strings in UI-Code!
+
+##### 2.4.1 Während der Implementierung
+
+**Bei JEDEM neuen UI-Element (Button, Label, MessageBox, etc.):**
+
+1. **SOFORT Resource-String verwenden statt hardcoded String:**
+   ```csharp
+   // ❌ FALSCH - Hardcoded String
+   button.Text = "Install Update";
+   MessageBox.Show("Update downloaded successfully!", "Success");
+
+   // ✅ RICHTIG - Lokalisierter String
+   button.Text = _localizationService.GetString("UpdateInstall");
+   MessageBox.Show(
+       _localizationService.GetString("UpdateDownloadedMessage"),
+       _localizationService.GetString("UpdateDownloadedTitle"));
+   ```
+
+2. **Resource-String zu Strings.resx hinzufügen:**
+   ```xml
+   <data name="UpdateInstall" xml:space="preserve">
+     <value>Install Update</value>
+     <comment>Button to install update</comment>
+   </data>
+   ```
+
+3. **Component muss ILocalizationService akzeptieren:**
+   ```csharp
+   private readonly ILocalizationService _localization;
+
+   public MyComponent(ILocalizationService localization)
+   {
+       _localization = localization ?? throw new ArgumentNullException(nameof(localization));
+   }
+   ```
+
+##### 2.4.2 Nach der Implementierung - Lokalisierungs-Audit
+
+**KRITISCH:** Vor jedem Commit prüfen ob alle Strings lokalisiert sind!
+
+**Schritt 1: Hardcoded Strings finden**
+```bash
+# Suche nach hardcoded Strings in UI-Code
+grep -r "Text = \"" markdown-viewer/MarkdownViewer/UI/
+grep -r "MessageBox.Show(\"" markdown-viewer/MarkdownViewer/
+grep -r "ToolTip.*= \"" markdown-viewer/MarkdownViewer/
+```
+
+**Schritt 2: Für JEDEN gefundenen String:**
+1. Resource-String zu `Strings.resx` hinzufügen (mit `<comment>`)
+2. Code auf `_localization.GetString()` umstellen
+3. Component-Konstruktor erweitern falls nötig
+
+**Schritt 3: In ALLE 8 Sprachen übersetzen (parallel mit Agenten)**
+
+Nutze 6 parallele Agenten für schnelle Übersetzung:
+```markdown
+Agent 1: Strings.de.resx (Deutsch)
+Agent 2: Strings.es.resx (Spanisch)
+Agent 3: Strings.fr.resx (Französisch)
+Agent 4: Strings.ja.resx (Japanisch)
+Agent 5: Strings.zh.resx (Chinesisch)
+Agent 6: Strings.ru.resx (Russisch)
+Agent 7: Strings.mn.resx (Mongolisch)
+```
+
+**Schritt 4: Build-Warnungen prüfen**
+```bash
+dotnet build | grep "doppelte Ressourcenname"
+```
+- Bei Duplikaten: Alte Versionen entfernen, nur neue behalten
+
+##### 2.4.3 Lokalisierungs-Checkliste (vor jedem Commit)
+
+```
+[ ] Keine hardcoded Strings in UI-Code (Button.Text, Label.Text, MessageBox, ToolTip)
+[ ] Alle neuen Strings in Strings.resx mit <comment> Tags
+[ ] Component akzeptiert ILocalizationService im Konstruktor
+[ ] Alle 8 Sprachen übersetzt (en, de, es, fr, ja, zh, ru, mn)
+[ ] Build ohne "doppelte Ressourcenname" Warnungen
+[ ] Manuelle Tests in mindestens 2 Sprachen (z.B. Englisch + Deutsch)
+```
+
+##### 2.4.4 Unterstützte Sprachen
+
+MarkdownViewer unterstützt **8 Sprachen** (Stand v1.8.0):
+- 🇬🇧 English (en) - Base language in `Strings.resx`
+- 🇩🇪 Deutsch (de) - `Strings.de.resx`
+- 🇪🇸 Español (es) - `Strings.es.resx`
+- 🇫🇷 Français (fr) - `Strings.fr.resx`
+- 🇯🇵 日本語 (ja) - `Strings.ja.resx`
+- 🇨🇳 简体中文 (zh) - `Strings.zh.resx`
+- 🇷🇺 Русский (ru) - `Strings.ru.resx`
+- 🇲🇳 Монгол (mn) - `Strings.mn.resx`
+
+##### 2.4.5 Best Practices
+
+**✅ DO:**
+- Resource-Strings SOFORT beim Schreiben von UI-Code verwenden
+- Aussagekräftige String-Namen: `UpdateInstall` statt `Button1Text`
+- `<comment>` Tags für Kontext: `<comment>Button to install update</comment>`
+- Platzhalter für dynamische Werte: `"Update v{0} available"`
+- Parallele Agenten für Übersetzungen nutzen (6-7 Agenten gleichzeitig)
+
+**❌ DON'T:**
+- "Ich lokalisiere später" - wird garantiert vergessen!
+- Hardcoded Strings als "TODO" markieren
+- Übersetzungen manuell nacheinander machen (nutze Agenten!)
+- Resource-Strings ohne `<comment>` Tags
+- Duplikate in verschiedenen .resx Dateien
 
 ### Phase 3: Testing & Validation
 
@@ -530,6 +646,10 @@ graph TD
 - [ ] Code kompiliert ohne Fehler
 - [ ] **KEINE Compiler-Warnungen** (0 warnings erforderlich!)
 - [ ] Alle Tests laufen durch
+- [ ] **Lokalisierung vollständig** (siehe Phase 2.4.3):
+  - [ ] Keine hardcoded UI-Strings
+  - [ ] Alle Strings in allen 8 Sprachen übersetzt
+  - [ ] Build ohne "doppelte Ressourcenname" Warnungen
 - [ ] impl_progress.md aktualisiert
 - [ ] Neue Begriffe im Glossar
 - [ ] Relevante Doku angepasst
@@ -586,6 +706,9 @@ dotnet test /p:CollectCoverage=true /p:CoverletOutputFormat=lcov
 - ✅ **Implementierungsplan vor Agenten-Start** (verhindert Chaos)
 - ✅ **Ein Message mit mehreren Task-Aufrufen** (echte Parallelität)
 - ✅ **Klare Agent-Aufgaben mit spezifischen Dateien** (keine Überschneidungen)
+- ✅ **Resource-Strings SOFORT beim UI-Code schreiben** (nicht später!)
+- ✅ **Parallele Agenten für Übersetzungen** (6-7 Sprachen gleichzeitig in 2 Minuten!)
+- ✅ **ILocalizationService im Konstruktor** (erzwingt Lokalisierung)
 
 ### Was vermeiden:
 - ❌ "Ich dokumentiere später" (wird vergessen)
@@ -603,6 +726,11 @@ dotnet test /p:CollectCoverage=true /p:CoverletOutputFormat=lcov
 - ❌ **dotnet build statt dotnet publish verwenden** (erzeugt 138 KB DLL statt 3.3 MB EXE)
 - ❌ **Binary-Größe nicht prüfen vor Upload** (138 KB ist offensichtlich falsch, sollte ~3.3 MB sein)
 - ❌ **Binary aus bin/Release/ statt publish/ verwenden** (Managed DLL statt Self-Contained EXE)
+- ❌ **"Ich lokalisiere später"** (wird GARANTIERT vergessen, führt zu 20+ nachträglich zu lokalisierenden Strings!)
+- ❌ **Hardcoded UI-Strings schreiben** (Button.Text = "Click me" statt _localization.GetString())
+- ❌ **Übersetzungen manuell machen** (6-7 Agenten parallel sind 10x schneller!)
+- ❌ **Resource-Strings ohne <comment> Tags** (Übersetzer brauchen Kontext!)
+- ❌ **Duplikate in .resx Dateien ignorieren** (führt zu MSB3568 Warnungen!)
 
 ## Quick Reference: Soll ich parallelisieren?
 
@@ -668,10 +796,22 @@ Nach diesem Dokument:
 
 ---
 
-**Version:** 2.2 (Dokumentations-Whitelist und Agent-Parallelisierung)
+**Version:** 2.3 (Lokalisierung als Teil des Workflows)
 **Erstellt:** 2025-11-05
-**Aktualisiert:** 2025-01-10
+**Aktualisiert:** 2025-01-11
 **Status:** Active
+
+**Änderungen in v2.3:**
+- **Phase 2.2:** Lokalisierungs-Hinweis während Implementierung
+- **Phase 2.4 NEU:** Umfassende Lokalisierungs-Sektion (KRITISCH!)
+  - 2.4.1: Sofortige Resource-String-Verwendung bei UI-Code
+  - 2.4.2: Lokalisierungs-Audit nach Implementierung
+  - 2.4.3: Lokalisierungs-Checkliste (vor jedem Commit)
+  - 2.4.4: Liste aller 8 unterstützten Sprachen
+  - 2.4.5: Best Practices (DO/DON'T)
+- **Quality Gates:** Lokalisierungs-Prüfung vor jedem Commit
+- **Lessons Learned:** Lokalisierungs-Erfolge und -Fehler dokumentiert
+- **Motivation:** Nach v1.8.0 Erfahrung (20+ nachträglich lokalisierte Strings) ist Lokalisierung jetzt Pflicht-Bestandteil des Workflows
 
 **Änderungen in v2.2:**
 - Phase 3: Tests generalisiert (keine konkreten Test-Namen mehr, Verweis auf TESTING-CHECKLIST.md)

@@ -1,7 +1,7 @@
 using System;
 using System.Linq;
 using Xunit;
-using MarkdownViewer.Services;
+using MarkdownViewer.Core.Services;
 
 namespace MarkdownViewer.Tests.Integration
 {
@@ -90,7 +90,7 @@ namespace MarkdownViewer.Tests.Integration
 
             // Assert
             Assert.Equal("English", languageLabel);
-            Assert.Equal("Standard", themeStandard);
+            Assert.Equal("Standard (Enhanced)", themeStandard);
         }
 
         [Fact]
@@ -105,7 +105,7 @@ namespace MarkdownViewer.Tests.Integration
 
             // Assert
             Assert.Equal("Deutsch", languageLabel);
-            Assert.Equal("Standard", themeStandard);
+            Assert.Equal("Standard (Erweitert)", themeStandard);
         }
 
         [Fact]
@@ -140,11 +140,12 @@ namespace MarkdownViewer.Tests.Integration
             // Arrange
             var localization = new LocalizationService("en");
 
-            // Act
-            var result = localization.GetString("StatusBarLanguage", "EN");
+            // Act - Test with UpdateAvailable which has a {0} placeholder
+            var result = localization.GetString("UpdateAvailable", "1.8.0");
 
             // Assert
-            Assert.Contains("EN", result);
+            Assert.Contains("1.8.0", result);
+            Assert.Contains("Update", result);
         }
 
         [Fact]

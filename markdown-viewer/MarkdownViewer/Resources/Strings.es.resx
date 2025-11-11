@@ -191,13 +191,6 @@ Se han eliminado todos los puntos de integración.</value>
   </data>
 
   <!-- Updates -->
-  <data name="UpdateCheckFailedMessage" xml:space="preserve">
-    <value>Error al verificar actualizaciones:
-{0}</value>
-  </data>
-  <data name="UpdateCheckFailedTitle" xml:space="preserve">
-    <value>Error de actualización</value>
-  </data>
   <data name="NoUpdateAvailableMessage" xml:space="preserve">
     <value>Ya está utilizando la última versión ({0}).</value>
   </data>
@@ -218,23 +211,6 @@ Notas de la versión:
   <data name="UpdateAvailableTitle" xml:space="preserve">
     <value>Actualización disponible</value>
   </data>
-  <data name="UpdateDownloadFailedMessage" xml:space="preserve">
-    <value>Error en la descarga.
-Por favor, inténtelo de nuevo más tarde.</value>
-  </data>
-  <data name="UpdateDownloadFailedTitle" xml:space="preserve">
-    <value>Error de descarga</value>
-  </data>
-  <data name="UpdateDownloadedMessage" xml:space="preserve">
-    <value>Se ha descargado la actualización.
-
-La actualización se instalará en el próximo inicio.
-
-¿Reiniciar ahora?</value>
-  </data>
-  <data name="UpdateDownloadedTitle" xml:space="preserve">
-    <value>Actualización descargada</value>
-  </data>
   <data name="UpdateCheckUnexpectedError" xml:space="preserve">
     <value>Error inesperado al verificar actualizaciones:
 {0}</value>
@@ -254,7 +230,16 @@ La actualización se instalará en el próximo inicio.
     <value>Integración del Explorador inactiva</value>
   </data>
   <data name="StatusBarLanguage" xml:space="preserve">
-    <value>Idioma: {0}</value>
+    <value>Seleccionar idioma</value>
+  </data>
+  <data name="StatusBarChecking" xml:space="preserve">
+    <value>Buscando actualizaciones...</value>
+  </data>
+  <data name="StatusBarUpdateError" xml:space="preserve">
+    <value>Error al buscar actualizaciones</value>
+  </data>
+  <data name="StatusBarCheckForUpdates" xml:space="preserve">
+    <value>Buscar actualizaciones</value>
   </data>
   <data name="StatusBarInfo" xml:space="preserve">
     <value>Info</value>
@@ -304,5 +289,68 @@ La actualización se instalará en el próximo inicio.
   </data>
   <data name="LanguageRussian" xml:space="preserve">
     <value>Русский</value>
+  </data>
+
+  <!-- UpdateNotificationBar Strings (Spanish) -->
+  <data name="UpdateAvailable" xml:space="preserve">
+    <value>Actualización v{0} disponible</value>
+  </data>
+  <data name="UpdateShowReleaseNotes" xml:space="preserve">
+    <value>Mostrar notas de versión</value>
+  </data>
+  <data name="UpdateInstall" xml:space="preserve">
+    <value>Instalar actualización</value>
+  </data>
+  <data name="UpdateIgnore" xml:space="preserve">
+    <value>Ignorar</value>
+  </data>
+  <data name="UpdateReleaseNotesTitle" xml:space="preserve">
+    <value>Notas de Versión - {0}</value>
+  </data>
+  <data name="UpdateShowReleaseNotesError" xml:space="preserve">
+    <value>No se pudieron mostrar las notas de versión:
+
+{0}</value>
+  </data>
+  <data name="UpdateDownloadedTitle" xml:space="preserve">
+    <value>Actualización Lista</value>
+  </data>
+  <data name="UpdateDownloadedMessage" xml:space="preserve">
+    <value>¡Actualización descargada exitosamente!
+
+¿Desea reiniciar la aplicación ahora para instalar la actualización?</value>
+  </data>
+  <data name="UpdatePostponedTitle" xml:space="preserve">
+    <value>Actualización Pospuesta</value>
+  </data>
+  <data name="UpdatePostponedMessage" xml:space="preserve">
+    <value>La actualización se instalará en el próximo reinicio.</value>
+  </data>
+  <data name="UpdateDownloadFailedTitle" xml:space="preserve">
+    <value>Descarga Fallida</value>
+  </data>
+  <data name="UpdateDownloadFailedMessage" xml:space="preserve">
+    <value>No se pudo descargar la actualización.
+
+Por favor, inténtelo de nuevo más tarde.</value>
+  </data>
+  <data name="UpdateDownloadError" xml:space="preserve">
+    <value>Error de descarga:
+
+{0}</value>
+  </data>
+  <data name="UpdateCheckUpToDateTitle" xml:space="preserve">
+    <value>Actualizado</value>
+  </data>
+  <data name="UpdateCheckUpToDateMessage" xml:space="preserve">
+    <value>Está ejecutando la última versión (v{0}).</value>
+  </data>
+  <data name="UpdateCheckFailedTitle" xml:space="preserve">
+    <value>Error</value>
+  </data>
+  <data name="UpdateCheckFailedMessage" xml:space="preserve">
+    <value>Error al verificar actualización:
+
+{0}</value>
   </data>
 </root>

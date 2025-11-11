@@ -318,3 +318,32 @@ Microsoft.Extensions.DependencyInjection container configured in Program.cs.
 
 ---
 
+
+### ReleaseNotesEventArgs
+Event arguments for UpdateNotificationBar.ShowRequested event. Contains version number and release notes in markdown format.
+
+**File:** UI/UpdateNotificationBar.cs
+**Properties:** Version (string), ReleaseNotes (string)
+**Used by:** MainForm.OnShowReleaseNotes
+
+### UpdateEventArgs
+Event arguments for UpdateNotificationBar.UpdateRequested event. Contains version number for the available update.
+
+**File:** UI/UpdateNotificationBar.cs
+**Properties:** Version (string)
+**Used by:** MainForm.OnUpdateNow
+
+### UpdateNotificationBar
+Notification bar component for displaying update availability above StatusBar. Provides 3 action buttons: Show Release Notes, Install Update, Ignore. Replaces the previous two-dialog system (MarkdownDialog + MessageBox).
+
+**File:** UI/UpdateNotificationBar.cs
+**Type:** Panel-based WinForms control
+**Events:** ShowRequested, UpdateRequested, IgnoreRequested
+**Features:**
+- Theme-aware colors (light/dark)
+- Localized UI strings (8 languages)
+- Non-invasive notification design
+- Positioned above StatusBar with DockStyle.Bottom
+
+**Used by:** MainForm
+

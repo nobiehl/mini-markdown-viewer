@@ -59,6 +59,7 @@ MarkdownViewer/
 │   ├── StatusBarManager.cs       → Status bar logic
 │   ├── NavigationBar.cs          → Navigation buttons
 │   ├── SearchBar.cs              → Search UI
+│   ├── UpdateNotificationBar.cs  → Update notification (v1.8.0)
 │   └── ContextMenuBuilder.cs     → Context menus
 │
 ├── Models/                   # Data Models
@@ -301,6 +302,7 @@ public class MainWindow : Form
     private readonly StatusBarManager _statusBar;
     private readonly NavigationBar _navigationBar;
     private readonly SearchBar _searchBar;
+    private readonly UpdateNotificationBar _updateNotificationBar;
 
     public MainWindow(string filePath, /* dependencies */)
     {
@@ -316,6 +318,7 @@ public class MainWindow : Form
 - Event orchestration
 - Keyboard shortcuts
 - Menu building
+- Update notification handling (v1.8.0)
 
 **Target Size:** < 250 lines (down from 735!)
 
@@ -376,6 +379,44 @@ public class SearchBar
 - Search UI panel
 - Match counter
 - Keyboard shortcuts (Enter, F3, Esc)
+
+#### UpdateNotificationBar
+```csharp
+public class UpdateNotificationBar : Panel
+{
+    private readonly ILocalizationService _localization;
+
+    public event EventHandler<ReleaseNotesEventArgs>? ShowRequested;
+    public event EventHandler<UpdateEventArgs>? UpdateRequested;
+    public event EventHandler? IgnoreRequested;
+
+    public void Show(string latestVersion, string releaseNotes);
+    public void Hide();
+    public void ApplyTheme(bool isDarkTheme);
+}
+
+public class ReleaseNotesEventArgs : EventArgs
+{
+    public string Version { get; }
+    public string ReleaseNotes { get; }
+}
+
+public class UpdateEventArgs : EventArgs
+{
+    public string Version { get; }
+}
+```
+
+**Responsibilities:**
+- Non-invasive update notification bar (above StatusBar)
+- 3 action buttons: Show Release Notes, Install Update, Ignore
+- Theme-aware colors (light/dark)
+- Event-driven communication with MainForm
+- Fully localized (8 languages)
+
+**Version:** v1.8.0
+**Replaces:** Previous two-dialog system (MarkdownDialog + MessageBox)
+**Positioning:** DockStyle.Bottom, appears above StatusBar using BringToFront()
 
 #### ContextMenuBuilder
 ```csharp

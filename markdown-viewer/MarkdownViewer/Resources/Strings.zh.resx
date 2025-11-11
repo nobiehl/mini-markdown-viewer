@@ -191,13 +191,6 @@
   </data>
 
   <!-- Updates -->
-  <data name="UpdateCheckFailedMessage" xml:space="preserve">
-    <value>检查更新失败：
-{0}</value>
-  </data>
-  <data name="UpdateCheckFailedTitle" xml:space="preserve">
-    <value>更新错误</value>
-  </data>
   <data name="NoUpdateAvailableMessage" xml:space="preserve">
     <value>您已在使用最新版本（{0}）。</value>
   </data>
@@ -218,23 +211,6 @@
   <data name="UpdateAvailableTitle" xml:space="preserve">
     <value>有可用更新</value>
   </data>
-  <data name="UpdateDownloadFailedMessage" xml:space="preserve">
-    <value>下载失败。
-请稍后重试。</value>
-  </data>
-  <data name="UpdateDownloadFailedTitle" xml:space="preserve">
-    <value>下载错误</value>
-  </data>
-  <data name="UpdateDownloadedMessage" xml:space="preserve">
-    <value>更新已下载。
-
-更新将在下次启动时安装。
-
-立即重新启动？</value>
-  </data>
-  <data name="UpdateDownloadedTitle" xml:space="preserve">
-    <value>更新已下载</value>
-  </data>
   <data name="UpdateCheckUnexpectedError" xml:space="preserve">
     <value>检查更新时发生意外错误：
 {0}</value>
@@ -254,7 +230,16 @@
     <value>资源管理器集成未激活</value>
   </data>
   <data name="StatusBarLanguage" xml:space="preserve">
-    <value>语言：{0}</value>
+    <value>选择语言</value>
+  </data>
+  <data name="StatusBarChecking" xml:space="preserve">
+    <value>正在检查更新...</value>
+  </data>
+  <data name="StatusBarUpdateError" xml:space="preserve">
+    <value>更新检查失败</value>
+  </data>
+  <data name="StatusBarCheckForUpdates" xml:space="preserve">
+    <value>检查更新</value>
   </data>
   <data name="StatusBarInfo" xml:space="preserve">
     <value>信息</value>
@@ -304,5 +289,68 @@
   </data>
   <data name="LanguageRussian" xml:space="preserve">
     <value>Русский</value>
+  </data>
+
+  <!-- UpdateNotificationBar Strings (Chinese) -->
+  <data name="UpdateAvailable" xml:space="preserve">
+    <value>可用更新 v{0}</value>
+  </data>
+  <data name="UpdateShowReleaseNotes" xml:space="preserve">
+    <value>显示发行说明</value>
+  </data>
+  <data name="UpdateInstall" xml:space="preserve">
+    <value>安装更新</value>
+  </data>
+  <data name="UpdateIgnore" xml:space="preserve">
+    <value>忽略</value>
+  </data>
+  <data name="UpdateReleaseNotesTitle" xml:space="preserve">
+    <value>发行说明 - {0}</value>
+  </data>
+  <data name="UpdateShowReleaseNotesError" xml:space="preserve">
+    <value>无法显示发行说明:
+
+{0}</value>
+  </data>
+  <data name="UpdateDownloadedTitle" xml:space="preserve">
+    <value>更新就绪</value>
+  </data>
+  <data name="UpdateDownloadedMessage" xml:space="preserve">
+    <value>更新下载成功！
+
+您想现在重新启动应用程序以安装更新吗？</value>
+  </data>
+  <data name="UpdatePostponedTitle" xml:space="preserve">
+    <value>更新已推迟</value>
+  </data>
+  <data name="UpdatePostponedMessage" xml:space="preserve">
+    <value>更新将在下次启动时安装。</value>
+  </data>
+  <data name="UpdateDownloadFailedTitle" xml:space="preserve">
+    <value>下载失败</value>
+  </data>
+  <data name="UpdateDownloadFailedMessage" xml:space="preserve">
+    <value>无法下载更新。
+
+请稍后再试。</value>
+  </data>
+  <data name="UpdateDownloadError" xml:space="preserve">
+    <value>下载错误:
+
+{0}</value>
+  </data>
+  <data name="UpdateCheckUpToDateTitle" xml:space="preserve">
+    <value>已是最新</value>
+  </data>
+  <data name="UpdateCheckUpToDateMessage" xml:space="preserve">
+    <value>您正在运行最新版本 (v{0})。</value>
+  </data>
+  <data name="UpdateCheckFailedTitle" xml:space="preserve">
+    <value>错误</value>
+  </data>
+  <data name="UpdateCheckFailedMessage" xml:space="preserve">
+    <value>更新检查失败:
+
+{0}</value>
   </data>
 </root>

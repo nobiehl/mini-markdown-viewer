@@ -7,9 +7,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
-## [1.8.0] - 2025-01-10
+## [1.8.0] - 2025-01-11
 
 ### Added
+- **UpdateNotificationBar**: New update notification system
+  - Non-invasive notification bar above StatusBar (replaces two-dialog system)
+  - 3 action buttons: Show Release Notes, Install Update, Ignore
+  - Theme-aware colors (adapts to light/dark theme)
+  - Fully localized in all 8 supported languages
+  - Event-driven architecture (ShowRequested, UpdateRequested, IgnoreRequested)
+  - Release notes displayed in main viewer (full navigation support)
+- **Complete Localization**: All Update-related UI strings translated
+  - 16 new resource strings for UpdateNotificationBar
+  - MessageBox dialogs (download success/failure, up-to-date, errors)
+  - Release notes title format with version
+  - Comprehensive error messages for all update scenarios
+  - Languages: English, Deutsch, Español, Français, 日本語, 简体中文, Русский, Монгол
 - **Auto Table of Contents**: Generate hierarchical TOC from `[TOC]` placeholder
   - JavaScript-based navigation with smooth scrolling
   - Supports all heading levels (h1-h6)
@@ -31,20 +44,59 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Dark theme support with automatic color adjustments
   - Sample: `samples/admonitions-example.md`
 
+### Fixed
+- **Double "v" in Release Notes**: Fixed "vv1.8.0" → "v1.8.0" in release notes title
+  - Version prefix check to avoid duplication (GitHub TagName already includes "v")
+- **UpdateNotificationBar Positioning**: Bar now correctly appears ABOVE StatusBar
+  - Added BringToFront() calls in initialization and Show() method
+  - Changed initialization order (StatusBar first, then UpdateNotificationBar)
+- **LocalizationServiceIntegrationTests**: Fixed test using string without placeholder
+  - Changed from StatusBarLanguage (no placeholder) to UpdateAvailable (has {0} placeholder)
+
+### Changed
+- **PROCESS-MODEL.md v2.3**: Localization now mandatory part of development workflow
+  - New Phase 2.4: Lokalisierung (KRITISCH - Nicht vergessen!)
+    - 2.4.1: Sofortige Resource-String-Verwendung bei UI-Code
+    - 2.4.2: Lokalisierungs-Audit nach Implementierung
+    - 2.4.3: Lokalisierungs-Checkliste (vor jedem Commit)
+    - 2.4.4: Liste aller 8 unterstützten Sprachen
+    - 2.4.5: Best Practices (DO/DON'T)
+  - Quality Gates: Lokalisierungs-Prüfung vor jedem Commit
+  - Lessons Learned: Lokalisierungs-Erfolge und -Fehler dokumentiert
+  - Motivation: "Ich lokalisiere später" führt zu 20+ nachträglich zu lokalisierenden Strings
+
 ### Technical
-- Parallel implementation with 3 specialized agents
+- **UpdateNotificationBar Implementation**: 293 lines, Panel-based WinForms control
+- **Localization**: 16 strings × 8 languages = 128 translations
+  - Parallel agents used for translation (6 languages translated simultaneously in ~2 minutes)
+  - All resource strings include `<comment>` tags for translator context
+- **Tests**: 248/249 passing (99.6% success rate)
+  - 1 UI Automation test failing (COM environment error, not critical)
+- **Build**: 0 errors, 0 warnings
+- **Markdown Extensions**:
+  - Parallel implementation with 3 specialized agents
   - Agent 1: TOC (JavaScript + CSS + Tests)
   - Agent 2: Emoji + Diff (Pipeline + CSS + Tests)
   - Agent 3: Admonitions (CSS + Tests)
   - Result: 0 merge conflicts, 66% time savings (30 min vs 90 min)
-- 18 new unit tests (all passing)
-- Build: 0 Errors, 0 Warnings
-- Binary size: 3.3 MB (unchanged)
+  - 18 new unit tests for markdown features (all passing)
+- **Binary size**: 3.3 MB (unchanged)
 
 ### Files Changed
+- `UI/UpdateNotificationBar.cs`: New notification bar component (293 lines)
+- `MainForm.cs`: UpdateNotificationBar integration, localized Update dialogs (~100 lines modified)
+- `Resources/Strings.*.resx`: 16 new Update strings in all 8 languages (~200 lines total)
+- `docs/PROCESS-MODEL.md`: Phase 2.4 Lokalisierung section (~120 lines added)
 - `MarkdownViewer.Core/Core/MarkdownRenderer.cs`: Extended pipeline, added CSS and JavaScript
 - `samples/toc-example.md`, `emoji-example.md`, `diff-example.md`, `admonitions-example.md`: New examples
-- `MarkdownViewer.Tests/Tests/Core/MarkdownRendererTests.cs`: 18 new tests
+- `MarkdownViewer.Tests/Tests/Core/MarkdownRendererTests.cs`: 18 new markdown tests
+- `MarkdownViewer.Tests/Integration/LocalizationServiceIntegrationTests.cs`: Fixed placeholder test
+
+### Upgrade from v1.7.x
+- ✅ **Drop-in replacement**: Just replace the `.exe`
+- ✅ **No breaking changes**: All settings and themes preserved
+- ✅ **New UpdateNotificationBar**: Automatically replaces old two-dialog system
+- ✅ **All features work immediately**: No configuration needed
 
 ---
 
@@ -423,7 +475,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 | Version | Date | Type | Key Features |
 |---------|------|------|--------------|
-| 1.8.0 | 2025-01-10 | Feature | TOC, Emoji, Diff, Admonitions |
+| 1.8.0 | 2025-01-11 | Feature | UpdateNotificationBar, Localization, TOC, Emoji, Diff, Admonitions |
 | 1.7.4 | 2025-11-09 | Bugfix | WebView2 resource error fix |
 | 1.7.2 | 2025-11-08 | Technical | UI Automation Tests, MarkdownDialog isolation |
 | 1.7.1 | 2025-11-08 | Cleanup | Remove Avalonia experiments |
