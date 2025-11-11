@@ -7,6 +7,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.8.1] - 2025-01-11
+
+### Fixed
+- **UI Automation Tests**: Fixed flaky test failures due to parallel execution
+  - Created "Sequential UI Tests" xUnit collection
+  - All 18 UI Automation tests now run sequentially instead of parallel
+  - Prevents Windows UI Automation COM conflicts (HRESULT E_FAIL errors)
+  - Test success rate: 248/249 → 249/249 (100%)
+
+### Technical
+- Added [Collection("Sequential UI Tests")] to DemoUITest and MainFormUITests
+- UI tests no longer interfere with each other during parallel test runs
+- All other tests (Unit, Integration) still run in parallel for speed
+
+---
+
 ## [1.8.0] - 2025-01-11
 
 ### Added
@@ -475,6 +491,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 | Version | Date | Type | Key Features |
 |---------|------|------|--------------|
+| 1.8.1 | 2025-01-11 | Bugfix | UI Automation tests sequential execution fix |
 | 1.8.0 | 2025-01-11 | Feature | UpdateNotificationBar, Localization, TOC, Emoji, Diff, Admonitions |
 | 1.7.4 | 2025-11-09 | Bugfix | WebView2 resource error fix |
 | 1.7.2 | 2025-11-08 | Technical | UI Automation Tests, MarkdownDialog isolation |
