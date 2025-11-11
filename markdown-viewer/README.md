@@ -171,7 +171,7 @@ Current test coverage: **69%** (730/1057 lines)
 
 ## 🛠️ Technologies
 
-- **.NET 8.0** - Modern cross-platform framework
+- **.NET 8.0** - Modern Windows framework
 - **WinForms** - Native Windows UI
 - **WebView2** - Chromium-based web rendering
 - **Markdig** - Fast Markdown parser
