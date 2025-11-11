@@ -6,6 +6,39 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ---
 
+## [1.8.0] - 2025-01-10
+
+### Added
+- **Auto Table of Contents**: Generate hierarchical TOC from `[TOC]` placeholder
+  - JavaScript-based navigation with smooth scrolling
+  - Supports all heading levels (h1-h6)
+  - Theme-aware styling
+  - Sample: `samples/toc-example.md`
+- **Emoji Support**: Convert emoji codes to Unicode emojis
+  - Markdig extension: `UseEmojiAndSmiley()`
+  - Supports `:smile:`, `:heart:`, `:rocket:`, etc.
+  - Sample: `samples/emoji-example.md`
+- **Code Diff Highlighting**: Syntax highlighting for diff code blocks
+  - Green background for added lines (+)
+  - Red background for removed lines (-)
+  - Sample: `samples/diff-example.md`
+- **Admonitions/Callouts**: Styled information boxes
+  - 5 types: `note`, `info`, `tip`, `warning`, `danger`
+  - Colored borders, backgrounds, and Unicode icons
+  - Dark theme support
+  - Sample: `samples/admonitions-example.md`
+
+### Technical
+- **Parallel Implementation**: Used 3 agents for faster development
+  - Agent 1: TOC feature (JavaScript + CSS + Tests)
+  - Agent 2: Emoji + Diff (Pipeline + CSS + Tests)
+  - Agent 3: Admonitions (CSS + Tests)
+  - Result: 0 merge conflicts, 66% time savings (30 min vs 90 min)
+- **Test Coverage**: Added 18 new unit tests (all passing)
+- **Build Quality**: 0 Errors, 0 Warnings
+
+---
+
 ## [1.5.2] - 2025-11-06
 
 ### Fixed

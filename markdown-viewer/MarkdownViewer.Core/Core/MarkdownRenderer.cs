@@ -23,6 +23,7 @@ namespace MarkdownViewer.Core
         {
             _pipeline = new MarkdownPipelineBuilder()
                 .UseAdvancedExtensions() // Includes AutoIdentifiers for heading IDs
+                .UseEmojiAndSmiley()
                 .UseMathematics()
                 .Build();
         }
@@ -178,6 +179,146 @@ namespace MarkdownViewer.Core
         .math.math-inline {{
             display: inline;
         }}
+        /* Table of Contents */
+        .table-of-contents {{
+            border: 1px solid {tableBorder};
+            border-radius: 6px;
+            padding: 1rem;
+            margin: 2rem 0;
+            background: {tableHeaderBg};
+        }}
+        .toc-title {{
+            font-weight: 600;
+            font-size: 1.1rem;
+            margin-bottom: 0.5rem;
+            color: {headingColor};
+        }}
+        .toc-list {{
+            list-style: none;
+            padding-left: 0;
+            margin: 0;
+        }}
+        .toc-list ul {{
+            padding-left: 1.5rem;
+            margin-top: 0.25rem;
+        }}
+        .toc-list li {{
+            margin: 0.25rem 0;
+        }}
+        .toc-link {{
+            color: {linkColor};
+            text-decoration: none;
+            transition: all 0.2s;
+        }}
+        .toc-link:hover {{
+            text-decoration: underline;
+            font-weight: 500;
+        }}
+        /* Code Diff Highlighting */
+        .hljs-deletion {{
+            background-color: #ffdddd;
+            color: #cc0000;
+        }}
+        .hljs-addition {{
+            background-color: #ddffdd;
+            color: #008800;
+        }}
+        code.language-diff {{
+            background: transparent;
+        }}
+        pre:has(code.language-diff) {{
+            background: #f8f8f8;
+        }}
+        /* Admonitions / Callouts */
+        div.note, div.info, div.tip, div.warning, div.danger {{
+            border-left: 4px solid;
+            border-radius: 4px;
+            padding: 1rem;
+            margin: 1rem 0;
+            position: relative;
+            padding-left: 3rem;
+        }}
+        div.note::before, div.info::before, div.tip::before,
+        div.warning::before, div.danger::before {{
+            position: absolute;
+            left: 1rem;
+            font-size: 1.2rem;
+            font-weight: bold;
+        }}
+
+        /* Note (Blue) */
+        div.note {{
+            border-left-color: #4A90E2;
+            background-color: #E3F2FD;
+            color: #1565C0;
+        }}
+        div.note::before {{
+            content: '\\2139\\FE0F'; /* ℹ️ */
+        }}
+
+        /* Info (Cyan) */
+        div.info {{
+            border-left-color: #00BCD4;
+            background-color: #E0F7FA;
+            color: #006064;
+        }}
+        div.info::before {{
+            content: '\\1F4A1'; /* 💡 */
+        }}
+
+        /* Tip (Green) */
+        div.tip {{
+            border-left-color: #28A745;
+            background-color: #D4EDDA;
+            color: #155724;
+        }}
+        div.tip::before {{
+            content: '\\2705'; /* ✅ */
+        }}
+
+        /* Warning (Orange) */
+        div.warning {{
+            border-left-color: #FFA500;
+            background-color: #FFF3CD;
+            color: #856404;
+        }}
+        div.warning::before {{
+            content: '\\26A0\\FE0F'; /* ⚠️ */
+        }}
+
+        /* Danger (Red) */
+        div.danger {{
+            border-left-color: #DC3545;
+            background-color: #F8D7DA;
+            color: #721C24;
+        }}
+        div.danger::before {{
+            content: '\\1F6AB'; /* 🚫 */
+        }}
+
+        /* Dark theme adjustments */
+        @media (prefers-color-scheme: dark) {{
+            div.note {{
+                background-color: rgba(74, 144, 226, 0.1);
+                color: #90CAF9;
+            }}
+            div.info {{
+                background-color: rgba(0, 188, 212, 0.1);
+                color: #80DEEA;
+            }}
+            div.tip {{
+                background-color: rgba(40, 167, 69, 0.1);
+                color: #A5D6A7;
+            }}
+            div.warning {{
+                background-color: rgba(255, 165, 0, 0.1);
+                color: #FFB74D;
+            }}
+            div.danger {{
+                background-color: rgba(220, 53, 69, 0.1);
+                color: #EF5350;
+            }}
+        }}
     </style>
 </head>
 <body>
@@ -332,6 +473,75 @@ namespace MarkdownViewer.Core
                 window.chrome.webview.postMessage(href);
             }}
         }}, true);
+
+        // Auto-generate Table of Contents from [TOC] placeholder
+        document.addEventListener('DOMContentLoaded', function() {{
+            const tocPlaceholder = document.querySelector('p:has(> :only-child:is([href=""#TOC""], [href=""TOC""]))') ||
+                                    Array.from(document.querySelectorAll('p')).find(p => p.textContent.trim() === '[TOC]');
+
+            if (tocPlaceholder) {{
+                const headings = document.querySelectorAll('h1[id], h2[id], h3[id], h4[id], h5[id], h6[id]');
+
+                if (headings.length > 0) {{
+                    const toc = document.createElement('nav');
+                    toc.className = 'table-of-contents';
+
+                    const tocTitle = document.createElement('div');
+                    tocTitle.className = 'toc-title';
+                    tocTitle.textContent = 'Table of Contents';
+                    toc.appendChild(tocTitle);
+
+                    const tocList = document.createElement('ul');
+                    tocList.className = 'toc-list';
+
+                    let currentLevel = 1;
+                    let currentList = tocList;
+                    const listStack = [tocList];
+
+                    headings.forEach(heading => {{
+                        const level = parseInt(heading.tagName.substring(1));
+                        const id = heading.id;
+                        const text = heading.textContent;
+
+                        // Adjust nesting
+                        while (level > currentLevel && listStack.length < 6) {{
+                            const newList = document.createElement('ul');
+                            newList.className = 'toc-list';
+                            if (currentList.lastElementChild) {{
+                                currentList.lastElementChild.appendChild(newList);
+                            }} else {{
+                                const li = document.createElement('li');
+                                currentList.appendChild(li);
+                                li.appendChild(newList);
+                            }}
+                            listStack.push(newList);
+                            currentList = newList;
+                            currentLevel++;
+                        }}
+
+                        while (level < currentLevel && listStack.length > 1) {{
+                            listStack.pop();
+                            currentList = listStack[listStack.length - 1];
+                            currentLevel--;
+                        }}
+
+                        // Create TOC entry
+                        const li = document.createElement('li');
+                        const a = document.createElement('a');
+                        a.href = '#' + id;
+                        a.textContent = text;
+                        a.className = 'toc-link';
+                        li.appendChild(a);
+                        currentList.appendChild(li);
+                    }});
+
+                    toc.appendChild(tocList);
+                    tocPlaceholder.replaceWith(toc);
+                }} else {{
+                    tocPlaceholder.remove();
+                }}
+            }}
+        }});
     </script>
 </body>
 </html>";

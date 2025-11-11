@@ -2,7 +2,7 @@
 
 Lightweight Windows desktop viewer for Markdown files with themes, localization, navigation, and search. Full Windows Explorer integration included.
 
-![Version](https://img.shields.io/badge/version-2.0.0-blue)
+![Version](https://img.shields.io/badge/version-1.8.0-blue)
 ![.NET](https://img.shields.io/badge/.NET-8.0-purple)
 ![Size](https://img.shields.io/badge/size-2.0_MB-green)
 ![Languages](https://img.shields.io/badge/languages-8-orange)
@@ -18,6 +18,10 @@ Lightweight Windows desktop viewer for Markdown files with themes, localization,
   - Inline math: `$E = mc^2$`
   - Display math: `$$\int_{-\infty}^{\infty} e^{-x^2} dx = \sqrt{\pi}$$`
   - Full LaTeX support: matrices, Greek letters, fractions, summations, integrals, etc.
+- ✅ **Auto Table of Contents** - Generate TOC from `[TOC]` placeholder
+- ✅ **Emoji Support** - Convert emoji codes (`:smile:`, `:rocket:`) to Unicode emojis
+- ✅ **Code Diff Highlighting** - Highlight added (+) and removed (-) lines in diff blocks
+- ✅ **Admonitions/Callouts** - Styled boxes for notes, tips, warnings, and danger alerts
 - ✅ **Charts** - Chart.js for data visualization (line, bar, pie, doughnut, radar, polar area)
 - ✅ **Mermaid Diagrams** (flowcharts, sequence, class, state, gantt, ER, etc.)
 - ✅ **PlantUML Diagrams** (class, sequence, use case, activity, component, etc.)

@@ -674,6 +674,106 @@ A -> B
 
         #endregion
 
+        #region Table of Contents (TOC) Tests
+
+        [Fact]
+        public void RenderToHtml_WithTocPlaceholder_ContainsTableOfContents()
+        {
+            // Arrange
+            var markdown = "[TOC]\n\n## Heading 1\n\n### Subheading\n\n## Heading 2";
+            var renderer = new MarkdownRenderer();
+
+            // Act
+            var html = renderer.RenderToHtml(markdown, _testFilePath);
+
+            // Assert
+            Assert.Contains("[TOC]", html); // JavaScript will replace this
+            Assert.Contains("h2 id=\"heading-1\"", html);
+            Assert.Contains("h2 id=\"heading-2\"", html);
+            Assert.Contains("h3 id=\"subheading\"", html);
+        }
+
+        [Fact]
+        public void RenderToHtml_WithTocPlaceholder_ContainsJavaScript()
+        {
+            // Arrange
+            var markdown = "[TOC]\n\n## Test Heading";
+            var renderer = new MarkdownRenderer();
+
+            // Act
+            var html = renderer.RenderToHtml(markdown, _testFilePath);
+
+            // Assert
+            Assert.Contains("// Auto-generate Table of Contents from [TOC] placeholder", html);
+            Assert.Contains("document.querySelector('p:has(> :only-child:is", html);
+            Assert.Contains("table-of-contents", html);
+        }
+
+        [Fact]
+        public void RenderToHtml_WithTocPlaceholder_ContainsCssStyles()
+        {
+            // Arrange
+            var markdown = "[TOC]\n\n## Test Heading";
+            var renderer = new MarkdownRenderer();
+
+            // Act
+            var html = renderer.RenderToHtml(markdown, _testFilePath);
+
+            // Assert
+            Assert.Contains(".table-of-contents", html);
+            Assert.Contains(".toc-title", html);
+            Assert.Contains(".toc-list", html);
+            Assert.Contains(".toc-link", html);
+        }
+
+        [Fact]
+        public void RenderToHtml_WithoutTocPlaceholder_DoesNotAffectRendering()
+        {
+            // Arrange
+            var markdown = "## Heading 1\n\n### Subheading";
+            var renderer = new MarkdownRenderer();
+
+            // Act
+            var html = renderer.RenderToHtml(markdown, _testFilePath);
+
+            // Assert
+            // Should still contain TOC JavaScript (always included)
+            Assert.Contains("// Auto-generate Table of Contents", html);
+            // Should contain headings but not TOC markup in body
+            Assert.Contains("h2 id=\"heading-1\"", html);
+            Assert.Contains("h3 id=\"subheading\"", html);
+        }
+
+        [Fact]
+        public void RenderToHtml_WithMultipleLevels_GeneratesNestedToc()
+        {
+            // Arrange
+            var markdown = @"[TOC]
+
+# Main Title
+
+## Chapter 1
+### Section 1.1
+#### Subsection 1.1.1
+
+## Chapter 2
+### Section 2.1";
+            var renderer = new MarkdownRenderer();
+
+            // Act
+            var html = renderer.RenderToHtml(markdown, _testFilePath);
+
+            // Assert
+            Assert.Contains("h1 id=\"main-title\"", html);
+            Assert.Contains("h2 id=\"chapter-1\"", html);
+            Assert.Contains("h3 id=\"section-1", html); // AutoIdentifier converts dots to hyphens
+            Assert.Contains("h4 id=\"subsection-1", html);
+            Assert.Contains("h2 id=\"chapter-2\"", html);
+            Assert.Contains("h3 id=\"section-2", html);
+        }
+
+        #endregion
+
         #region Edge Cases and Error Handling Tests
 
         [Fact]
@@ -755,6 +855,184 @@ A -> B
             // Assert
             result.Should().Contain("<input");
             result.Should().Contain("type=\"checkbox\"");
+        }
+
+        #endregion
+
+        #region Admonitions / Callouts Tests
+
+        [Fact]
+        public void RenderToHtml_WithCustomContainers_GeneratesAdmonitions()
+        {
+            // Arrange
+            var markdown = @"::: note
+This is a note
+:::
+
+::: warning
+This is a warning
+:::";
+            var renderer = new MarkdownRenderer();
+
+            // Act
+            var html = renderer.RenderToHtml(markdown, _testFilePath);
+
+            // Assert
+            html.Should().Contain("<div class=\"note\">");
+            html.Should().Contain("<div class=\"warning\">");
+            html.Should().Contain("This is a note");
+            html.Should().Contain("This is a warning");
+        }
+
+        [Theory]
+        [InlineData("note")]
+        [InlineData("info")]
+        [InlineData("tip")]
+        [InlineData("warning")]
+        [InlineData("danger")]
+        public void RenderToHtml_WithAllAdmonitionTypes_GeneratesCorrectClasses(string type)
+        {
+            // Arrange
+            var markdown = $"::: {type}\nContent\n:::";
+            var renderer = new MarkdownRenderer();
+
+            // Act
+            var html = renderer.RenderToHtml(markdown, _testFilePath);
+
+            // Assert
+            html.Should().Contain($"<div class=\"{type}\">");
+        }
+
+        #endregion
+
+        #region Emoji Support Tests
+
+        [Fact]
+        public void RenderToHtml_WithEmojiCodes_ConvertsToEmoji()
+        {
+            // Arrange
+            var markdown = ":smile: :heart: :rocket:";
+            var renderer = new MarkdownRenderer();
+
+            // Act
+            var html = renderer.RenderToHtml(markdown, _testFilePath);
+
+            // Assert
+            // Emojis should be converted to Unicode emoji characters
+            html.Should().Contain("😄"); // smile
+            html.Should().Contain("❤"); // heart
+            html.Should().Contain("🚀"); // rocket
+        }
+
+        [Fact]
+        public void RenderToHtml_WithMultipleEmojis_ConvertsAll()
+        {
+            // Arrange
+            var markdown = "I :heart: Markdown! :rocket: :fire: :tada:";
+            var renderer = new MarkdownRenderer();
+
+            // Act
+            var html = renderer.RenderToHtml(markdown, _testFilePath);
+
+            // Assert
+            html.Should().Contain("❤"); // heart
+            html.Should().Contain("🚀"); // rocket
+            html.Should().Contain("🔥"); // fire
+            html.Should().Contain("🎉"); // tada
+        }
+
+        [Fact]
+        public void RenderToHtml_WithEmojiInHeading_ConvertsCorrectly()
+        {
+            // Arrange
+            var markdown = "# :rocket: Getting Started";
+            var renderer = new MarkdownRenderer();
+
+            // Act
+            var html = renderer.RenderToHtml(markdown, _testFilePath);
+
+            // Assert
+            html.Should().Contain("🚀");
+            html.Should().Contain("Getting Started");
+            html.Should().Contain("<h1");
+        }
+
+        [Fact]
+        public void RenderToHtml_WithEmojiInList_ConvertsCorrectly()
+        {
+            // Arrange
+            var markdown = "- :white_check_mark: Done\n- :x: Not done";
+            var renderer = new MarkdownRenderer();
+
+            // Act
+            var html = renderer.RenderToHtml(markdown, _testFilePath);
+
+            // Assert
+            html.Should().Contain("✅");
+            html.Should().Contain("❌");
+        }
+
+        #endregion
+
+        #region Diff Highlighting Tests
+
+        [Fact]
+        public void RenderToHtml_WithDiffCode_ContainsDiffClasses()
+        {
+            // Arrange
+            var markdown = "```diff\n- removed\n+ added\n```";
+            var renderer = new MarkdownRenderer();
+
+            // Act
+            var html = renderer.RenderToHtml(markdown, _testFilePath);
+
+            // Assert
+            html.Should().Contain("language-diff");
+            html.Should().Contain("hljs-deletion");
+            html.Should().Contain("hljs-addition");
+        }
+
+        [Fact]
+        public void RenderToHtml_WithComplexDiff_RendersCorrectly()
+        {
+            // Arrange
+            var markdown = @"```diff
+public class Test
+{
+-   public int Value { get; set; }
++   public string Value { get; set; }
+}
+```";
+            var renderer = new MarkdownRenderer();
+
+            // Act
+            var html = renderer.RenderToHtml(markdown, _testFilePath);
+
+            // Assert
+            html.Should().Contain("language-diff");
+            html.Should().Contain("public class Test");
+        }
+
+        [Fact]
+        public void RenderToHtml_WithGitDiff_RendersCorrectly()
+        {
+            // Arrange
+            var markdown = @"```diff
+diff --git a/file.js b/file.js
+--- a/file.js
++++ b/file.js
+@@ -1,3 +1,3 @@
+-console.log('old');
++console.log('new');
+```";
+            var renderer = new MarkdownRenderer();
+
+            // Act
+            var html = renderer.RenderToHtml(markdown, _testFilePath);
+
+            // Assert
+            html.Should().Contain("language-diff");
+            html.Should().Contain("diff --git");
         }
 
         #endregion

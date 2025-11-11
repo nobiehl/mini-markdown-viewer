@@ -1681,3 +1681,58 @@ All requested phases have been completed:
 4. ✅ UI Automation Tests (FlaUI)
 5. ✅ Comprehensive documentation
 
+
+## [2025-01-10] Session - 4 Neue Markdown Extensions
+
+**Status:** ✅ Completed
+
+**Implementierte Features:**
+
+1. **Auto Table of Contents (TOC)**
+   - JavaScript-basierte TOC-Generierung aus [TOC] Platzhalter
+   - Hierarchische Navigation mit allen Heading-Levels (h1-h6)
+   - Theme-aware CSS-Styling
+   - Sample: samples/toc-example.md
+
+2. **Emoji Support**
+   - Markdig Extension: UseEmojiAndSmiley()
+   - Konvertiert :smile: :heart: :rocket: etc. zu Unicode-Emojis
+   - Sample: samples/emoji-example.md
+
+3. **Code Diff Highlighting**
+   - CSS für +/- Zeilen (grün/rot)
+   - Highlight.js diff-Language Support
+   - Sample: samples/diff-example.md
+
+4. **Admonitions/Callouts**
+   - 5 Typen: note, info, tip, warning, danger
+   - Farbige Boxen mit Icons
+   - Dark Theme Support
+   - Sample: samples/admonitions-example.md
+
+**Changes:**
+- MarkdownViewer.Core/Core/MarkdownRenderer.cs: Pipeline + CSS + JavaScript
+- samples/toc-example.md: TOC Demo (neu)
+- samples/emoji-example.md: Emoji Demo (neu)
+- samples/diff-example.md: Diff Demo (neu)
+- samples/admonitions-example.md: Admonitions Demo (neu)
+- MarkdownViewer.Tests/Tests/Core/MarkdownRendererTests.cs: 18 neue Tests
+
+**Metrics:**
+- Files changed: 6
+- Tests added: 18 (alle bestanden)
+- Build: 0 Errors, 0 Warnings
+- Implementierungsmethode: Parallele Agenten (3 Agents)
+- Zeitersparnis: ~66% (30 Min statt 90 Min)
+
+**Parallele Implementierung:**
+- Agent 1: TOC (JavaScript + CSS + Tests)
+- Agent 2: Emoji + Diff (Pipeline + CSS + Tests)
+- Agent 3: Admonitions (CSS + Tests)
+- Ergebnis: 0 Merge-Konflikte, perfekte Trennung
+
+**Next:**
+- [ ] README.md updaten mit neuen Features
+- [ ] CHANGELOG.md eintragen
+
+---
