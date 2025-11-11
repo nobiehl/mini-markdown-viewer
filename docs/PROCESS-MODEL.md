@@ -389,27 +389,72 @@ ls -lh publish/MarkdownViewer.exe
 - **Dateigröße prüfen**: ~3.3 MB ist korrekt, 138 KB ist FALSCH (Managed DLL statt EXE)
 - **Binary manuell testen**: Doppelklick, öffnet Datei, keine Crashes, UI funktioniert
 
-**4. Version bump, Dokumentation, Release Notes:**
-- Version bump in Program.cs und MainForm.cs
-- CHANGELOG.md aktualisieren
-- Release Notes schreiben
-- README.md Badge aktualisieren
+**4. KRITISCH: Dokumentation aktualisieren (VOR Release!):**
 
-**5. Erst nach erfolgreichen Tests: Build testen und Release erstellen**
+**4.1 Version Bump:**
+- `Program.cs`: `private const string Version = "X.Y.Z";`
+- `MainForm.cs`: `private const string Version = "X.Y.Z";`
+- `README.md`: Version Badge aktualisieren
+
+**4.2 CHANGELOG.md aktualisieren (PFLICHT!):**
+```markdown
+## [X.Y.Z] - YYYY-MM-DD
+
+### Added
+- Feature 1 mit Beschreibung
+- Feature 2 mit Beschreibung
+
+### Fixed
+- Bug 1 mit Beschreibung
+
+### Changed
+- Änderung 1 mit Beschreibung
+
+### Technical
+- Build info, Tests, etc.
+```
+**WICHTIG:**
+- CHANGELOG.md ist die **einzige Quelle der Wahrheit** für Release-Informationen
+- **KEINE separaten RELEASE-NOTES-vX.Y.Z.md Dateien mehr erstellen!**
+- Alle Release-Informationen gehen in CHANGELOG.md
+- GitHub Release Notes können aus CHANGELOG.md kopiert werden
+
+**4.3 README.md aktualisieren:**
+- Version Badge (nur Nummer, keine Features!)
+- Binary Size Badge falls geändert
+- Test Count Badge
+- Quick Start Section: Download-Link auf neue Version
+- Installation Commands: `MarkdownViewer-vX.Y.Z.exe` statt generisch
+
+**4.4 impl_progress.md aktualisieren:**
+```bash
+printf "\n## [$(date +%Y-%m-%d)] Session - Feature Name\n\n**Status:** ✅ Completed\n\n..." >> docs/impl_progress.md
+```
+
+**5. Erst nach erfolgreichen Tests UND Dokumentation: Release erstellen**
 
 ## Dokumentationsstruktur
 
 ```
 mini-markdown-viewer/
-├── PROCESS-MODEL.md          # Dieses Dokument
-├── ROADMAP.md                # Detaillierter Fahrplan
-├── ARCHITECTURE.md           # Architektur-Übersicht
-├── impl_progress.md          # Implementierungs-Fortschritt (chronologisch)
-├── GLOSSARY.md               # Begriffe & Definitionen
-├── DEVELOPMENT.md            # Developer Docs
-├── DEPLOYMENT-GUIDE.md       # Deployment Process
-└── README.md                 # User Docs
+├── README.md                 # User Docs (Features, Quick Start, Installation)
+├── docs/
+│   ├── CHANGELOG.md          # ⭐ SINGLE SOURCE OF TRUTH für alle Releases!
+│   ├── PROCESS-MODEL.md      # Dieses Dokument - Entwicklungsprozess
+│   ├── ROADMAP.md            # Detaillierter Fahrplan
+│   ├── ARCHITECTURE.md       # Architektur-Übersicht
+│   ├── impl_progress.md      # Implementierungs-Fortschritt (chronologisch)
+│   ├── GLOSSARY.md           # Begriffe & Definitionen
+│   ├── DEVELOPMENT.md        # Developer Docs
+│   ├── DEPLOYMENT-GUIDE.md   # Deployment Process
+│   └── USER-GUIDE.md         # Ausführliche Benutzer-Dokumentation
 ```
+
+**WICHTIG:**
+- **CHANGELOG.md** ist die einzige Quelle für Release-Informationen
+- **KEINE RELEASE-NOTES-vX.Y.Z.md Dateien** mehr erstellen!
+- GitHub Release Notes werden aus CHANGELOG.md kopiert
+- README.md enthält nur Quickstart und Feature-Übersicht, keine detaillierten Release Notes
 
 ## Workflow pro Feature
 

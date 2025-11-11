@@ -2,7 +2,8 @@
 
 All notable changes to MarkdownViewer are documented in this file.
 
-The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
+and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ---
 
@@ -16,26 +17,48 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   - Sample: `samples/toc-example.md`
 - **Emoji Support**: Convert emoji codes to Unicode emojis
   - Markdig extension: `UseEmojiAndSmiley()`
-  - Supports `:smile:`, `:heart:`, `:rocket:`, etc.
+  - Supports `:smile:`, `:heart:`, `:rocket:`, `:warning:`, `:fire:`, etc.
+  - Works in headings, lists, and text
   - Sample: `samples/emoji-example.md`
 - **Code Diff Highlighting**: Syntax highlighting for diff code blocks
   - Green background for added lines (+)
   - Red background for removed lines (-)
+  - Git diff compatible
   - Sample: `samples/diff-example.md`
 - **Admonitions/Callouts**: Styled information boxes
   - 5 types: `note`, `info`, `tip`, `warning`, `danger`
-  - Colored borders, backgrounds, and Unicode icons
-  - Dark theme support
+  - Colored borders, backgrounds, and Unicode icons (ℹ️ 💡 ✅ ⚠️ 🚫)
+  - Dark theme support with automatic color adjustments
   - Sample: `samples/admonitions-example.md`
 
 ### Technical
-- **Parallel Implementation**: Used 3 agents for faster development
-  - Agent 1: TOC feature (JavaScript + CSS + Tests)
+- Parallel implementation with 3 specialized agents
+  - Agent 1: TOC (JavaScript + CSS + Tests)
   - Agent 2: Emoji + Diff (Pipeline + CSS + Tests)
   - Agent 3: Admonitions (CSS + Tests)
   - Result: 0 merge conflicts, 66% time savings (30 min vs 90 min)
-- **Test Coverage**: Added 18 new unit tests (all passing)
-- **Build Quality**: 0 Errors, 0 Warnings
+- 18 new unit tests (all passing)
+- Build: 0 Errors, 0 Warnings
+- Binary size: 3.3 MB (unchanged)
+
+### Files Changed
+- `MarkdownViewer.Core/Core/MarkdownRenderer.cs`: Extended pipeline, added CSS and JavaScript
+- `samples/toc-example.md`, `emoji-example.md`, `diff-example.md`, `admonitions-example.md`: New examples
+- `MarkdownViewer.Tests/Tests/Core/MarkdownRendererTests.cs`: 18 new tests
+
+---
+
+## [1.7.4] - 2025-11-09
+
+### Fixed
+- **WebView2 Resource Error**: Resolved "resource already in use" error when opening files
+  - Fixed race condition in WebView2 initialization
+  - Improved error handling during file loading
+  - More robust navigation logic
+
+### Changed
+- Enhanced logging for WebView2 initialization
+- Better error messages for file loading issues
 
 ---
 
@@ -43,12 +66,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Fixed
 - **Critical Bug**: Update check retry logic
-  - RecordUpdateCheck() now only called on successful API response
+  - `RecordUpdateCheck()` now only called on successful API response
   - Failed checks (403 rate limit, network errors) no longer block retries
   - Automatic retry on next start until success
   - Enhanced error logging: "Will retry on next start"
-  - Problem: Timestamp was saved BEFORE API call, preventing retries for 7 days
-  - Impact: Users never received updates if first check failed
+  - **Problem**: Timestamp was saved BEFORE API call, preventing retries for 7 days
+  - **Impact**: Users never received updates if first check failed
 
 ### Changed
 - **Update Interval**: Changed from daily to once every 7 days
@@ -57,199 +80,208 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
   - Optional GitHub token support for power users (5000 requests/hour)
 
 ### Documentation
-- **UPDATE-MECHANISMUS-DOKUMENTATION.md**: Complete update mechanism with 3 Mermaid diagrams
-- **RELEASE-NOTES-v1.5.2.md**: Detailed bug analysis and fix documentation
-- **UPDATE-INTERVALL-FIX.md**: 7-day interval explanation
-- **GITHUB-TOKEN-SUPPORT.md**: Optional token authentication guide
+- `UPDATE-MECHANISMUS-DOKUMENTATION.md`: Complete update mechanism with 3 Mermaid diagrams
+- `RELEASE-NOTES-v1.5.2.md`: Detailed bug analysis and fix documentation
+- `UPDATE-INTERVALL-FIX.md`: 7-day interval explanation
+- `GITHUB-TOKEN-SUPPORT.md`: Optional token authentication guide
 
 ---
 
 ## [1.5.0] - 2025-11-06
 
 ### Added
-- **Testing Infrastructure**: TESTING-CHECKLIST.md with 85 integration tests
-- **Documentation**: USER-GUIDE.md with comprehensive feature documentation
-- **Documentation**: Updated README.md with all v1.2.0-v1.5.0 features
+- **Testing Infrastructure**: `TESTING-CHECKLIST.md` with 85 integration tests
+- **Documentation**: `USER-GUIDE.md` with comprehensive feature documentation
+- **Documentation**: Updated `README.md` with all v1.2.0-v1.5.0 features
 - **Version Updates**: All version strings bumped to 1.5.0
 
 ### Changed
 - **Production Ready**: All features tested and documented
-- **Polish**: Code quality, documentation completeness
+- **Polish**: Code quality improvements, documentation completeness
+
+### Test Categories (85 tests total)
+1. First Launch
+2. Settings Persistence
+3. Explorer Registration
+4. Theme Switching
+5. Localization (8 languages)
+6. Navigation
+7. Search
+8. Markdown Rendering
+9. File Watching
+10. Performance
+11. Error Handling
+12. Command-Line Arguments
 
 ---
 
 ## [1.4.0] - 2025-11-06
 
 ### Added
-- **Navigation**: Back/forward navigation (Alt+Left/Right)
-  - NavigationManager.cs (107 lines) - WebView2 history management
-  - NavigationBar.cs (161 lines) - Optional toolbar
-  - Keyboard shortcuts for navigation
-- **In-Page Search**: Real-time highlighting with mark.js
-  - SearchManager.cs (339 lines) - mark.js integration
-  - SearchBar.cs (247 lines) - Search toolbar
-  - Ctrl+F, F3, Shift+F3, Enter, Esc shortcuts
-  - Yellow highlighting for matches, orange for current match
-  - Results counter ("X of Y")
-- **Resource Strings**: 8 new localization strings for navigation and search
+- **🧭 Navigation**: WebView2-based history navigation
+  - Back/Forward buttons with keyboard shortcuts (Alt+Left/Right)
+  - Auto-enable/disable based on navigation state
+  - Optional NavigationBar (hidden by default)
+  - Localized tooltips
+  - `NavigationManager.cs` (107 lines)
+  - `NavigationBar.cs` (161 lines)
 
-### Changed
-- **MainForm.cs**: Added keyboard shortcut handling (ProcessCmdKey override)
-- **Binary Size**: Increased to 2.0 MB (from 1.6 MB) due to new features
+- **🔍 In-Page Search**: mark.js-powered search with highlighting
+  - Search bar with Ctrl+F
+  - Real-time highlighting (yellow for matches, orange for current)
+  - Match navigation: F3 (next), Shift+F3 (previous)
+  - Results counter ("X of Y" or "No results")
+  - Smooth scrolling to matches
+  - `SearchManager.cs` (339 lines)
+  - `SearchBar.cs` (247 lines)
+
+### Improved
+- Architecture: Added NavigationManager and SearchManager to Core layer
+- User Experience: Non-blocking CDN loading, 300ms debounce on search
+- Localization: 8 new resource strings for Navigation and Search
 
 ### Technical
-- mark.js v8.11.1 loaded dynamically from CDN
-- WebMessage-based communication for search results
-- Event-driven architecture for navigation state
 - ~1,010 lines of code added
+- 4 new classes
+- mark.js v8.11.1 (loaded from CDN on demand)
+- Build: 0 errors, 54 nullable warnings
+- Binary size: ~2.0 MB (unchanged)
 
 ---
 
-## [1.3.0] - 2025-11-06
+## [1.3.0] - 2025-11-05
 
 ### Added
-- **Localization**: Support for 8 languages
-  - English, Deutsch, Монгол, Français, Español, 日本語, 简体中文, Русский
-  - 8 complete .resx resource files (~3,200 lines)
-  - LocalizationService.cs (220 lines)
-  - Instant language switching
+- **🌍 Localization**: Multi-language support
+  - 8 languages: English, Deutsch, Монгол, Français, Español, 日本語, 简体中文, Русский
+  - Instant language switching via StatusBar dropdown
+  - All UI elements fully translated
   - Fallback to English for missing translations
-- **StatusBar**: 5-section status bar (hidden by default)
-  - Update status icon (✅/🔄/❌/❓)
-  - Explorer registration status (✅📁/❌📁)
-  - Language selector dropdown
-  - Info button (shows version, theme, settings location)
-  - Help button (keyboard shortcuts, features)
-  - StatusBarControl.cs (334 lines)
-- **Theme Switcher**: Right-click context menu
-  - Select from 4 themes instantly
-  - Localized theme names
-  - Visual feedback (checkmarks)
-  - No restart required
+  - `LocalizationService.cs` with .resx resource files
 
-### Changed
-- **MainForm.cs**: Version 1.3.0, integrated localization and StatusBar
-- **Settings**: Added Language setting (default: "system")
+- **📊 StatusBar**: Always-visible status bar at bottom
+  - 5 sections: Update status, Explorer registration, Language selector, Info, Help
+  - Real-time status updates
+  - Integrated theme and language switching
+  - Themed icons and styling
+  - `StatusBarControl.cs` (390 lines)
+
+### Improved
+- Theme switcher: Moved to StatusBar context menu
+- Settings: Language preference persisted in `settings.json`
+- Architecture: Added localization layer with service pattern
 
 ### Technical
-- ~3,800 lines of code added
-- ResourceManager-based localization
-- Event-driven language switching
+- 8 `.resx` resource files (~50 strings each)
+- `LocalizationService` with culture management
+- StatusBar with ComboBox and ToolStripButtons
+- Build: 0 errors, 54 nullable warnings
+- Binary size: ~2.0 MB
 
 ---
 
-## [1.2.0] - 2025-11-06
+## [1.2.0] - 2025-11-04
 
 ### Added
-- **Theme System**: 4 built-in themes
-  - Dark (VS Code-inspired)
-  - Solarized Light (eye-friendly)
-  - Dräger (corporate)
-  - Standard (enhanced)
-  - Theme files in Themes/ folder (JSON format)
-- **Settings System**: JSON-based configuration
-  - AppSettings.cs with nested classes
-  - SettingsService.cs for load/save
-  - Location: %APPDATA%\MarkdownViewer\settings.json
-- **Theme Service**: ThemeService.cs for theme management
-  - Load themes from JSON
-  - Apply to UI and markdown content
-  - Dynamic CSS injection
+- **🎨 Theme System**: Complete theming support
+  - 4 built-in themes: Dark, Solarized Light, Dräger, Standard
+  - Theme switcher via right-click context menu
+  - Instant theme application (no restart required)
+  - JSON-based theme files in `Themes/` folder
+  - Settings persistence in `%APPDATA%\MarkdownViewer\settings.json`
+  - Custom theme support (add your own JSON files)
 
-### Changed
-- **Architecture**: Refactored to layered architecture
-  - Core/ - Business logic
-  - Services/ - Application services
-  - UI/ - User interface components
-  - Models/ - Data models
-  - Configuration/ - Configuration classes
-  - Resources/ - Localization resources
-  - Themes/ - Theme JSON files
-- **MainForm.cs**: Reduced from 735 to 433 lines (41% reduction)
-  - Extracted MarkdownRenderer.cs (336 lines)
-  - Extracted FileWatcherManager.cs (101 lines)
+### Architecture
+- **Layered Architecture**: Organized into logical layers
+  - `Core/`: Business logic (MarkdownRenderer, FileWatcher, LinkNavigation)
+  - `Services/`: Reusable services (SettingsService, ThemeService)
+  - `UI/`: UI components (MainForm)
+  - `Models/`: Data models (AppSettings, Theme, GitHubRelease)
+  - `Configuration/`: Configuration classes (UpdateConfiguration)
+
+### Improved
+- Settings system with JSON persistence
+- Theme service with dynamic loading
+- Markdown rendering with theme-aware colors
+- WebView2 integration with themed backgrounds
+- Context menu with theme selection
 
 ### Technical
-- ~950 lines of code added
-- 7 new folders created
-- Clean separation of concerns
+- `ThemeService.cs` for theme management
+- `SettingsService.cs` for settings persistence
+- 4 theme JSON files (~100 lines each)
+- Build: 0 errors, 0 warnings
+- Binary size: ~2.0 MB
 
 ---
 
-## [1.1.0] - 2025-11-05
+## [1.1.0] - 2025-11-03
 
 ### Added
-- **Automatic Updates**: Daily update checks
-  - Background check (non-blocking)
-  - UpdateChecker.cs with retry logic
-  - Release notes display
-  - Manual check with `--update`
-  - Test mode for development (`--test-update`)
-- **Update Configuration**: UpdateConfiguration.cs
-  - Rate limiting (60 requests/hour)
-  - Retry with exponential backoff
-  - Network error handling
+- **Chart.js Integration**: Data visualization support
+  - Line, bar, pie, doughnut, radar, polar area charts
+  - JSON-based chart configuration in code blocks
+  - CDN-loaded library (Chart.js v4.4.1)
+  - Sample files demonstrating various chart types
 
-### Changed
-- **Settings**: Added UpdateSettings class
+### Improved
+- JavaScript error handling for chart rendering
+- Sample files with comprehensive chart examples
 
 ---
 
-## [1.0.3] - 2025-11-05
-
-### Fixed
-- **PlantUML Rendering**: Fixed HEX encoding for complex diagrams
-- **Version Display**: Added version in window title
-
----
-
-## [1.0.2] - 2025-11-05
-
-### Fixed
-- **PlantUML Diagrams**: Fixed rendering issue with diagram encoding
-
----
-
-## [1.0.1] - 2025-11-05
-
-### Added
-- **Documentation**: English documentation (README, guides)
-- **Testing**: Comprehensive test suite
-
-### Fixed
-- **PlantUML**: Various diagram rendering fixes
-
----
-
-## [1.0.0] - 2025-11-05
+## [1.0.0] - 2025-11-01
 
 ### Initial Release
 
 #### Core Features
-- Markdown rendering (CommonMark)
-- Syntax highlighting (Highlight.js)
-- Mathematical formulas (KaTeX)
-- Mermaid diagrams
-- PlantUML diagrams
-- Live file reload
-- Copy buttons for code blocks
-- Link navigation
-- Anchor links
-- Professional logging (Serilog)
+- **Markdown Rendering**: Full CommonMark support via Markdig
+  - Tables, lists, blockquotes
+  - Task lists
+  - Footnotes
+  - Definition lists
+  - Abbreviations
+  - Custom containers
+
+- **Syntax Highlighting**: Code blocks with Highlight.js
+  - 190+ languages supported
+  - GitHub theme styling
+  - Copy buttons for code blocks
+
+- **Mathematical Formulas**: LaTeX support via KaTeX
+  - Inline math: `$E = mc^2$`
+  - Display math: `$$\int_{-\infty}^{\infty} e^{-x^2} dx = \sqrt{\pi}$$`
+  - Full LaTeX support (matrices, Greek letters, fractions, etc.)
+
+- **Diagrams**: Multiple diagram types
+  - **Mermaid**: Flowcharts, sequence, class, state, gantt, ER diagrams
+  - **PlantUML**: Class, sequence, use case, activity, component diagrams
+  - Online rendering via plantuml.com
+
+- **Live Reload**: FileSystemWatcher for automatic updates
+- **Link Navigation**: Navigate between .md files, open external links
+- **Anchor Links**: Jump to headings with # anchors
+- **Professional Logging**: Serilog with rolling daily logs
 
 #### Windows Integration
-- Double-click .md files
-- Right-click context menu
+- Double-click `.md` files to open in viewer
+- Right-click context menu ("Open with Markdown Viewer")
 - "Open With" dialog integration
 - "Send To" menu integration
-- File open dialog
-- Command-line arguments
+- File open dialog when started without arguments
 
 #### Properties
-- Single-file executable (1.6 MB)
+- Single-file executable (2.0 MB)
 - Portable (no installation required)
-- No admin rights required
-- Clean uninstall
+- No admin rights required (HKCU registry only)
+- Clean uninstall with `--uninstall`
+
+#### Automatic Updates
+- Check for updates once every 7 days
+- Manual check with `--update`
+- Background check (non-blocking)
+- Release notes display
+- Safe installation with backup and rollback
 
 ---
 
@@ -257,23 +289,54 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 | Version | Date | Type | Key Features |
 |---------|------|------|--------------|
-| 1.5.2 | 2025-11-06 | Bugfix | Update check retry logic + 7-day interval |
-| 1.5.0 | 2025-11-06 | Polish | Testing, Documentation |
+| 1.8.0 | 2025-01-10 | Feature | TOC, Emoji, Diff, Admonitions |
+| 1.7.4 | 2025-11-09 | Bugfix | WebView2 resource error fix |
+| 1.5.2 | 2025-11-06 | Bugfix | Update retry logic fix |
+| 1.5.0 | 2025-11-06 | Polish | Testing + Documentation |
 | 1.4.0 | 2025-11-06 | Feature | Navigation + Search |
-| 1.3.0 | 2025-11-06 | Feature | Localization + StatusBar + Theme Switcher |
-| 1.2.0 | 2025-11-06 | Major | Themes + Settings + Architecture Refactoring |
-| 1.1.0 | 2025-11-05 | Feature | Automatic Updates |
-| 1.0.3 | 2025-11-05 | Hotfix | PlantUML HEX encoding fix |
-| 1.0.2 | 2025-11-05 | Hotfix | PlantUML rendering fix |
-| 1.0.1 | 2025-11-05 | Patch | Documentation + Tests |
-| 1.0.0 | 2025-11-05 | Initial | Core features + Windows integration |
+| 1.3.0 | 2025-11-05 | Feature | Localization + StatusBar |
+| 1.2.0 | 2025-11-04 | Feature | Theme System + Architecture |
+| 1.1.0 | 2025-11-03 | Feature | Chart.js Integration |
+| 1.0.0 | 2025-11-01 | Initial | Core Features + Windows Integration |
 
 ---
 
-**Development Model:**
-- Following semantic versioning (MAJOR.MINOR.PATCH)
-- Developed incrementally with comprehensive documentation
-- Each release fully tested before publication
-- Commitment to backward compatibility
+## Semantic Versioning
 
-**Repository:** https://github.com/nobiehl/mini-markdown-viewer
+This project follows [Semantic Versioning](https://semver.org/):
+
+- **MAJOR** version (X.0.0): Incompatible API changes
+- **MINOR** version (1.X.0): New features (backward compatible)
+- **PATCH** version (1.0.X): Bug fixes (backward compatible)
+
+---
+
+## Upgrade Guide
+
+### From v1.7.x to v1.8.0
+- ✅ **Drop-in replacement**: Just replace the `.exe`
+- ✅ **No breaking changes**: All settings preserved
+- ✅ **New features work immediately**: No configuration needed
+
+### From v1.5.x to v1.8.0
+- ✅ **Fully compatible**: Replace `.exe` and you're done
+- ✅ **Settings migration**: Automatic on first launch
+- ✅ **Theme files**: All compatible
+
+### From v1.0.x to v1.8.0
+- ⚠️ **Settings format changed**: Backup old settings if needed
+- ✅ **Manual migration**: Old settings will be auto-upgraded
+- ✅ **Themes**: Must use new JSON format (old themes incompatible)
+
+---
+
+## Links
+
+- **Repository**: https://github.com/nobiehl/mini-markdown-viewer
+- **Issues**: https://github.com/nobiehl/mini-markdown-viewer/issues
+- **Releases**: https://github.com/nobiehl/mini-markdown-viewer/releases
+
+---
+
+**Changelog maintained since v1.0.0**
+**Last updated: 2025-01-10**

@@ -4,10 +4,10 @@ Lightweight Windows desktop viewer for Markdown files with themes, localization,
 
 ![Version](https://img.shields.io/badge/version-1.8.0-blue)
 ![.NET](https://img.shields.io/badge/.NET-8.0-purple)
-![Size](https://img.shields.io/badge/size-2.0_MB-green)
+![Size](https://img.shields.io/badge/size-3.3_MB-green)
 ![Languages](https://img.shields.io/badge/languages-8-orange)
 ![Themes](https://img.shields.io/badge/themes-4-purple)
-![Tests](https://img.shields.io/badge/tests-231_total-blue)
+![Tests](https://img.shields.io/badge/tests-247_passing-success)
 
 ## Features
 
@@ -79,31 +79,36 @@ Lightweight Windows desktop viewer for Markdown files with themes, localization,
 - ✅ **File open dialog** when started without arguments
 
 ### Properties
-- 🚀 **Fast**: 2.0 MB single-file executable
+- 🚀 **Fast**: 3.3 MB single-file executable
 - 📦 **Portable**: No installation required
 - 🔒 **No admin rights**: Registry entries in HKCU only
 - 🧹 **Clean uninstall**: `--uninstall` removes everything
 - 🌍 **Multi-language**: 8 languages supported
 - 🎨 **Themeable**: 4 built-in themes + custom themes
-- 🧪 **Testable**: MVP architecture with 43 passing unit tests (v2.0.0)
+- 🧪 **Well-tested**: 247 passing unit tests (v1.8.0)
 
 ## Quick Start
 
+### Download & Run
+
+1. **Download** the latest release: [MarkdownViewer-v1.8.0.exe](https://github.com/nobiehl/mini-markdown-viewer/releases/tag/v1.8.0) (3.3 MB)
+2. **Run** directly - no installation needed!
+
 ### Option 1: File Open Dialog
 ```bash
-.\bin-single\MarkdownViewer.exe
+.\MarkdownViewer-v1.8.0.exe
 # Opens dialog to select a .md file
 ```
 
 ### Option 2: Open File Directly
 ```bash
-.\bin-single\MarkdownViewer.exe test-diagrams.md
+.\MarkdownViewer-v1.8.0.exe README.md
 ```
 
-### Option 3: Windows Explorer Integration
+### Option 3: Windows Explorer Integration (Recommended)
 ```bash
 # Install all integration points
-.\bin-single\MarkdownViewer.exe --install
+.\MarkdownViewer-v1.8.0.exe --install
 
 # Then: Double-click .md files in Explorer
 # Or: Right-click → "Open with Markdown Viewer"
@@ -114,7 +119,7 @@ Lightweight Windows desktop viewer for Markdown files with themes, localization,
 
 ### Install (recommended)
 ```bash
-.\bin-single\MarkdownViewer.exe --install
+.\MarkdownViewer-v1.8.0.exe --install
 ```
 
 **What gets installed:**
@@ -127,7 +132,7 @@ Lightweight Windows desktop viewer for Markdown files with themes, localization,
 
 ### Uninstall
 ```bash
-.\bin-single\MarkdownViewer.exe --uninstall
+.\MarkdownViewer-v1.8.0.exe --uninstall
 ```
 
 Removes all registry entries and shortcuts. The executable remains and can be deleted manually.
