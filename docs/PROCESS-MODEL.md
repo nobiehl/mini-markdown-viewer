@@ -427,9 +427,17 @@ dotnet publish -c Release -r win-x64 --self-contained false \
 
 # WICHTIG: Verifiziere Dateigröße (sollte ~3.3 MB sein, NICHT 138 KB!)
 ls -lh publish/MarkdownViewer.exe
+
+# ⚠️ KRITISCH: Binary umbenennen für GitHub Release
+# Update-Mechanismus erwartet "MarkdownViewer.exe" OHNE Versionsnummer!
+cp publish/MarkdownViewer.exe ./MarkdownViewer.exe
 ```
 - **Dateigröße prüfen**: ~3.3 MB ist korrekt, 138 KB ist FALSCH (Managed DLL statt EXE)
 - **Binary manuell testen**: Doppelklick, öffnet Datei, keine Crashes, UI funktioniert
+- **⚠️ KRITISCH - Binary Name**: Muss `MarkdownViewer.exe` heißen, NICHT `MarkdownViewer-vX.Y.Z.exe`!
+  - Update-Mechanismus sucht nach Asset mit Namen "MarkdownViewer.exe"
+  - Falsche Namen brechen Auto-Update Feature komplett!
+  - Dies ist bereits MEHRFACH schief gegangen - NIE vergessen!
 
 **4. KRITISCH: Dokumentation aktualisieren (VOR Release!):**
 
@@ -664,6 +672,10 @@ graph TD
   - Output aus `publish/` Ordner verwenden, NICHT aus `bin/Release/`
 - [ ] **Binary Größe verifiziert** (~3.3 MB korrekt, 138 KB = FEHLER!) - KRITISCH!
 - [ ] **Published Binary manuell getestet** (startet, öffnet Dateien, keine Crashes, UI funktioniert) - KRITISCH!
+- [ ] **⚠️ Binary Name korrekt** (MUSS "MarkdownViewer.exe" heißen, KEINE Versionsnummer!) - KRITISCH!
+  - Update-Mechanismus sucht nach "MarkdownViewer.exe"
+  - "MarkdownViewer-v1.8.1.exe" bricht Auto-Update!
+  - MEHRFACH schief gegangen - absolute Pflicht-Prüfung!
 - [ ] **Code kompiliert mit 0 Errors und 0 Warnings** (KRITISCH!)
 - [ ] Test Coverage >= 80%
 - [ ] Alle Features dokumentiert
@@ -726,6 +738,10 @@ dotnet test /p:CollectCoverage=true /p:CoverletOutputFormat=lcov
 - ❌ **dotnet build statt dotnet publish verwenden** (erzeugt 138 KB DLL statt 3.3 MB EXE)
 - ❌ **Binary-Größe nicht prüfen vor Upload** (138 KB ist offensichtlich falsch, sollte ~3.3 MB sein)
 - ❌ **Binary aus bin/Release/ statt publish/ verwenden** (Managed DLL statt Self-Contained EXE)
+- ❌ **⚠️ KRITISCH: Binary mit Versionsnummer hochladen** (MarkdownViewer-v1.8.1.exe → bricht Update-Mechanismus!)
+  - Update-Mechanismus sucht nach Asset "MarkdownViewer.exe" OHNE Versionsnummer
+  - Binary MUSS "MarkdownViewer.exe" heißen, sonst funktioniert Auto-Update nicht
+  - Dies ist MEHRFACH schief gegangen - absolute Pflicht-Prüfung vor Release!
 - ❌ **"Ich lokalisiere später"** (wird GARANTIERT vergessen, führt zu 20+ nachträglich zu lokalisierenden Strings!)
 - ❌ **Hardcoded UI-Strings schreiben** (Button.Text = "Click me" statt _localization.GetString())
 - ❌ **Übersetzungen manuell machen** (6-7 Agenten parallel sind 10x schneller!)
