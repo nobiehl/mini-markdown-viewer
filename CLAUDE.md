@@ -10,5 +10,10 @@
   - Entferne temporäre Test-Dateien (test-*.md, nul, *.tmp)
   - Entferne temporäre Dokumentation (implementation-plan-*.md)
   - Halte Repository sauber für Entwicklung!
+- **💡 Schnelle Feature-Ideen:** Nutze `/roadmap <idea>` um Ideen zur ROADMAP.md hinzuzufügen
+  - Läuft im Hintergrund-Agent (kein Context-Verbrauch!)
+  - Findet automatisch die richtige Sektion
+  - Folgt ROADMAP.md Formatierung
+  - Siehe `.claude/commands/README.md` für Details
 - Wir kommunizieren immer in Deutsch
 - Projekt Dokumentation wird immer in Englisch geschrieben
