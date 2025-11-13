@@ -353,4 +353,26 @@ Veuillez réessayer plus tard.</value>
 
 {0}</value>
   </data>
+
+  <!-- RawDataView Strings (v1.9.0) -->
+  <data name="RawDataViewShow" xml:space="preserve">
+    <value>Afficher les données brutes (F12)</value>
+    <comment>Context menu item to show raw data view</comment>
+  </data>
+  <data name="RawDataViewHide" xml:space="preserve">
+    <value>Masquer les données brutes</value>
+    <comment>Context menu item to hide raw data view (not currently used, kept for future)</comment>
+  </data>
+  <data name="ContextMenuMoreTools" xml:space="preserve">
+    <value>Plus d'Outils</value>
+    <comment>Context menu submenu label for additional tools</comment>
+  </data>
+  <data name="RawDataViewMarkdownLabel" xml:space="preserve">
+    <value>Source Markdown</value>
+    <comment>Label for the markdown source panel in raw data view</comment>
+  </data>
+  <data name="RawDataViewHtmlLabel" xml:space="preserve">
+    <value>HTML Généré</value>
+    <comment>Label for the generated HTML panel in raw data view</comment>
+  </data>
 </root>

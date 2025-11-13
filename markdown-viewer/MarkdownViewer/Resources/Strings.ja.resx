@@ -353,4 +353,25 @@
 
 {0}</value>
   </data>
+  <!-- RawDataView Strings (v1.9.0) -->
+  <data name="RawDataViewShow" xml:space="preserve">
+    <value>生データを表示 (F12)</value>
+    <comment>Context menu item to show raw data view</comment>
+  </data>
+  <data name="RawDataViewHide" xml:space="preserve">
+    <value>生データを非表示</value>
+    <comment>Context menu item to hide raw data view (not currently used, kept for future)</comment>
+  </data>
+  <data name="ContextMenuMoreTools" xml:space="preserve">
+    <value>その他のツール</value>
+    <comment>Context menu submenu label for additional tools</comment>
+  </data>
+  <data name="RawDataViewMarkdownLabel" xml:space="preserve">
+    <value>Markdownソース</value>
+    <comment>Label for the markdown source panel in raw data view</comment>
+  </data>
+  <data name="RawDataViewHtmlLabel" xml:space="preserve">
+    <value>生成されたHTML</value>
+    <comment>Label for the generated HTML panel in raw data view</comment>
+  </data>
 </root>

@@ -103,6 +103,20 @@ namespace MarkdownViewer.UI
                                 g.FillEllipse(new SolidBrush(iconColor), center - 1.5f, center + radius * 0.45f, 3, 3);
                                 break;
 
+                            case "file-text":
+                                // Document rectangle
+                                var docRect = new RectangleF(margin + 2, margin, size - margin * 2 - 4, size - margin * 2);
+                                g.DrawRectangle(pen, docRect.X, docRect.Y, docRect.Width, docRect.Height);
+                                // Text lines inside document
+                                pen.Width = 1.5f;
+                                float lineY = docRect.Y + docRect.Height * 0.3f;
+                                g.DrawLine(pen, docRect.X + 3, lineY, docRect.X + docRect.Width - 3, lineY);
+                                lineY += docRect.Height * 0.2f;
+                                g.DrawLine(pen, docRect.X + 3, lineY, docRect.X + docRect.Width - 3, lineY);
+                                lineY += docRect.Height * 0.2f;
+                                g.DrawLine(pen, docRect.X + 3, lineY, docRect.X + docRect.Width * 0.6f, lineY);
+                                break;
+
                             default:
                                 // Default: simple circle
                                 g.DrawEllipse(pen, margin, margin, size - margin * 2, size - margin * 2);

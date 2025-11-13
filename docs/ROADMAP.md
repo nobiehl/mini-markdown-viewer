@@ -1636,6 +1636,130 @@ protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
 
 ---
 
+## v1.9.0: Raw Data View (Developer Tools)
+
+**Ziel:** Toggle-View für Entwickler/Power-User um Markdown-Quelle und generiertes HTML parallel anzusehen
+
+**Aufwand:** ~7 Stunden (1 Session)
+
+**Priority:** Medium (Quality-of-Life Feature)
+
+### Feature 1.9.1: Raw Data View Component
+
+**Was:** Split-View Panel mit Syntax-Highlighting für Markdown und HTML
+
+**Technische Details:**
+- **Component:** `UI/RawDataViewPanel.cs` (neue Datei)
+- **Library:** ScintillaNET v5.3.2 für Syntax-Highlighting
+- **Binary Size Impact:** +2.2 MB (3.3 MB → 5.5 MB)
+- **Architecture:** Panel mit SplitContainer (horizontal)
+
+**Features:**
+- ✅ Read-Only Mode (bleibt ein Viewer!)
+- ✅ Syntax-Highlighting für Markdown (links) und HTML (rechts)
+- ✅ Resizable Splitter (Position wird persistiert)
+- ✅ Theme-Aware (Dark/Light/Solarized/Draeger Support)
+- ✅ Keyboard-Shortcut: F12 (wie "View Source" in Browsern)
+- ✅ Kontextmenü: "Weitere Tools" → "Rohdaten anzeigen (F12)"
+- ✅ State-Persistenz: Splitter-Position in `settings.json`
+- ✅ Vollständig lokalisiert in allen 8 Sprachen
+
+**Tasks:**
+- [x] Library evaluieren (ScintillaNET vs RichTextBox)
+- [ ] RawDataViewPanel.cs erstellen (~250 lines)
+- [ ] MainForm Integration (Toggle-Logik)
+- [ ] F12 Shortcut implementieren
+- [ ] Kontextmenü erweitern
+- [ ] AppSettings erweitern (RawDataViewVisible, SplitterDistance)
+- [ ] Lokalisierung (5 strings × 8 languages = 40 translations)
+- [ ] Unit Tests schreiben
+- [ ] Integration Tests durchführen
+- [ ] Build & Test
+
+**Test Strategy:**
+- Unit Tests: RawDataViewPanelTests.cs (ShowRawData, Hide, SplitterDistance)
+- Integration Tests: F12 Toggle, Kontextmenü, Settings-Persistenz, Theme-Wechsel
+- Manual Tests: Performance (große Dateien), Theme-Compatibility
+
+**Success Criteria:**
+- ✅ F12 togglet zwischen Normal und Raw Data Mode
+- ✅ Syntax-Highlighting funktioniert in beiden Panels
+- ✅ Splitter-Position wird gespeichert
+- ✅ Theme-Wechsel funktioniert im Raw Data Mode
+- ✅ Alle Tests bestehen (>= 80% Coverage)
+- ✅ Build ohne Fehler und Warnungen
+- ✅ Binary Size ~5.5 MB (akzeptabel)
+
+---
+
+### Feature 1.9.2: Settings Extension
+
+**Was:** AppSettings erweitern für Raw Data View State
+
+**Changes in `AppSettings.cs`:**
+```csharp
+public class UISettings
+{
+    // ... existing properties ...
+
+    public bool RawDataViewVisible { get; set; } = false;
+    public int RawDataSplitterDistance { get; set; } = 500; // 50% default
+}
+```
+
+---
+
+### Feature 1.9.3: Localization
+
+**Was:** 5 neue Resource-Strings in allen 8 Sprachen
+
+**New Strings:**
+- `RawDataViewShow` = "Show Raw Data" / "Rohdaten anzeigen"
+- `RawDataViewHide` = "Hide Raw Data" / "Rohdaten ausblenden"
+- `ContextMenuMoreTools` = "More Tools" / "Weitere Tools"
+- `RawDataViewMarkdownLabel` = "Markdown Source" / "Markdown-Quelle"
+- `RawDataViewHtmlLabel` = "Generated HTML" / "Generiertes HTML"
+
+**Implementation:**
+- Parallele Übersetzung mit 7 Agenten (wie in v1.8.0)
+- Alle Strings mit `<comment>` Tags für Kontext
+
+---
+
+### v1.9.0 Deliverables
+
+**Code:**
+- ✅ RawDataViewPanel.cs (~250 lines)
+- ✅ MainForm Integration (~50 lines modified)
+- ✅ AppSettings extension (2 properties)
+- ✅ ScintillaNET dependency added
+
+**Tests:**
+- ✅ 3 unit tests (RawDataViewPanelTests.cs)
+- ✅ 6 integration test scenarios
+- ✅ Manual testing passed (all themes, large files)
+- ✅ Test coverage >= 80%
+
+**Localization:**
+- ✅ 5 strings × 8 languages = 40 translations
+- ✅ All strings with context comments
+- ✅ Tested in all 8 languages
+
+**Documentation:**
+- ✅ CHANGELOG.md updated
+- ✅ USER-GUIDE.md: New "Raw Data View" section
+- ✅ ARCHITECTURE.md: RawDataViewPanel documented
+- ✅ GLOSSARY.md: New terms added
+- ✅ impl_progress.md: Session entry
+
+**Release:**
+- ✅ Version 1.9.0 released
+- ✅ Binary tested (~5.5 MB)
+- ✅ GitHub release created with MarkdownViewer.exe (NO version in filename!)
+- ✅ CHANGELOG.md is single source of truth
+
+---
+
 ## Future Roadmap (v1.6.0+)
 
 ### Nice-to-have Features (nicht committet)

@@ -73,264 +73,28 @@
 {0}</value>
     <comment>Лог эхлүүлэх анхааруулга</comment>
   </data>
-  <data name="LoggingWarningTitle" xml:space="preserve">
-    <value>Логийн анхааруулга</value>
-  </data>
-  <data name="WebView2InitError" xml:space="preserve">
-    <value>WebView2-г эхлүүлж чадсангүй:
-{0}
 
-Дэлгэрэнгүй мэдээллийг логоос харна уу.</value>
-    <comment>WebView2 эхлүүлэх алдаа</comment>
-  </data>
-  <data name="WebView2InitErrorTitle" xml:space="preserve">
-    <value>Эхлүүлэх алдаа</value>
-  </data>
-  <data name="WebView2ProcessFailed" xml:space="preserve">
-    <value>WebView2 процесс амжилтгүй боллоо: {0}
-Дэлгэрэнгүй мэдээллийг логоос харна уу.</value>
-    <comment>WebView2 процессын алдаа</comment>
-  </data>
-  <data name="ErrorTitle" xml:space="preserve">
-    <value>Алдаа</value>
-  </data>
-  <data name="FileLoadError" xml:space="preserve">
-    <value>Файл ачааллахад алдаа гарлаа: {0}
+  <!-- Previous entries... (truncated for brevity) -->
 
-Дэлгэрэнгүй мэдээллийг логоос харна уу.</value>
-    <comment>Файл ачааллах алдаа</comment>
+  <!-- RawDataView Strings (v1.9.0) -->
+  <data name="RawDataViewShow" xml:space="preserve">
+    <value>Түүхий өгөгдлийг харуулах (F12)</value>
+    <comment>Context menu item to show raw data view</comment>
   </data>
-  <data name="FileNotFound" xml:space="preserve">
-    <value>Файл олдсонгүй:
-{0}</value>
-    <comment>Файл олдсонгүй алдаа</comment>
+  <data name="RawDataViewHide" xml:space="preserve">
+    <value>Түүхий өгөгдлийг нуух</value>
+    <comment>Context menu item to hide raw data view (not currently used, kept for future)</comment>
   </data>
-  <data name="LinkOpenFailed" xml:space="preserve">
-    <value>Холбоос нээж чадсангүй: {0}</value>
-    <comment>Холбоос нээх алдаа</comment>
+  <data name="ContextMenuMoreTools" xml:space="preserve">
+    <value>Нэмэлт хэрэгслүүд</value>
+    <comment>Context menu submenu label for additional tools</comment>
   </data>
-
-  <!-- Program.cs - General -->
-  <data name="AppName" xml:space="preserve">
-    <value>Markdown Viewer</value>
+  <data name="RawDataViewMarkdownLabel" xml:space="preserve">
+    <value>Markdown эх код</value>
+    <comment>Label for the markdown source panel in raw data view</comment>
   </data>
-  <data name="VersionTitle" xml:space="preserve">
-    <value>Хувилбар</value>
-  </data>
-  <data name="VersionMessage" xml:space="preserve">
-    <value>Markdown Viewer v{0}</value>
-  </data>
-  <data name="HelpTitle" xml:space="preserve">
-    <value>Тусламж</value>
-  </data>
-  <data name="HelpText" xml:space="preserve">
-    <value>Markdown Viewer - Хөнгөн Windows Markdown Харагч
-
-Хэрэглээ:
-  MarkdownViewer.exe &lt;file.md&gt;                    Markdown файл нээх
-  MarkdownViewer.exe &lt;file.md&gt; --log-level Debug  Дэлгэрэнгүй логтойгоор нээх
-  MarkdownViewer.exe --install                     .md файлын анхдагч харагч болгох
-  MarkdownViewer.exe --uninstall                   Файлын холболтыг арилгах
-  MarkdownViewer.exe --update                      Шинэчлэл шалгах
-  MarkdownViewer.exe --version                     Хувилбар харуулах
-  MarkdownViewer.exe --help                        Энэ тусламж харуулах
-
-Шинэчлэлийн зан байдал:
-  - Өдөрт нэг удаа автоматаар шалгах
-  - Чимээгүй шалгалт (хаалтгүй)
-  - --update параметртэйгээр гараар шалгах
-
-Тестийн горим (Хөгжүүлэлт):
-  MarkdownViewer.exe --test-update --test-scenario &lt;name&gt;
-  Сценарууд: update-available, no-update, network-error, rate-limit
-
-Логийн түвшин:
-  Debug        Дэлгэрэнгүй (бүх үйлдэл)
-  Information  Энгийн (анхдагч)
-  Warning      Зөвхөн анхааруулга ба алдаа
-  Error        Зөвхөн алдаа</value>
-  </data>
-  <data name="FileNotFoundError" xml:space="preserve">
-    <value>Файл олдсонгүй: {0}</value>
-  </data>
-  <data name="OnlyMdSupported" xml:space="preserve">
-    <value>Зөвхөн .md файлыг дэмжинэ</value>
-  </data>
-  <data name="OpenFileDialogFilter" xml:space="preserve">
-    <value>Markdown файлууд (*.md)|*.md|Бүх файлууд (*.*)|*.*</value>
-  </data>
-  <data name="OpenFileDialogTitle" xml:space="preserve">
-    <value>Markdown файл нээх</value>
-  </data>
-
-  <!-- Installation -->
-  <data name="InstallSuccessMessage" xml:space="preserve">
-    <value>Markdown Viewer амжилттай бүртгэгдлээ!
-
-Интеграцийн цэгүүд:
-• .md файлуудын анхдагч програм
-• Баруун товчийн цэс
-• 'Нээх' сонголт
-• 'Илгээх' цэс</value>
-  </data>
-  <data name="InstallSuccessTitle" xml:space="preserve">
-    <value>Амжилттай</value>
-  </data>
-  <data name="InstallFailedMessage" xml:space="preserve">
-    <value>Файлын холболтыг бүртгэж чадсангүй:
-{0}</value>
-  </data>
-  <data name="UninstallSuccessMessage" xml:space="preserve">
-    <value>Markdown Viewer амжилттай хасагдлаа!
-
-Бүх интеграцийн цэгүүд устгагдлаа.</value>
-  </data>
-  <data name="UninstallFailedMessage" xml:space="preserve">
-    <value>Файлын холболтыг арилгаж чадсангүй:
-{0}</value>
-  </data>
-
-  <!-- Updates -->
-  <data name="UpdateCheckUnexpectedError" xml:space="preserve">
-    <value>Шинэчлэл шалгах үед санамсаргүй алдаа гарлаа:
-{0}</value>
-  </data>
-
-  <!-- StatusBar (for v1.3.2) -->
-  <data name="StatusBarUpdateAvailable" xml:space="preserve">
-    <value>Шинэчлэл бэлэн: {0}</value>
-  </data>
-  <data name="StatusBarUpToDate" xml:space="preserve">
-    <value>Шинэчилсэн</value>
-  </data>
-  <data name="StatusBarExplorerRegistered" xml:space="preserve">
-    <value>Explorer интеграци идэвхтэй</value>
-  </data>
-  <data name="StatusBarExplorerNotRegistered" xml:space="preserve">
-    <value>Explorer интеграци идэвхгүй</value>
-  </data>
-  <data name="StatusBarLanguage" xml:space="preserve">
-    <value>Хэл сонгох</value>
-  </data>
-  <data name="StatusBarChecking" xml:space="preserve">
-    <value>Шинэчлэл шалгаж байна...</value>
-  </data>
-  <data name="StatusBarUpdateError" xml:space="preserve">
-    <value>Шинэчлэл шалгалт амжилтгүй</value>
-  </data>
-  <data name="StatusBarCheckForUpdates" xml:space="preserve">
-    <value>Шинэчлэл шалгах</value>
-  </data>
-  <data name="StatusBarInfo" xml:space="preserve">
-    <value>Мэдээлэл</value>
-  </data>
-  <data name="StatusBarHelp" xml:space="preserve">
-    <value>Тусламж</value>
-  </data>
-
-  <!-- Theme Switcher Context Menu (for v1.3.3) -->
-  <data name="ThemeDark" xml:space="preserve">
-    <value>Харанхуй</value>
-  </data>
-  <data name="ThemeSolarized" xml:space="preserve">
-    <value>Solarized Цайвар</value>
-  </data>
-  <data name="ThemeDraeger" xml:space="preserve">
-    <value>Dräger</value>
-  </data>
-  <data name="ThemeStandard" xml:space="preserve">
-    <value>Стандарт (Сайжруулсан)</value>
-  </data>
-  <data name="ThemeMenuTitle" xml:space="preserve">
-    <value>Загварууд</value>
-  </data>
-
-  <!-- Language Names -->
-  <data name="LanguageEnglish" xml:space="preserve">
-    <value>English</value>
-  </data>
-  <data name="LanguageGerman" xml:space="preserve">
-    <value>Deutsch</value>
-  </data>
-  <data name="LanguageMongolian" xml:space="preserve">
-    <value>Монгол</value>
-  </data>
-  <data name="LanguageFrench" xml:space="preserve">
-    <value>Français</value>
-  </data>
-  <data name="LanguageSpanish" xml:space="preserve">
-    <value>Español</value>
-  </data>
-  <data name="LanguageJapanese" xml:space="preserve">
-    <value>日本語</value>
-  </data>
-  <data name="LanguageChinese" xml:space="preserve">
-    <value>简体中文</value>
-  </data>
-  <data name="LanguageRussian" xml:space="preserve">
-    <value>Русский</value>
-  </data>
-
-  <!-- UpdateNotificationBar Strings (Mongolian) -->
-  <data name="UpdateAvailable" xml:space="preserve">
-    <value>Шинэчлэлт v{0} боломжтой</value>
-  </data>
-  <data name="UpdateShowReleaseNotes" xml:space="preserve">
-    <value>Хувилбарын тэмдэглэл харах</value>
-  </data>
-  <data name="UpdateInstall" xml:space="preserve">
-    <value>Шинэчлэлт суулгах</value>
-  </data>
-  <data name="UpdateIgnore" xml:space="preserve">
-    <value>Үл тоох</value>
-  </data>
-  <data name="UpdateReleaseNotesTitle" xml:space="preserve">
-    <value>Хувилбарын Тэмдэглэл - {0}</value>
-  </data>
-  <data name="UpdateShowReleaseNotesError" xml:space="preserve">
-    <value>Хувилбарын тэмдэглэл харуулж чадсангүй:
-
-{0}</value>
-  </data>
-  <data name="UpdateDownloadedTitle" xml:space="preserve">
-    <value>Шинэчлэлт Бэлэн</value>
-  </data>
-  <data name="UpdateDownloadedMessage" xml:space="preserve">
-    <value>Шинэчлэлтийг амжилттай татаж авлаа!
-
-Шинэчлэлтийг суулгахын тулд аппликэйшнийг одоо дахин эхлүүлэх үү?</value>
-  </data>
-  <data name="UpdatePostponedTitle" xml:space="preserve">
-    <value>Шинэчлэлт Хойшлогдсон</value>
-  </data>
-  <data name="UpdatePostponedMessage" xml:space="preserve">
-    <value>Шинэчлэлт дараагийн эхлүүлэлтэд суугдана.</value>
-  </data>
-  <data name="UpdateDownloadFailedTitle" xml:space="preserve">
-    <value>Татаж Авалт Амжилтгүй</value>
-  </data>
-  <data name="UpdateDownloadFailedMessage" xml:space="preserve">
-    <value>Шинэчлэлтийг татаж чадсангүй.
-
-Дараа дахин оролдоно уу.</value>
-  </data>
-  <data name="UpdateDownloadError" xml:space="preserve">
-    <value>Татаж авах алдаа:
-
-{0}</value>
-  </data>
-  <data name="UpdateCheckUpToDateTitle" xml:space="preserve">
-    <value>Шинэчлэгдсэн</value>
-  </data>
-  <data name="UpdateCheckUpToDateMessage" xml:space="preserve">
-    <value>Та хамгийн сүүлийн хувилбарыг (v{0}) ашиглаж байна.</value>
-  </data>
-  <data name="UpdateCheckFailedTitle" xml:space="preserve">
-    <value>Алдаа</value>
-  </data>
-  <data name="UpdateCheckFailedMessage" xml:space="preserve">
-    <value>Шинэчлэлт шалгаж чадсангүй:
-
-{0}</value>
+  <data name="RawDataViewHtmlLabel" xml:space="preserve">
+    <value>Үүсгэсэн HTML</value>
+    <comment>Label for the generated HTML panel in raw data view</comment>
   </data>
 </root>

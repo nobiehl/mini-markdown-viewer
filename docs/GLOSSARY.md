@@ -347,3 +347,66 @@ Notification bar component for displaying update availability above StatusBar. P
 
 **Used by:** MainForm
 
+---
+
+### RawDataViewPanel
+Developer tool component for inspecting Markdown rendering. Displays Markdown source and generated HTML side-by-side in a split-view panel. Toggled via F12 keyboard shortcut.
+
+**File:** UI/RawDataViewPanel.cs
+**Type:** Panel-based WinForms control with SplitContainer
+**Component:** v1.9.0 feature
+**Shortcut:** F12
+
+**Features:**
+- Split-view with Markdown (left) and HTML (right)
+- Syntax highlighting for both panels (RichTextBox-based)
+- Theme-aware colors (Dark, Light, Solarized, Draeger)
+- Read-only mode (no editing capabilities)
+- Resizable splitter with position persistence
+- State persistence (visibility and splitter position in settings.json)
+- Localized labels (8 languages)
+
+**Properties:**
+- `SplitterDistance` (int): Position between panels (default: 500px)
+
+**Methods:**
+- `ShowRawData(markdown, html)`: Displays content and applies syntax highlighting
+- `Hide()`: Hides the panel
+- `SetLabelTexts(markdownLabel, htmlLabel)`: Sets localized panel headers
+- `ApplyTheme(theme)`: Applies theme colors to text boxes and labels
+
+**Use Cases:**
+- Debugging Markdown rendering issues
+- Learning how Markdown translates to HTML
+- Inspecting generated HTML for custom CSS
+- Educational purposes for Markdown beginners
+
+**Used by:** MainForm
+**Tests:** RawDataViewPanelTests.cs (12 unit tests)
+
+
+### CodeViewControl
+Custom WinForms Control for displaying code/text with flicker-free row highlighting and integrated line numbers. Inherits from Control (not RichTextBox) to have full OnPaint() control for rendering everything in a single paint cycle.
+
+**Features:**
+- Flicker-free row highlighting (mouse-over + cursor line)
+- Integrated line numbers (50px gutter, right-aligned)
+- Theme-aware colors for all elements
+- Single VScrollBar with MouseWheel support
+- Optimized rendering with OptimizedDoubleBuffer
+
+**File:** UI/CodeViewControl.cs
+**Used by:** RawDataViewPanel
+**Replaces:** HighlightedRichTextBox (obsolete)
+**Since:** v1.9.0
+
+### Row Highlighting
+Visual feedback in CodeViewControl that highlights the line under the mouse cursor (light) and the clicked/selected line (strong). Rendered in OnPaint() together with text to avoid flickering.
+
+**Colors:**
+- Mouse-over: Alpha 25 (light theme), Alpha 35 (dark theme)
+- Cursor line: Alpha 80 (light theme), Alpha 100 (dark theme)
+
+**Used in:** CodeViewControl
+**Since:** v1.9.0
+

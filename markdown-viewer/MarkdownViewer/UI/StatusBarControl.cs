@@ -33,6 +33,7 @@ namespace MarkdownViewer.UI
         // Status items
         private readonly ToolStripStatusLabel _updateStatus;
         private readonly ToolStripStatusLabel _explorerStatus;
+        private readonly ToolStripStatusLabel _rawDataViewButton;
         private readonly ToolStripDropDownButton _themeSelector;
         private readonly ToolStripDropDownButton _languageSelector;
         private readonly ToolStripStatusLabel _infoLabel;
@@ -43,6 +44,7 @@ namespace MarkdownViewer.UI
         private readonly Bitmap? _iconCheckCircle;
         private readonly Bitmap? _iconAlertCircle;
         private readonly Bitmap? _iconFolder;
+        private readonly Bitmap? _iconFileText;
         private readonly Bitmap? _iconGlobe;
         private readonly Bitmap? _iconInfo;
         private readonly Bitmap? _iconHelpCircle;
@@ -50,6 +52,7 @@ namespace MarkdownViewer.UI
         // Additional events (not in IStatusBarView, but useful)
         public event EventHandler? UpdateClicked;
         public event EventHandler? ExplorerClicked;
+        public event EventHandler? RawDataViewClicked;
         public event EventHandler? InfoClicked;
         public event EventHandler? HelpClicked;
 
@@ -104,6 +107,7 @@ namespace MarkdownViewer.UI
             _iconCheckCircle = IconHelper.LoadIcon("check-circle", 20, iconColor);
             _iconAlertCircle = IconHelper.LoadIcon("alert-circle", 20, iconColor);
             _iconFolder = IconHelper.LoadIcon("folder", 20, iconColor);
+            _iconFileText = IconHelper.LoadIcon("file-text", 20, iconColor);
             _iconGlobe = IconHelper.LoadIcon("globe", 20, iconColor);
             _iconInfo = IconHelper.LoadIcon("info", 20, iconColor);
             _iconHelpCircle = IconHelper.LoadIcon("help-circle", 20, iconColor);
@@ -116,7 +120,8 @@ namespace MarkdownViewer.UI
                 DisplayStyle = ToolStripItemDisplayStyle.Image,
                 AutoSize = true,
                 IsLink = true,
-                Padding = new Padding(5, 0, 5, 0)
+                Padding = new Padding(5, 0, 5, 0),
+                Name = "UpdateStatus" // For UI Automation
             };
 
             _updateStatus.Click += (s, e) => UpdateClicked?.Invoke(this, EventArgs.Empty);
@@ -128,20 +133,35 @@ namespace MarkdownViewer.UI
                 DisplayStyle = ToolStripItemDisplayStyle.Image,
                 AutoSize = true,
                 IsLink = true,
-                Padding = new Padding(5, 0, 5, 0)
+                Padding = new Padding(5, 0, 5, 0),
+                Name = "ExplorerStatus" // For UI Automation
             };
 
             _explorerStatus.Click += (s, e) => ExplorerClicked?.Invoke(this, EventArgs.Empty);
+
+            _rawDataViewButton = new ToolStripStatusLabel
+            {
+                Image = _iconFileText,
+                ToolTipText = _localization.GetString("RawDataViewShow"),
+                DisplayStyle = ToolStripItemDisplayStyle.Image,
+                AutoSize = true,
+                IsLink = true,
+                Padding = new Padding(5, 0, 5, 0),
+                Name = "RawDataViewButton" // For UI Automation
+            };
+
+            _rawDataViewButton.Click += (s, e) => RawDataViewClicked?.Invoke(this, EventArgs.Empty);
 
             // NEW: Theme selector
             _themeSelector = new ToolStripDropDownButton
             {
                 Text = "Theme: Standard",
-                ToolTipText = "Select theme for Markdown rendering and UI",
+                ToolTipText = "Select theme for rendering",
                 DisplayStyle = ToolStripItemDisplayStyle.Text,
                 AutoSize = true,
                 ShowDropDownArrow = true,
-                Padding = new Padding(5, 0, 5, 0)
+                Padding = new Padding(5, 0, 5, 0),
+                Name = "ThemeSelector" // For UI Automation
             };
 
             // Populate theme dropdown (will be populated from MainForm)
@@ -151,11 +171,12 @@ namespace MarkdownViewer.UI
             {
                 Image = _iconGlobe,
                 Text = GetLanguageDisplayName(_localization.GetCurrentLanguage()),
-                ToolTipText = _localization.GetString("StatusBarLanguage", _localization.GetCurrentLanguage().ToUpper()),
+                ToolTipText = _localization.GetString("StatusBarLanguage"),
                 DisplayStyle = ToolStripItemDisplayStyle.ImageAndText,
                 AutoSize = true,
                 ShowDropDownArrow = true,
-                Padding = new Padding(5, 0, 5, 0)
+                Padding = new Padding(5, 0, 5, 0),
+                Name = "LanguageSelector" // For UI Automation
             };
 
             // Populate language dropdown
@@ -168,7 +189,8 @@ namespace MarkdownViewer.UI
                 DisplayStyle = ToolStripItemDisplayStyle.Image,
                 AutoSize = true,
                 IsLink = true,
-                Padding = new Padding(5, 0, 5, 0)
+                Padding = new Padding(5, 0, 5, 0),
+                Name = "InfoLabel" // For UI Automation
             };
 
             _infoLabel.Click += (s, e) => InfoClicked?.Invoke(this, EventArgs.Empty);
@@ -180,7 +202,8 @@ namespace MarkdownViewer.UI
                 DisplayStyle = ToolStripItemDisplayStyle.Image,
                 AutoSize = true,
                 IsLink = true,
-                Padding = new Padding(5, 0, 5, 0)
+                Padding = new Padding(5, 0, 5, 0),
+                Name = "HelpLabel" // For UI Automation
             };
 
             _helpLabel.Click += (s, e) => HelpClicked?.Invoke(this, EventArgs.Empty);
@@ -189,6 +212,8 @@ namespace MarkdownViewer.UI
             this.Items.Add(_updateStatus);
             this.Items.Add(new ToolStripSeparator());
             this.Items.Add(_explorerStatus);
+            this.Items.Add(new ToolStripSeparator());
+            this.Items.Add(_rawDataViewButton);
             this.Items.Add(new ToolStripSeparator());
 
             // Add spring to push theme/language selector to the center-right
@@ -227,8 +252,9 @@ namespace MarkdownViewer.UI
                 string displayName = GetThemeDisplayName(themeName);
                 var item = new ToolStripMenuItem(displayName)
                 {
-                    Tag = themeName,
-                    Checked = themeName == currentTheme
+                    Tag = themeName, // Keep code in Tag for functionality and automation
+                    Checked = themeName == currentTheme,
+                    Name = $"Theme_{themeName}" // For UI Automation
                 };
 
                 item.Click += OnThemeItemClick;
@@ -279,6 +305,7 @@ namespace MarkdownViewer.UI
 
         /// <summary>
         /// Populates the language dropdown with all supported languages.
+        /// Display shows only language names, but Tag property stores the language code for automation.
         /// </summary>
         private void PopulateLanguageDropdown()
         {
@@ -289,8 +316,9 @@ namespace MarkdownViewer.UI
                 string displayName = GetLanguageDisplayName(langCode);
                 var item = new ToolStripMenuItem(displayName)
                 {
-                    Tag = langCode,
-                    Checked = langCode == _localization.GetCurrentLanguage()
+                    Tag = langCode, // Keep code in Tag for functionality and automation
+                    Checked = langCode == _localization.GetCurrentLanguage(),
+                    Name = $"Language_{langCode}" // For UI Automation
                 };
 
                 item.Click += OnLanguageItemClick;
@@ -349,28 +377,28 @@ namespace MarkdownViewer.UI
             {
                 case UpdateStatus.UpToDate:
                     _updateStatus.Image = _iconCheckCircle;
-                    _updateStatus.ToolTipText = _localization.GetString("StatusBarUpToDate") + " (Click to check)";
+                    _updateStatus.ToolTipText = _localization.GetString("StatusBarUpToDate");
                     break;
 
                 case UpdateStatus.UpdateAvailable:
                     _updateStatus.Image = _iconRefreshCw;
-                    _updateStatus.ToolTipText = _localization.GetString("StatusBarUpdateAvailable", latestVersion ?? "?") + " (Click to download)";
+                    _updateStatus.ToolTipText = _localization.GetString("StatusBarUpdateAvailable", latestVersion ?? "?");
                     break;
 
                 case UpdateStatus.Checking:
                     _updateStatus.Image = _iconRefreshCw;
-                    _updateStatus.ToolTipText = "Checking for updates...";
+                    _updateStatus.ToolTipText = _localization.GetString("StatusBarChecking");
                     break;
 
                 case UpdateStatus.Error:
                     _updateStatus.Image = _iconAlertCircle;
-                    _updateStatus.ToolTipText = "Update check failed (Click to retry)";
+                    _updateStatus.ToolTipText = _localization.GetString("StatusBarUpdateError");
                     break;
 
                 case UpdateStatus.Unknown:
                 default:
                     _updateStatus.Image = _iconRefreshCw;
-                    _updateStatus.ToolTipText = "Update status unknown (Click to check)";
+                    _updateStatus.ToolTipText = _localization.GetString("StatusBarCheckForUpdates");
                     break;
             }
         }
@@ -403,12 +431,12 @@ namespace MarkdownViewer.UI
             if (IsExplorerRegistered)
             {
                 _explorerStatus.Image = _iconCheckCircle;
-                _explorerStatus.ToolTipText = _localization.GetString("StatusBarExplorerRegistered") + " (Click to uninstall)";
+                _explorerStatus.ToolTipText = _localization.GetString("StatusBarExplorerRegistered");
             }
             else
             {
                 _explorerStatus.Image = _iconFolder;
-                _explorerStatus.ToolTipText = _localization.GetString("StatusBarExplorerNotRegistered") + " (Click to install)";
+                _explorerStatus.ToolTipText = _localization.GetString("StatusBarExplorerNotRegistered");
             }
         }
 
@@ -420,7 +448,7 @@ namespace MarkdownViewer.UI
             // Update language selector (globe icon is set as Image property)
             string currentLang = _localization.GetCurrentLanguage();
             _languageSelector.Text = GetLanguageDisplayName(currentLang);
-            _languageSelector.ToolTipText = _localization.GetString("StatusBarLanguage", currentLang.ToUpper());
+            _languageSelector.ToolTipText = _localization.GetString("StatusBarLanguage");
 
             // Update dropdown items
             foreach (ToolStripMenuItem item in _languageSelector.DropDownItems)
@@ -470,8 +498,9 @@ namespace MarkdownViewer.UI
                 var menuItem = new ToolStripMenuItem
                 {
                     Text = GetLanguageDisplayName(langCode),
-                    Tag = langCode,
-                    Checked = langCode == CurrentLanguage
+                    Tag = langCode, // Keep code in Tag for functionality and automation
+                    Checked = langCode == CurrentLanguage,
+                    Name = $"Language_{langCode}" // For UI Automation
                 };
 
                 menuItem.Click += OnLanguageItemClick;
@@ -518,6 +547,7 @@ namespace MarkdownViewer.UI
                 var newCheckIcon = IconHelper.LoadIcon("check-circle", 20, iconColor);
                 var newAlertIcon = IconHelper.LoadIcon("alert-circle", 20, iconColor);
                 var newFolderIcon = IconHelper.LoadIcon("folder", 20, iconColor);
+                var newFileTextIcon = IconHelper.LoadIcon("file-text", 20, iconColor);
                 var newGlobeIcon = IconHelper.LoadIcon("globe", 20, iconColor);
                 var newInfoIcon = IconHelper.LoadIcon("info", 20, iconColor);
                 var newHelpIcon = IconHelper.LoadIcon("help-circle", 20, iconColor);
@@ -525,6 +555,7 @@ namespace MarkdownViewer.UI
                 // Update status items with new icons
                 if (newRefreshIcon != null) _updateStatus.Image = newRefreshIcon;
                 if (newFolderIcon != null) _explorerStatus.Image = newFolderIcon;
+                if (newFileTextIcon != null) _rawDataViewButton.Image = newFileTextIcon;
                 if (newGlobeIcon != null) _languageSelector.Image = newGlobeIcon;
                 if (newInfoIcon != null) _infoLabel.Image = newInfoIcon;
                 if (newHelpIcon != null) _helpLabel.Image = newHelpIcon;

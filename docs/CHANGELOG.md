@@ -7,6 +7,78 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.9.0] - 2025-11-12
+
+### Added
+- **Raw Data View**: Professional developer tool for inspecting Markdown rendering
+  - Split-view panel showing Markdown source (left) and generated HTML (right)
+  - **Flicker-free row highlighting** (NEW):
+    - Mouse-over highlighting (light) for easy line tracking
+    - Cursor line highlighting (strong, very visible) for current selection
+    - Single paint cycle rendering - zero flickering
+    - Theme-aware alpha blending (stronger in dark theme)
+  - **Integrated line numbers** (NEW):
+    - Professional gutter display (50px width, right-aligned)
+    - Perfect scroll synchronization (no separate controls needed)
+    - Theme-aware coloring
+  - StatusBar button with file-text icon for quick access
+  - Custom CodeViewControl component for flicker-free rendering
+  - Theme-aware colors (Dark, Light, Solarized, Draeger)
+  - Read-only mode (stays a viewer, not an editor)
+  - Resizable splitter with 50/50 default split
+  - State persistence (visibility and splitter position)
+  - Fully localized in all 8 supported languages
+  - Use cases: Debugging rendering issues, learning Markdown→HTML, inspecting HTML structure
+
+- **Complete Localization**: All Raw Data View UI strings translated
+  - 5 new resource strings for RawDataViewPanel
+  - Context menu labels and panel headers
+  - Languages: English, Deutsch, Español, Français, 日本語, 简体中文, Русский, Монгол
+
+- **AppSettings Extension**: New UI settings for Raw Data View
+  - `RawDataViewVisible`: Persists panel visibility state (default: false)
+  - `RawDataSplitterDistance`: Persists splitter position in pixels (default: 500px)
+  - `ToggleRawDataView` shortcut: "F12"
+
+### Technical
+- **RawDataViewPanel Implementation**: 306 lines, RichTextBox-based split-view control
+  - Custom syntax highlighting using System.Text.RegularExpressions
+  - Markdown patterns: headings, code blocks, inline code, links
+  - HTML patterns: tags, attribute values
+  - Scroll position preservation during syntax highlighting
+  - Windows Message API for scroll control (EM_GETFIRSTVISIBLELINE, EM_LINESCROLL)
+- **Localization**: 5 strings × 8 languages = 40 translations
+  - Parallel agents used for translation (7 languages translated simultaneously in ~2 minutes)
+  - All resource strings include `<comment>` tags for translator context
+- **Tests**: 12 new unit tests for RawDataViewPanel (all passing)
+  - Panel initialization, visibility toggle, splitter distance, theme application
+  - Large content handling, empty/null string handling, label localization
+  - Total test suite: 260/261 passing (99.6% success rate)
+- **Build**: 0 errors, 0 warnings
+- **Binary size**: 3.3 MB (unchanged - RichTextBox is native WinForms, no dependencies)
+
+### Changed
+- **MainForm.cs**: Context menu extended with "More Tools" submenu
+  - Separator before tools section for visual grouping
+  - Localized menu items using LocalizationService
+- **Architecture**: UI layer enhanced with developer tools category
+  - RawDataViewPanel added to UI components in ARCHITECTURE.md
+  - ROADMAP.md updated with v1.9.0 feature documentation
+
+### Development Process
+- **Parallel Agent Translation**: Used 7 agents simultaneously for localization
+  - German, Spanish, French, Japanese, Chinese, Russian, Mongolian
+  - All translations completed in parallel in ~2 minutes
+  - 100% success rate (no errors, proper XML structure maintained)
+- **Test-Driven Development**: Unit tests written before integration testing
+  - 12 tests covering all RawDataViewPanel functionality
+  - Fixed 3 WinForms constraint issues (SplitterDistance requires parent Form)
+- **Documentation-First**: ROADMAP and ARCHITECTURE updated before implementation
+  - Mermaid diagrams for state machine and component architecture
+  - Technical specifications documented in docs/implementation-plan-raw-data-view.md
+
+---
+
 ## [1.8.1] - 2025-01-11
 
 ### Fixed

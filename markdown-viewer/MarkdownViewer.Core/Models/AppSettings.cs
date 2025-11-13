@@ -25,6 +25,18 @@ namespace MarkdownViewer.Core.Models
         public StatusBarSettings StatusBar { get; set; } = new();
         public NavigationBarSettings NavigationBar { get; set; } = new();
         public SearchSettings Search { get; set; } = new();
+
+        /// <summary>
+        /// Whether Raw Data View is currently visible (v1.9.0)
+        /// Default: Hidden (false)
+        /// </summary>
+        public bool RawDataViewVisible { get; set; } = false;
+
+        /// <summary>
+        /// Splitter distance for Raw Data View in pixels (v1.9.0)
+        /// Default: 500px (50% of typical 1024px width)
+        /// </summary>
+        public int RawDataSplitterDistance { get; set; } = 500;
     }
 
     /// <summary>
@@ -94,6 +106,7 @@ namespace MarkdownViewer.Core.Models
         public string NavigateBack { get; set; } = "Alt+Left";
         public string NavigateForward { get; set; } = "Alt+Right";
         public string Help { get; set; } = "F1";
+        public string ToggleRawDataView { get; set; } = "F12";  // v1.9.0
     }
 
     /// <summary>

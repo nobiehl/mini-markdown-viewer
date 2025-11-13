@@ -26,7 +26,7 @@ namespace MarkdownViewer
     /// </summary>
     public class MainForm : Form, IMainView
     {
-        private const string Version = "1.8.1";
+        private const string Version = "1.9.0";
 
         // UI Components
         private WebView2 _webView = null!;
@@ -34,6 +34,7 @@ namespace MarkdownViewer
         private NavigationBar? _navigationBar;
         private SearchBar? _searchBar;
         private UpdateNotificationBar? _updateNotificationBar;
+        private RawDataViewPanel? _rawDataViewPanel;
         private ContextMenuStrip? _themeContextMenu;
 
         // Core Services
@@ -49,6 +50,8 @@ namespace MarkdownViewer
 
         // State
         private string _currentFilePath = null!;
+        private string _currentMarkdown = null!;
+        private string _currentHtml = null!;
         private AppSettings _settings = null!;
         private Theme? _currentTheme;
 
@@ -205,6 +208,9 @@ namespace MarkdownViewer
             // Initialize UpdateNotificationBar after StatusBar (hidden by default, shown above StatusBar when update available)
             // IMPORTANT: Must be initialized AFTER StatusBar so it appears above it (both use DockStyle.Bottom)
             InitializeUpdateNotificationBar();
+
+            // Initialize RawDataViewPanel (hidden by default, shown with F12 shortcut)
+            InitializeRawDataViewPanel();
 
             // Initialize Theme Context Menu
             InitializeThemeContextMenu();
@@ -642,11 +648,11 @@ namespace MarkdownViewer
 
             try
             {
-                string markdown = File.ReadAllText(filePath);
-                Log.Debug("Read {Bytes} bytes from {FilePath}", markdown.Length, filePath);
+                _currentMarkdown = File.ReadAllText(filePath);
+                Log.Debug("Read {Bytes} bytes from {FilePath}", _currentMarkdown.Length, filePath);
 
-                string html = _renderer.RenderToHtml(markdown, filePath, _currentTheme);
-                Log.Debug("Rendered markdown to HTML ({HtmlLength} characters)", html.Length);
+                _currentHtml = _renderer.RenderToHtml(_currentMarkdown, filePath, _currentTheme);
+                Log.Debug("Rendered markdown to HTML ({HtmlLength} characters)", _currentHtml.Length);
 
                 // Update window title
                 this.Text = $"{Path.GetFileName(filePath)} - Markdown Viewer v{Version}";
@@ -654,7 +660,7 @@ namespace MarkdownViewer
                 if (_webView.CoreWebView2 != null)
                 {
                     Log.Debug("Navigating WebView2 to HTML content");
-                    _webView.CoreWebView2.NavigateToString(html);
+                    _webView.CoreWebView2.NavigateToString(_currentHtml);
                 }
                 else
                 {
@@ -664,7 +670,7 @@ namespace MarkdownViewer
                         if (e.IsSuccess)
                         {
                             Log.Debug("WebView2 ready, navigating to queued HTML");
-                            _webView.CoreWebView2!.NavigateToString(html);
+                            _webView.CoreWebView2!.NavigateToString(_currentHtml);
                         }
                     };
                 }
@@ -823,6 +829,104 @@ namespace MarkdownViewer
         }
 
         /// <summary>
+        /// Initializes and configures the raw data view panel.
+        /// Provides split-view for displaying Markdown source and generated HTML side-by-side.
+        /// </summary>
+        private void InitializeRawDataViewPanel()
+        {
+            Log.Debug("Initializing RawDataViewPanel");
+
+            try
+            {
+                _rawDataViewPanel = new RawDataViewPanel();
+
+                // Set localized label texts
+                _rawDataViewPanel.SetLabelTexts(
+                    _localizationService.GetString("RawDataViewMarkdownLabel"),
+                    _localizationService.GetString("RawDataViewHtmlLabel")
+                );
+
+                // Set splitter distance from settings
+                _rawDataViewPanel.SplitterDistance = _settings.UI.RawDataSplitterDistance;
+
+                // Add to form (docked to fill, hidden by default)
+                this.Controls.Add(_rawDataViewPanel);
+
+                // Apply initial theme
+                if (_currentTheme != null)
+                {
+                    _rawDataViewPanel.ApplyTheme(_currentTheme);
+                }
+
+                // Restore visibility state from settings
+                if (_settings.UI.RawDataViewVisible)
+                {
+                    // Don't show immediately, will be toggled by user or restored on load
+                    // For now, keep hidden - user will press F12 to show
+                }
+
+                Log.Information("RawDataViewPanel initialized successfully");
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex, "Failed to initialize RawDataViewPanel");
+            }
+        }
+
+        /// <summary>
+        /// Toggles between normal WebView mode and raw data view mode.
+        /// F12 keyboard shortcut handler.
+        /// </summary>
+        private void ToggleRawDataView()
+        {
+            if (_rawDataViewPanel == null) return;
+
+            try
+            {
+                if (_rawDataViewPanel.Visible)
+                {
+                    // Hide Raw Data View, show WebView
+                    Log.Debug("Hiding Raw Data View, showing WebView");
+                    _rawDataViewPanel.Hide();
+                    _webView.Visible = true;
+                    _settings.UI.RawDataViewVisible = false;
+                }
+                else
+                {
+                    // Show Raw Data View, hide WebView
+                    var sw = System.Diagnostics.Stopwatch.StartNew();
+                    Log.Debug("Showing Raw Data View, hiding WebView");
+
+                    // Use cached markdown and HTML (no file I/O, no rendering!)
+                    _rawDataViewPanel.ShowRawData(_currentMarkdown, _currentHtml);
+                    var t1 = sw.ElapsedMilliseconds;
+                    Log.Debug("Performance: ShowRawData took {Time}ms", t1);
+
+                    _webView.Visible = false;
+                    _settings.UI.RawDataViewVisible = true;
+
+                    sw.Stop();
+                    Log.Information("Performance: Total toggle time: {TotalTime}ms", sw.ElapsedMilliseconds);
+                }
+
+                // Save splitter position and visibility state
+                _settings.UI.RawDataSplitterDistance = _rawDataViewPanel.SplitterDistance;
+                _settingsService.Save(_settings);
+
+                Log.Information("Raw Data View toggled: {Visible}", _rawDataViewPanel.Visible);
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex, "Failed to toggle Raw Data View");
+                MessageBox.Show(
+                    $"Failed to toggle Raw Data View:\n{ex.Message}",
+                    "Error",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Error);
+            }
+        }
+
+        /// <summary>
         /// Initializes and configures the status bar.
         /// </summary>
         private void InitializeStatusBar()
@@ -838,6 +942,7 @@ namespace MarkdownViewer
                 _statusBar.ThemeChanged += OnThemeChanged;  // NEW
                 _statusBar.UpdateClicked += OnUpdateClicked;
                 _statusBar.ExplorerClicked += OnExplorerClicked;
+                _statusBar.RawDataViewClicked += (s, e) => ToggleRawDataView();
                 _statusBar.InfoClicked += OnInfoClicked;
                 _statusBar.HelpClicked += OnHelpClicked;
 
@@ -1318,7 +1423,7 @@ Developed with:
 
         /// <summary>
         /// Initializes the theme context menu.
-        /// Allows right-click theme switching.
+        /// Allows right-click theme switching and access to developer tools.
         /// </summary>
         private void InitializeThemeContextMenu()
         {
@@ -1345,10 +1450,23 @@ Developed with:
                     _themeContextMenu.Items.Add(menuItem);
                 }
 
+                // Add separator before tools menu
+                _themeContextMenu.Items.Add(new ToolStripSeparator());
+
+                // Create "More Tools" submenu (localized)
+                var toolsMenu = new ToolStripMenuItem(_localizationService.GetString("ContextMenuMoreTools"));
+
+                // Add "Show Raw Data (F12)" menu item (localized)
+                var rawDataMenuItem = new ToolStripMenuItem(_localizationService.GetString("RawDataViewShow"));
+                rawDataMenuItem.Click += (s, e) => ToggleRawDataView();
+                toolsMenu.DropDownItems.Add(rawDataMenuItem);
+
+                _themeContextMenu.Items.Add(toolsMenu);
+
                 // Assign context menu to the form
                 this.ContextMenuStrip = _themeContextMenu;
 
-                Log.Information("Theme Context Menu initialized with {Count} themes", themes.Count);
+                Log.Information("Theme Context Menu initialized with {Count} themes + Tools submenu", themes.Count);
             }
             catch (Exception ex)
             {
@@ -1454,6 +1572,14 @@ Developed with:
                 Log.Debug("F5 pressed");
                 RefreshRequested?.Invoke(this, EventArgs.Empty); // Trigger IMainView event
                 LoadMarkdownFile(_currentFilePath); // Reload current file
+                return true;
+            }
+
+            // F12: Toggle Raw Data View (v1.9.0)
+            if (keyData == Keys.F12)
+            {
+                Log.Debug("F12 pressed - Toggle Raw Data View");
+                ToggleRawDataView();
                 return true;
             }
 

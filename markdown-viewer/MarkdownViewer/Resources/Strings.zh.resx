@@ -353,4 +353,26 @@
 
 {0}</value>
   </data>
+
+  <!-- RawDataView Strings (v1.9.0) -->
+  <data name="RawDataViewShow" xml:space="preserve">
+    <value>显示原始数据 (F12)</value>
+    <comment>Context menu item to show raw data view</comment>
+  </data>
+  <data name="RawDataViewHide" xml:space="preserve">
+    <value>隐藏原始数据</value>
+    <comment>Context menu item to hide raw data view (not currently used, kept for future)</comment>
+  </data>
+  <data name="ContextMenuMoreTools" xml:space="preserve">
+    <value>更多工具</value>
+    <comment>Context menu submenu label for additional tools</comment>
+  </data>
+  <data name="RawDataViewMarkdownLabel" xml:space="preserve">
+    <value>Markdown 源代码</value>
+    <comment>Label for the markdown source panel in raw data view</comment>
+  </data>
+  <data name="RawDataViewHtmlLabel" xml:space="preserve">
+    <value>生成的 HTML</value>
+    <comment>Label for the generated HTML panel in raw data view</comment>
+  </data>
 </root>
