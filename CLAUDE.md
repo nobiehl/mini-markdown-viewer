@@ -1,0 +1,8 @@
+- Wende **immer** @docs\PROCESS-MODEL.md an wenn du neue Features implementierst!
+- **⚠️ KRITISCH: Lies IMMER @docs\RELEASE-CHECKLIST.md BEVOR du ein GitHub Release erstellst!**
+  - Binary MUSS "MarkdownViewer.exe" heißen (OHNE Versionsnummer!)
+  - Binary MUSS ~3.3 MB groß sein (NICHT 138 KB!)
+  - Alle Tests MÜSSEN bestanden haben
+  - Dies ist MEHRFACH schief gegangen - absolute Pflicht!
+- Wir kommunizieren immer in Deutsch
+- Projekt Dokumentation wird immer in Englisch geschrieben
