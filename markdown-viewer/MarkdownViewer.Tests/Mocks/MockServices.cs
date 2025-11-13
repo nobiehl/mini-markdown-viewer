@@ -1,5 +1,5 @@
-using MarkdownViewer.Models;
-using MarkdownViewer.Services;
+using MarkdownViewer.Core.Models;
+using MarkdownViewer.Core.Services;
 
 namespace MarkdownViewer.Tests.Mocks
 {

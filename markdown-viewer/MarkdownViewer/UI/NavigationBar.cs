@@ -65,10 +65,6 @@ namespace MarkdownViewer.UI
         // Events (View → Presenter)
         public event EventHandler? BackRequested;
         public event EventHandler? ForwardRequested;
-#pragma warning disable CS0067 // Event is declared but never used (reserved for future use)
-        public event EventHandler? RefreshRequested;
-        public event EventHandler? HomeRequested;
-#pragma warning restore CS0067
 
         #endregion
 

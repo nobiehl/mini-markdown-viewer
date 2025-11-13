@@ -1,0 +1,76 @@
+# Build results
+[Dd]ebug/
+[Rr]elease/
+x64/
+x86/
+[Bb]in/
+[Oo]bj/
+[Ll]og/
+
+# Visual Studio cache/options
+.vs/
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# Test Results
+[Tt]est[Rr]esult*/
+[Bb]uild[Ll]og.*
+*.trx
+*.coverage
+*.coveragexml
+
+# Code coverage
+coverage.cobertura.xml
+coveragereport/
+
+# NuGet Packages
+*.nupkg
+**/packages/*
+
+# User-specific files
+*.csproj.user
+*.dbmdl
+*.jfm
+*.pfx
+*.publishsettings
+
+# Backup & report files
+_UpgradeReport_Files/
+Backup*/
+UpgradeLog*.XML
+UpgradeLog*.htm
+
+# Publish profiles
+*.pubxml
+*.publishproj
+
+# Windows image file caches
+Thumbs.db
+ehthumbs.db
+
+# Folder config file
+Desktop.ini
+
+# macOS
+.DS_Store
+
+# Release binaries (use GitHub Releases instead)
+*.exe
+*.dll
+
+# Publish output folders
+publish/
+bin-single/
+
+# Temporary test files
+test-*.md
+test-*.csx
+nul
+*.tmp
+*.temp
+
+# Test projects (not Tests/)
+Test*/
+!*Tests/

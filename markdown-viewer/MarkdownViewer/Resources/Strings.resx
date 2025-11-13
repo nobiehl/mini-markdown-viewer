@@ -191,13 +191,6 @@ All integration points have been removed.</value>
   </data>
 
   <!-- Updates -->
-  <data name="UpdateCheckFailedMessage" xml:space="preserve">
-    <value>Update check failed:
-{0}</value>
-  </data>
-  <data name="UpdateCheckFailedTitle" xml:space="preserve">
-    <value>Update Error</value>
-  </data>
   <data name="NoUpdateAvailableMessage" xml:space="preserve">
     <value>You are already using the latest version ({0}).</value>
   </data>
@@ -218,23 +211,6 @@ Download now?</value>
   <data name="UpdateAvailableTitle" xml:space="preserve">
     <value>Update Available</value>
   </data>
-  <data name="UpdateDownloadFailedMessage" xml:space="preserve">
-    <value>Download failed.
-Please try again later.</value>
-  </data>
-  <data name="UpdateDownloadFailedTitle" xml:space="preserve">
-    <value>Download Error</value>
-  </data>
-  <data name="UpdateDownloadedMessage" xml:space="preserve">
-    <value>Update has been downloaded.
-
-The update will be installed on next start.
-
-Restart now?</value>
-  </data>
-  <data name="UpdateDownloadedTitle" xml:space="preserve">
-    <value>Update Downloaded</value>
-  </data>
   <data name="UpdateCheckUnexpectedError" xml:space="preserve">
     <value>Unexpected error during update check:
 {0}</value>
@@ -254,7 +230,16 @@ Restart now?</value>
     <value>Explorer integration inactive</value>
   </data>
   <data name="StatusBarLanguage" xml:space="preserve">
-    <value>Language: {0}</value>
+    <value>Select language</value>
+  </data>
+  <data name="StatusBarChecking" xml:space="preserve">
+    <value>Checking for updates...</value>
+  </data>
+  <data name="StatusBarUpdateError" xml:space="preserve">
+    <value>Update check failed</value>
+  </data>
+  <data name="StatusBarCheckForUpdates" xml:space="preserve">
+    <value>Check for updates</value>
   </data>
   <data name="StatusBarInfo" xml:space="preserve">
     <value>Info</value>
@@ -340,5 +325,107 @@ Restart now?</value>
   <data name="SearchClose" xml:space="preserve">
     <value>Close (Esc)</value>
     <comment>Close search bar button tooltip</comment>
+  </data>
+
+  <!-- UpdateNotificationBar Strings -->
+  <data name="UpdateAvailable" xml:space="preserve">
+    <value>Update v{0} available</value>
+    <comment>Update notification message with version placeholder</comment>
+  </data>
+  <data name="UpdateShowReleaseNotes" xml:space="preserve">
+    <value>Show Release Notes</value>
+    <comment>Button to show release notes</comment>
+  </data>
+  <data name="UpdateInstall" xml:space="preserve">
+    <value>Install Update</value>
+    <comment>Button to install update</comment>
+  </data>
+  <data name="UpdateIgnore" xml:space="preserve">
+    <value>Ignore</value>
+    <comment>Button to ignore update</comment>
+  </data>
+  <data name="UpdateReleaseNotesTitle" xml:space="preserve">
+    <value>Release Notes - {0}</value>
+    <comment>Title for release notes with version placeholder</comment>
+  </data>
+  <data name="UpdateShowReleaseNotesError" xml:space="preserve">
+    <value>Failed to show release notes:
+
+{0}</value>
+    <comment>Error message when release notes cannot be shown</comment>
+  </data>
+  <data name="UpdateDownloadedTitle" xml:space="preserve">
+    <value>Update Ready</value>
+    <comment>Title when update is downloaded</comment>
+  </data>
+  <data name="UpdateDownloadedMessage" xml:space="preserve">
+    <value>Update downloaded successfully!
+
+Would you like to restart the application now to install the update?</value>
+    <comment>Message asking if user wants to restart</comment>
+  </data>
+  <data name="UpdatePostponedTitle" xml:space="preserve">
+    <value>Update Postponed</value>
+    <comment>Title when update is postponed</comment>
+  </data>
+  <data name="UpdatePostponedMessage" xml:space="preserve">
+    <value>The update will be installed on next restart.</value>
+    <comment>Message when update is postponed</comment>
+  </data>
+  <data name="UpdateDownloadFailedTitle" xml:space="preserve">
+    <value>Download Failed</value>
+    <comment>Title when download fails</comment>
+  </data>
+  <data name="UpdateDownloadFailedMessage" xml:space="preserve">
+    <value>Update could not be downloaded.
+
+Please try again later.</value>
+    <comment>Message when download fails</comment>
+  </data>
+  <data name="UpdateDownloadError" xml:space="preserve">
+    <value>Download error:
+
+{0}</value>
+    <comment>Error message during download with placeholder</comment>
+  </data>
+  <data name="UpdateCheckUpToDateTitle" xml:space="preserve">
+    <value>Up to Date</value>
+    <comment>Title when app is up to date</comment>
+  </data>
+  <data name="UpdateCheckUpToDateMessage" xml:space="preserve">
+    <value>You are running the latest version (v{0}).</value>
+    <comment>Message when app is up to date with version placeholder</comment>
+  </data>
+  <data name="UpdateCheckFailedTitle" xml:space="preserve">
+    <value>Error</value>
+    <comment>Title when update check fails</comment>
+  </data>
+  <data name="UpdateCheckFailedMessage" xml:space="preserve">
+    <value>Update check failed:
+
+{0}</value>
+    <comment>Error message when update check fails</comment>
+  </data>
+
+  <!-- RawDataView Strings (v1.9.0) -->
+  <data name="RawDataViewShow" xml:space="preserve">
+    <value>Show Raw Data (F12)</value>
+    <comment>Context menu item to show raw data view</comment>
+  </data>
+  <data name="RawDataViewHide" xml:space="preserve">
+    <value>Hide Raw Data</value>
+    <comment>Context menu item to hide raw data view (not currently used, kept for future)</comment>
+  </data>
+  <data name="ContextMenuMoreTools" xml:space="preserve">
+    <value>More Tools</value>
+    <comment>Context menu submenu label for additional tools</comment>
+  </data>
+  <data name="RawDataViewMarkdownLabel" xml:space="preserve">
+    <value>Markdown Source</value>
+    <comment>Label for the markdown source panel in raw data view</comment>
+  </data>
+  <data name="RawDataViewHtmlLabel" xml:space="preserve">
+    <value>Generated HTML</value>
+    <comment>Label for the generated HTML panel in raw data view</comment>
   </data>
 </root>

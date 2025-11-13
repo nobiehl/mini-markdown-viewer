@@ -1,7 +1,7 @@
 using Xunit;
 using MarkdownViewer.Core;
-using MarkdownViewer.Models;
-using MarkdownViewer.Presenters;
+using MarkdownViewer.Core.Models;
+using MarkdownViewer.Core.Presenters;
 using MarkdownViewer.Tests.Mocks;
 
 namespace MarkdownViewer.Tests.Presenters

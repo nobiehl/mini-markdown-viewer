@@ -4,5 +4,11 @@
   - Binary MUSS ~3.3 MB groß sein (NICHT 138 KB!)
   - Alle Tests MÜSSEN bestanden haben
   - Dies ist MEHRFACH schief gegangen - absolute Pflicht!
+- **🧹 Repository Cleanup: Befolge @docs\CLEANUP-PROCESS.md nach Releases und monatlich**
+  - Entferne *.exe Dateien aus dem Repository
+  - Entferne Build-Artefakte (bin-single/, publish/)
+  - Entferne temporäre Test-Dateien (test-*.md, nul, *.tmp)
+  - Entferne temporäre Dokumentation (implementation-plan-*.md)
+  - Halte Repository sauber für Entwicklung!
 - Wir kommunizieren immer in Deutsch
 - Projekt Dokumentation wird immer in Englisch geschrieben

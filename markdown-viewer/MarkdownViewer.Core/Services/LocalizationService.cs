@@ -1,5 +1,6 @@
 using System;
 using System.Globalization;
+using System.Linq;
 using System.Resources;
 
 namespace MarkdownViewer.Core.Services
@@ -72,9 +73,16 @@ namespace MarkdownViewer.Core.Services
         public LocalizationService(string defaultLanguage = "en")
         {
             // Initialize ResourceManager to load from Resources/Strings.resx
+            // Try to find the MarkdownViewer assembly that contains the resources
+            var markdownViewerAssembly = AppDomain.CurrentDomain.GetAssemblies()
+                .FirstOrDefault(a => a.GetName().Name == "MarkdownViewer");
+
+            // Fallback to current assembly if MarkdownViewer assembly not found
+            var resourceAssembly = markdownViewerAssembly ?? typeof(LocalizationService).Assembly;
+
             _resourceManager = new ResourceManager(
                 "MarkdownViewer.Resources.Strings",
-                typeof(LocalizationService).Assembly
+                resourceAssembly
             );
 
             // Set initial culture
@@ -89,6 +97,8 @@ namespace MarkdownViewer.Core.Services
         /// <returns>Localized string or key surrounded by brackets if not found</returns>
         public string GetString(string key)
         {
+            ArgumentNullException.ThrowIfNull(key);
+
             try
             {
                 // Try to get string in current culture
@@ -123,6 +133,9 @@ namespace MarkdownViewer.Core.Services
         /// <returns>Formatted localized string or key if not found</returns>
         public string GetString(string key, params object[] args)
         {
+            ArgumentNullException.ThrowIfNull(key);
+            ArgumentNullException.ThrowIfNull(args);
+
             string format = GetString(key);
 
             try
@@ -143,6 +156,8 @@ namespace MarkdownViewer.Core.Services
         /// <param name="languageCode">Language code (e.g., "en", "de", "mn", "system")</param>
         public void SetLanguage(string languageCode)
         {
+            ArgumentNullException.ThrowIfNull(languageCode);
+
             try
             {
                 // Handle "system" language code by using current system culture

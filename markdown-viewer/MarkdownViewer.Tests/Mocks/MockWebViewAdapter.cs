@@ -1,3 +1,4 @@
+using MarkdownViewer.Core.Views;
 using MarkdownViewer.Views;
 
 namespace MarkdownViewer.Tests.Mocks

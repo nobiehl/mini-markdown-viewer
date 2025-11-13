@@ -1,8 +1,8 @@
 using System;
 using System.IO;
 using Xunit;
-using MarkdownViewer.Services;
-using MarkdownViewer.Models;
+using MarkdownViewer.Core.Services;
+using MarkdownViewer.Core.Models;
 
 namespace MarkdownViewer.Tests.Integration
 {
@@ -64,9 +64,9 @@ namespace MarkdownViewer.Tests.Integration
             // Act
             _settingsService.Save(settings);
 
-            // Assert
-            var settingsPath = Path.Combine(_testDirectory, "MarkdownViewer", "settings.json");
-            Assert.True(File.Exists(settingsPath));
+            // Assert - Use the actual path from SettingsService
+            var settingsPath = _settingsService.GetSettingsPath();
+            Assert.True(File.Exists(settingsPath), $"Settings file should exist at: {settingsPath}");
         }
 
         [Fact]
@@ -132,7 +132,7 @@ namespace MarkdownViewer.Tests.Integration
         public void Load_CorruptedFile_ReturnsDefaultSettings()
         {
             // Arrange
-            var settingsPath = Path.Combine(_testDirectory, "MarkdownViewer", "settings.json");
+            var settingsPath = _settingsService.GetSettingsPath();
             Directory.CreateDirectory(Path.GetDirectoryName(settingsPath)!);
             File.WriteAllText(settingsPath, "{ invalid json content }");
 

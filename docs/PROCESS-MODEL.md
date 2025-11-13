@@ -431,6 +431,11 @@ Die `docs/RELEASE-CHECKLIST.md` ist **PFLICHT** vor jedem Release und enthält:
 - Update-Mechanismus sucht nach diesem exakten Namen
 - Siehe RELEASE-CHECKLIST.md Phase 3.1 für Details
 
+**Nach jedem Release: Repository Cleanup durchführen!**
+- Siehe `docs/CLEANUP-PROCESS.md` für Details
+- Entferne Build-Artefakte, temporäre Dateien, Test-Projekte
+- Halte Repository sauber für nächste Entwicklungsphase
+
 ## Dokumentationsstruktur
 
 **REGEL:** Nur diese Dateien sind offiziell erlaubt! Alles andere muss gelöscht werden.
@@ -458,6 +463,7 @@ docs/
 ├── DEVELOPMENT.md            # Developer Setup, Build, Dependencies, lokale Entwicklung
 ├── DEPLOYMENT-GUIDE.md       # Release-Prozess, Publishing, Binary-Erstellung
 ├── RELEASE-CHECKLIST.md      # ⚠️ PFLICHT-Checkliste vor jedem Release (7 Phasen)
+├── CLEANUP-PROCESS.md        # 🧹 Repository-Cleanup nach Releases (Artefakte, Temp-Dateien)
 ├── TESTING-CHECKLIST.md      # Manuelle Integration/E2E Test-Szenarien
 ```
 

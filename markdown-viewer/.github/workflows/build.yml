@@ -1,0 +1,176 @@
+name: Build and Release
+
+on:
+  push:
+    branches:
+      - master
+    tags:
+      - 'v*'
+  pull_request:
+    branches:
+      - master
+
+env:
+  DOTNET_VERSION: '8.0.x'
+  PROJECT_PATH: 'MarkdownViewer/MarkdownViewer.csproj'
+  TEST_PROJECT_PATH: 'MarkdownViewer.Tests/MarkdownViewer.Tests.csproj'
+
+jobs:
+  build-and-test:
+    name: Build & Test
+    runs-on: windows-latest
+
+    strategy:
+      matrix:
+        configuration: [Debug, Release]
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      - name: Cache NuGet packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.nuget/packages
+          key: ${{ runner.os }}-nuget-${{ hashFiles('**/*.csproj') }}
+          restore-keys: |
+            ${{ runner.os }}-nuget-
+
+      - name: Restore dependencies
+        run: dotnet restore
+
+      - name: Build (${{ matrix.configuration }})
+        run: dotnet build --configuration ${{ matrix.configuration }} --no-restore
+
+      - name: Run tests
+        run: dotnet test ${{ env.TEST_PROJECT_PATH }} --configuration ${{ matrix.configuration }} --no-build --verbosity normal --logger "trx;LogFileName=test-results.trx"
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results-${{ matrix.configuration }}
+          path: '**/TestResults/*.trx'
+          retention-days: 7
+
+      - name: Publish application (Release only)
+        if: matrix.configuration == 'Release'
+        run: |
+          dotnet publish ${{ env.PROJECT_PATH }} `
+            --configuration Release `
+            --output ./publish `
+            --runtime win-x64 `
+            --self-contained false `
+            -p:PublishSingleFile=true `
+            -p:IncludeNativeLibrariesForSelfExtract=true `
+            -p:DebugType=none `
+            -p:DebugSymbols=false
+
+      - name: Upload build artifacts (Release only)
+        if: matrix.configuration == 'Release'
+        uses: actions/upload-artifact@v4
+        with:
+          name: MarkdownViewer-Release
+          path: ./publish/MarkdownViewer.exe
+          retention-days: 30
+
+  release:
+    name: Create GitHub Release
+    needs: build-and-test
+    if: startsWith(github.ref, 'refs/tags/v')
+    runs-on: windows-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      - name: Extract version from tag
+        id: version
+        shell: pwsh
+        run: |
+          $tag = "${{ github.ref_name }}"
+          $version = $tag -replace '^v', ''
+          echo "VERSION=$version" >> $env:GITHUB_OUTPUT
+          echo "TAG=$tag" >> $env:GITHUB_OUTPUT
+
+      - name: Restore dependencies
+        run: dotnet restore
+
+      - name: Build and publish release
+        run: |
+          dotnet publish ${{ env.PROJECT_PATH }} `
+            --configuration Release `
+            --output ./release `
+            --runtime win-x64 `
+            --self-contained false `
+            -p:PublishSingleFile=true `
+            -p:IncludeNativeLibrariesForSelfExtract=true `
+            -p:DebugType=none `
+            -p:DebugSymbols=false `
+            -p:Version=${{ steps.version.outputs.VERSION }}
+
+      - name: Rename executable
+        shell: pwsh
+        run: |
+          $version = "${{ steps.version.outputs.VERSION }}"
+          Move-Item -Path "./release/MarkdownViewer.exe" -Destination "./release/MarkdownViewer-$version-win-x64.exe"
+
+      - name: Create release notes
+        id: release_notes
+        shell: pwsh
+        run: |
+          $notes = @"
+          ## Markdown Viewer ${{ steps.version.outputs.TAG }}
+
+          ### Downloads
+          - **Windows x64**: MarkdownViewer-${{ steps.version.outputs.VERSION }}-win-x64.exe
+
+          ### Requirements
+          - Windows 10 or later
+          - .NET 8.0 Runtime (framework-dependent)
+
+          ### Installation
+          1. Download the executable
+          2. Run MarkdownViewer-${{ steps.version.outputs.VERSION }}-win-x64.exe
+
+          ### Features
+          - Single-file executable
+          - No installation required
+          - Embedded resources (themes, icons)
+
+          Built with GitHub Actions on ${{ github.event.head_commit.timestamp }}
+          "@
+
+          $notes | Out-File -FilePath release_notes.md -Encoding utf8
+          echo "NOTES_FILE=release_notes.md" >> $env:GITHUB_OUTPUT
+
+      - name: Create GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create ${{ steps.version.outputs.TAG }} `
+            ./release/MarkdownViewer-${{ steps.version.outputs.VERSION }}-win-x64.exe `
+            --title "Markdown Viewer ${{ steps.version.outputs.TAG }}" `
+            --notes-file ${{ steps.release_notes.outputs.NOTES_FILE }} `
+            --verify-tag
+
+      - name: Upload release artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: MarkdownViewer-${{ steps.version.outputs.VERSION }}-Release
+          path: ./release/MarkdownViewer-${{ steps.version.outputs.VERSION }}-win-x64.exe
+          retention-days: 90

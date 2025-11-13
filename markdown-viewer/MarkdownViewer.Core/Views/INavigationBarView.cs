@@ -14,8 +14,6 @@ namespace MarkdownViewer.Core.Views
         // Events (View -> Presenter)
         event EventHandler BackRequested;
         event EventHandler ForwardRequested;
-        event EventHandler RefreshRequested;
-        event EventHandler HomeRequested;
 
         // View Actions (Presenter -> View)
         void UpdateNavigationState(bool canGoBack, bool canGoForward);

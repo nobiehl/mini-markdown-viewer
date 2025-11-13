@@ -18,12 +18,10 @@ namespace MarkdownViewer.Core.Views
         event EventHandler ViewLoaded;
         event EventHandler<ThemeChangedEventArgs> ThemeChangeRequested;
         event EventHandler<LanguageChangedEventArgs> LanguageChangeRequested;
-        event EventHandler<string> FileLoadRequested;
         event EventHandler RefreshRequested;
         event EventHandler SearchRequested;
         event EventHandler NavigateBackRequested;
         event EventHandler NavigateForwardRequested;
-        event EventHandler CloseRequested;
 
         // View Actions (Presenter -> View)
         void DisplayMarkdown(string html);

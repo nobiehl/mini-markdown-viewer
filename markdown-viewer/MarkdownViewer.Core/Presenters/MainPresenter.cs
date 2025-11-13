@@ -53,7 +53,6 @@ namespace MarkdownViewer.Core.Presenters
             _view.ViewLoaded += OnViewLoaded;
             _view.ThemeChangeRequested += OnThemeChangeRequested;
             _view.LanguageChangeRequested += OnLanguageChangeRequested;
-            _view.FileLoadRequested += OnFileLoadRequested;
             _view.RefreshRequested += OnRefreshRequested;
             _view.SearchRequested += OnSearchRequested;
             _view.NavigateBackRequested += OnNavigateBackRequested;
@@ -166,11 +165,6 @@ namespace MarkdownViewer.Core.Presenters
                     $"Failed to change language: {ex.Message}",
                     "Language Error");
             }
-        }
-
-        private async void OnFileLoadRequested(object? sender, string filePath)
-        {
-            await LoadMarkdownFileAsync(filePath);
         }
 
         private async void OnRefreshRequested(object? sender, EventArgs e)

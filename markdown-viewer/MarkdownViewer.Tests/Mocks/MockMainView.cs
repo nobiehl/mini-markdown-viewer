@@ -1,5 +1,5 @@
-using MarkdownViewer.Models;
-using MarkdownViewer.Views;
+using MarkdownViewer.Core.Models;
+using MarkdownViewer.Core.Views;
 
 namespace MarkdownViewer.Tests.Mocks
 {
@@ -18,12 +18,16 @@ namespace MarkdownViewer.Tests.Mocks
         public event EventHandler? ViewLoaded;
         public event EventHandler<ThemeChangedEventArgs>? ThemeChangeRequested;
         public event EventHandler<LanguageChangedEventArgs>? LanguageChangeRequested;
+#pragma warning disable CS0067
         public event EventHandler<string>? FileLoadRequested;
+#pragma warning restore CS0067
         public event EventHandler? RefreshRequested;
         public event EventHandler? SearchRequested;
+#pragma warning disable CS0067
         public event EventHandler? NavigateBackRequested;
         public event EventHandler? NavigateForwardRequested;
         public event EventHandler? CloseRequested;
+#pragma warning restore CS0067
 
         // Tracking properties for assertions
         public string? LastDisplayedHtml { get; private set; }

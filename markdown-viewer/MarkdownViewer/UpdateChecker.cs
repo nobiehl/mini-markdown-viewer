@@ -54,7 +54,17 @@ namespace MarkdownViewer
                 if (_config.IsTestMode)
                 {
                     // Test mode: Read from local JSON files
-                    string testFilePath = Path.Combine(_config.TestDataPath!, "api-responses", $"{_config.TestScenario}.json");
+                    if (string.IsNullOrEmpty(_config.TestDataPath))
+                    {
+                        Log.Error("Test mode enabled but TestDataPath is null or empty");
+                        return new UpdateInfo
+                        {
+                            UpdateAvailable = false,
+                            Error = "Test mode enabled but TestDataPath is not configured"
+                        };
+                    }
+
+                    string testFilePath = Path.Combine(_config.TestDataPath, "api-responses", $"{_config.TestScenario}.json");
                     Log.Debug("Reading test data from: {Path}", testFilePath);
 
                     if (!File.Exists(testFilePath))
@@ -101,7 +111,7 @@ namespace MarkdownViewer
                 // Parse JSON response
                 var release = JsonSerializer.Deserialize<GitHubRelease>(response);
 
-                if (release == null || string.IsNullOrEmpty(release.TagName))
+                if (release?.TagName == null)
                 {
                     Log.Warning("Invalid release response: missing tag_name");
                     return new UpdateInfo
@@ -136,9 +146,9 @@ namespace MarkdownViewer
 
                 // Find exe asset
                 var exeAsset = release.Assets?.FirstOrDefault(a =>
-                    a.Name!.Equals("MarkdownViewer.exe", StringComparison.OrdinalIgnoreCase));
+                    a.Name?.Equals("MarkdownViewer.exe", StringComparison.OrdinalIgnoreCase) == true);
 
-                if (exeAsset == null)
+                if (exeAsset?.BrowserDownloadUrl == null)
                 {
                     Log.Warning("No MarkdownViewer.exe asset found in release");
                     return new UpdateInfo
@@ -157,7 +167,7 @@ namespace MarkdownViewer
                     CurrentVersion = currentVersion,
                     LatestVersion = release.TagName,
                     ReleaseNotes = release.Body ?? "No release notes available.",
-                    DownloadUrl = exeAsset.BrowserDownloadUrl!,
+                    DownloadUrl = exeAsset.BrowserDownloadUrl,
                     FileSize = exeAsset.Size,
                     IsPrerelease = release.Prerelease
                 };
@@ -243,12 +253,12 @@ namespace MarkdownViewer
             try
             {
                 string lastCheckPath = GetLastCheckFilePath();
-                string? logsFolder = Path.GetDirectoryName(lastCheckPath);
+                string logsFolder = Path.GetDirectoryName(lastCheckPath) ?? Environment.CurrentDirectory;
 
                 // Ensure logs folder exists
                 if (!Directory.Exists(logsFolder))
                 {
-                    Directory.CreateDirectory(logsFolder!);
+                    Directory.CreateDirectory(logsFolder);
                 }
 
                 string now = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
@@ -336,8 +346,8 @@ namespace MarkdownViewer
             try
             {
                 string exePath = Application.ExecutablePath;
-                string? exeDir = Path.GetDirectoryName(exePath);
-                string updatePath = Path.Combine(exeDir!, PendingUpdateFile);
+                string exeDir = Path.GetDirectoryName(exePath) ?? Environment.CurrentDirectory;
+                string updatePath = Path.Combine(exeDir, PendingUpdateFile);
 
                 if (!File.Exists(updatePath))
                 {
@@ -445,8 +455,8 @@ namespace MarkdownViewer
         /// </summary>
         private static string GetLastCheckFilePath()
         {
-            string? exeDir = Path.GetDirectoryName(Application.ExecutablePath);
-            string logsFolder = Path.Combine(exeDir!, "logs");
+            string exeDir = Path.GetDirectoryName(Application.ExecutablePath) ?? Environment.CurrentDirectory;
+            string logsFolder = Path.Combine(exeDir, "logs");
             return Path.Combine(logsFolder, LastCheckFile);
         }
 
@@ -455,8 +465,8 @@ namespace MarkdownViewer
         /// </summary>
         private static string GetPendingUpdatePath()
         {
-            string? exeDir = Path.GetDirectoryName(Application.ExecutablePath);
-            return Path.Combine(exeDir!, PendingUpdateFile);
+            string exeDir = Path.GetDirectoryName(Application.ExecutablePath) ?? Environment.CurrentDirectory;
+            return Path.Combine(exeDir, PendingUpdateFile);
         }
 
         /// <summary>

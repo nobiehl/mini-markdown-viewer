@@ -26,8 +26,6 @@ namespace MarkdownViewer.Core.Presenters
             // Subscribe to view events
             _view.BackRequested += OnBackRequested;
             _view.ForwardRequested += OnForwardRequested;
-            _view.RefreshRequested += OnRefreshRequested;
-            _view.HomeRequested += OnHomeRequested;
 
             Log.Debug("NavigationPresenter created");
         }
@@ -76,16 +74,5 @@ namespace MarkdownViewer.Core.Presenters
             }
         }
 
-        private void OnRefreshRequested(object? sender, EventArgs e)
-        {
-            _webView.Reload();
-            Log.Debug("Page refreshed");
-        }
-
-        private void OnHomeRequested(object? sender, EventArgs e)
-        {
-            // Home functionality would navigate to a default or home file
-            Log.Debug("Home requested (not implemented)");
-        }
     }
 }

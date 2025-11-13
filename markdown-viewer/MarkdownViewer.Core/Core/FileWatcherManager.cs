@@ -27,6 +27,8 @@ namespace MarkdownViewer.Core
         /// <param name="filePath">Full path to the file to watch</param>
         public void Watch(string filePath)
         {
+            ArgumentNullException.ThrowIfNull(filePath);
+
             Log.Debug("FileWatcherManager: Starting to watch {FilePath}", filePath);
 
             try
@@ -34,10 +36,22 @@ namespace MarkdownViewer.Core
                 string? directory = Path.GetDirectoryName(filePath);
                 string fileName = Path.GetFileName(filePath);
 
+                if (string.IsNullOrEmpty(directory))
+                {
+                    Log.Warning("Could not determine directory for file: {FilePath}", filePath);
+                    return;
+                }
+
+                if (string.IsNullOrEmpty(fileName))
+                {
+                    Log.Warning("Could not determine file name for file: {FilePath}", filePath);
+                    return;
+                }
+
                 // Dispose old watcher if exists
                 _watcher?.Dispose();
 
-                _watcher = new FileSystemWatcher(directory!)
+                _watcher = new FileSystemWatcher(directory)
                 {
                     Filter = fileName,
                     NotifyFilter = NotifyFilters.LastWrite | NotifyFilters.Size
