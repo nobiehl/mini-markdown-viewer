@@ -398,90 +398,38 @@ Siehe `docs/TESTING-CHECKLIST.md` für detaillierte manuelle Test-Szenarien.
 
 #### 4.2 Release vorbereiten
 
-**KRITISCH: Alle Tests MÜSSEN vor Release ausgeführt werden!**
+**⚠️ KRITISCH: Lies IMMER die vollständige `docs/RELEASE-CHECKLIST.md` BEVOR du ein Release erstellst!**
 
-**1. Unit Tests ausführen:**
-```bash
-cd markdown-viewer/MarkdownViewer.Tests
-dotnet test --verbosity normal
-```
-- Alle Tests müssen grün sein (0 failed)
-- Test Coverage >= 80%
-- Bei Fehlern: Release NICHT erstellen!
+Die `docs/RELEASE-CHECKLIST.md` ist **PFLICHT** vor jedem Release und enthält:
+- 7 detaillierte Release-Phasen mit Checkboxen
+- Alle Test-Anforderungen (Unit Tests, UI Automation Tests)
+- Binary-Erstellung und -Validierung
+- **⚠️ KRITISCHE Binary-Name-Prüfung** (mehrfach schiefgegangen!)
+- Dokumentations-Anforderungen
+- Git & GitHub Upload-Prozess
+- Post-Release Validation
+- Lessons Learned & Quick Reference Card
 
-**2. UI Automation Tests ausführen:**
-```bash
-cd markdown-viewer/MarkdownViewer.Tests
-dotnet test --filter "FullyQualifiedName~UIAutomation" --verbosity normal
-```
-- **WICHTIG**: UI Tests verifizieren dass die Anwendung tatsächlich startet
-- Würde Fehler wie "138 KB broken binary" sofort erkennen
-- Bei Fehlern: Release NICHT erstellen!
+**Quick Summary (vollständige Details in RELEASE-CHECKLIST.md):**
 
-**3. Publish Build erstellen und testen:**
-```bash
-cd markdown-viewer/MarkdownViewer
-dotnet publish -c Release -r win-x64 --self-contained false \
-  -p:PublishSingleFile=true \
-  -p:IncludeNativeLibrariesForSelfExtract=true -o publish
+1. ✅ **Tests** → Unit + UI Automation (alle müssen bestehen!)
+2. ✅ **Binary** → `dotnet publish` (~3.3 MB, NICHT 138 KB!)
+3. ⚠️ **Binary Name** → `MarkdownViewer.exe` (KEINE Versionsnummer!)
+4. ✅ **Dokumentation** → CHANGELOG.md, README.md, Version Bump
+5. ✅ **Git** → Commit + Tag + Push
+6. ✅ **GitHub Release** → NOCHMAL Binary Name prüfen!
+7. ✅ **Validierung** → Download testen
 
-# WICHTIG: Verifiziere Dateigröße (sollte ~3.3 MB sein, NICHT 138 KB!)
-ls -lh publish/MarkdownViewer.exe
+**Bei jedem Release:**
+- [ ] `docs/RELEASE-CHECKLIST.md` vollständig durchgehen
+- [ ] Alle Checkboxen abhaken
+- [ ] Bei Unsicherheit: Checklist nochmal lesen!
 
-# ⚠️ KRITISCH: Binary umbenennen für GitHub Release
-# Update-Mechanismus erwartet "MarkdownViewer.exe" OHNE Versionsnummer!
-cp publish/MarkdownViewer.exe ./MarkdownViewer.exe
-```
-- **Dateigröße prüfen**: ~3.3 MB ist korrekt, 138 KB ist FALSCH (Managed DLL statt EXE)
-- **Binary manuell testen**: Doppelklick, öffnet Datei, keine Crashes, UI funktioniert
-- **⚠️ KRITISCH - Binary Name**: Muss `MarkdownViewer.exe` heißen, NICHT `MarkdownViewer-vX.Y.Z.exe`!
-  - Update-Mechanismus sucht nach Asset mit Namen "MarkdownViewer.exe"
-  - Falsche Namen brechen Auto-Update Feature komplett!
-  - Dies ist bereits MEHRFACH schief gegangen - NIE vergessen!
-
-**4. KRITISCH: Dokumentation aktualisieren (VOR Release!):**
-
-**4.1 Version Bump:**
-- `Program.cs`: `private const string Version = "X.Y.Z";`
-- `MainForm.cs`: `private const string Version = "X.Y.Z";`
-- `README.md`: Version Badge aktualisieren
-
-**4.2 CHANGELOG.md aktualisieren (PFLICHT!):**
-```markdown
-## [X.Y.Z] - YYYY-MM-DD
-
-### Added
-- Feature 1 mit Beschreibung
-- Feature 2 mit Beschreibung
-
-### Fixed
-- Bug 1 mit Beschreibung
-
-### Changed
-- Änderung 1 mit Beschreibung
-
-### Technical
-- Build info, Tests, etc.
-```
-**WICHTIG:**
-- CHANGELOG.md ist die **einzige Quelle der Wahrheit** für Release-Informationen
-- **KEINE separaten RELEASE-NOTES-vX.Y.Z.md Dateien mehr erstellen!**
-- Alle Release-Informationen gehen in CHANGELOG.md
-- GitHub Release Notes können aus CHANGELOG.md kopiert werden
-
-**4.3 README.md aktualisieren:**
-- Version Badge (nur Nummer, keine Features!)
-- Binary Size Badge falls geändert
-- Test Count Badge
-- Quick Start Section: Download-Link auf neue Version
-- Installation Commands: `MarkdownViewer-vX.Y.Z.exe` statt generisch
-
-**4.4 impl_progress.md aktualisieren:**
-```bash
-printf "\n## [$(date +%Y-%m-%d)] Session - Feature Name\n\n**Status:** ✅ Completed\n\n..." >> docs/impl_progress.md
-```
-
-**5. Erst nach erfolgreichen Tests UND Dokumentation: Release erstellen**
+**⚠️ MEHRFACH SCHIEFGEGANGEN:**
+- Binary mit Versionsnummer (`MarkdownViewer-v1.9.0.exe`) → bricht Auto-Update!
+- Binary MUSS `MarkdownViewer.exe` heißen (ohne Version)
+- Update-Mechanismus sucht nach diesem exakten Namen
+- Siehe RELEASE-CHECKLIST.md Phase 3.1 für Details
 
 ## Dokumentationsstruktur
 
@@ -509,6 +457,7 @@ docs/
 docs/
 ├── DEVELOPMENT.md            # Developer Setup, Build, Dependencies, lokale Entwicklung
 ├── DEPLOYMENT-GUIDE.md       # Release-Prozess, Publishing, Binary-Erstellung
+├── RELEASE-CHECKLIST.md      # ⚠️ PFLICHT-Checkliste vor jedem Release (7 Phasen)
 ├── TESTING-CHECKLIST.md      # Manuelle Integration/E2E Test-Szenarien
 ```
 
@@ -663,26 +612,18 @@ graph TD
 - [ ] Relevante Doku angepasst
 
 ### Vor jedem Release:
-- [ ] **Alle Unit Tests ausgeführt und bestanden** (dotnet test) - KRITISCH!
-- [ ] **Alle UI Automation Tests ausgeführt und bestanden** - KRITISCH!
-  - UI Tests verifizieren dass die App tatsächlich startet
-  - Würde broken binaries (138 KB statt 3.3 MB) sofort erkennen
-- [ ] **Publish Build erstellt mit dotnet publish** (NICHT dotnet build!) - KRITISCH!
-  - Befehl: `dotnet publish -c Release -r win-x64 --self-contained false -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true`
-  - Output aus `publish/` Ordner verwenden, NICHT aus `bin/Release/`
-- [ ] **Binary Größe verifiziert** (~3.3 MB korrekt, 138 KB = FEHLER!) - KRITISCH!
-- [ ] **Published Binary manuell getestet** (startet, öffnet Dateien, keine Crashes, UI funktioniert) - KRITISCH!
-- [ ] **⚠️ Binary Name korrekt** (MUSS "MarkdownViewer.exe" heißen, KEINE Versionsnummer!) - KRITISCH!
-  - Update-Mechanismus sucht nach "MarkdownViewer.exe"
-  - "MarkdownViewer-v1.8.1.exe" bricht Auto-Update!
-  - MEHRFACH schief gegangen - absolute Pflicht-Prüfung!
-- [ ] **Code kompiliert mit 0 Errors und 0 Warnings** (KRITISCH!)
-- [ ] Test Coverage >= 80%
-- [ ] Alle Features dokumentiert
-- [ ] Glossar konsolidiert
-- [ ] Doku synchronisiert
-- [ ] Manual Testing durchgeführt
-- [ ] CHANGELOG.md vollständig
+
+**⚠️ PFLICHT: Vollständige `docs/RELEASE-CHECKLIST.md` durcharbeiten!**
+
+**Quick Summary (vollständige Checkliste in RELEASE-CHECKLIST.md):**
+- [ ] Alle Tests bestanden (Unit + UI Automation)
+- [ ] Binary mit `dotnet publish` erstellt (~3.3 MB)
+- [ ] ⚠️ Binary heißt `MarkdownViewer.exe` (KEINE Version!)
+- [ ] Binary manuell getestet
+- [ ] Code: 0 Errors, 0 Warnings
+- [ ] Dokumentation vollständig (CHANGELOG.md, README.md, etc.)
+- [ ] Git Commit + Tag + Push
+- [ ] GitHub Release mit korrektem Binary-Namen
 
 ### Code Quality Standards:
 - **NIEMALS** mit Warnungen releasen
@@ -734,14 +675,11 @@ dotnet test /p:CollectCoverage=true /p:CoverletOutputFormat=lcov
 - ❌ **Abhängige Tasks parallel ausführen** (Agent 2 braucht Ergebnis von Agent 1)
 - ❌ **Agenten sequentiell starten** (verliert Geschwindigkeitsvorteil)
 - ❌ **Gemeinsame Dateien von mehreren Agenten bearbeiten** (Merge-Hölle)
-- ❌ **Release ohne UI Automation Tests erstellen** (würde broken binaries erkennen!)
-- ❌ **dotnet build statt dotnet publish verwenden** (erzeugt 138 KB DLL statt 3.3 MB EXE)
-- ❌ **Binary-Größe nicht prüfen vor Upload** (138 KB ist offensichtlich falsch, sollte ~3.3 MB sein)
-- ❌ **Binary aus bin/Release/ statt publish/ verwenden** (Managed DLL statt Self-Contained EXE)
-- ❌ **⚠️ KRITISCH: Binary mit Versionsnummer hochladen** (MarkdownViewer-v1.8.1.exe → bricht Update-Mechanismus!)
-  - Update-Mechanismus sucht nach Asset "MarkdownViewer.exe" OHNE Versionsnummer
-  - Binary MUSS "MarkdownViewer.exe" heißen, sonst funktioniert Auto-Update nicht
-  - Dies ist MEHRFACH schief gegangen - absolute Pflicht-Prüfung vor Release!
+- ❌ **Release-Fehler machen** → Siehe `docs/RELEASE-CHECKLIST.md` "Lessons Learned" für Details:
+  - Binary mit Versionsnummer hochladen
+  - dotnet build statt dotnet publish
+  - Binary-Größe nicht prüfen (138 KB statt 3.3 MB)
+  - UI Automation Tests nicht ausführen
 - ❌ **"Ich lokalisiere später"** (wird GARANTIERT vergessen, führt zu 20+ nachträglich zu lokalisierenden Strings!)
 - ❌ **Hardcoded UI-Strings schreiben** (Button.Text = "Click me" statt _localization.GetString())
 - ❌ **Übersetzungen manuell machen** (6-7 Agenten parallel sind 10x schneller!)
@@ -812,10 +750,20 @@ Nach diesem Dokument:
 
 ---
 
-**Version:** 2.3 (Lokalisierung als Teil des Workflows)
+**Version:** 2.4 (Release-Prozess konsolidiert)
 **Erstellt:** 2025-11-05
-**Aktualisiert:** 2025-01-11
+**Aktualisiert:** 2025-11-13
 **Status:** Active
+
+**Änderungen in v2.4:**
+- **Phase 4.2 NEU:** Vollständig überarbeitet - verweist jetzt auf `docs/RELEASE-CHECKLIST.md`
+  - Entfernt: Redundante detaillierte Release-Anweisungen
+  - Hinzugefügt: Quick Summary mit Verweis auf vollständige Checklist
+  - RELEASE-CHECKLIST.md ist jetzt Single Source of Truth für Release-Prozess
+- **Quality Gates:** "Vor jedem Release" Sektion stark gekürzt, verweist auf RELEASE-CHECKLIST.md
+- **Lessons Learned:** Release-Fehler konsolidiert mit Verweis auf RELEASE-CHECKLIST.md
+- **Dokumentationsstruktur:** RELEASE-CHECKLIST.md hinzugefügt zu Developer Documentation
+- **Motivation:** Nach mehrfachen Release-Fehlern (v1.9.0 Binary mit Versionsnummer) ist eine dedizierte, detaillierte Release-Checklist notwendig
 
 **Änderungen in v2.3:**
 - **Phase 2.2:** Lokalisierungs-Hinweis während Implementierung
