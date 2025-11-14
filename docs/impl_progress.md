@@ -2198,3 +2198,139 @@ Why custom Control instead of RichTextBox:
 - [ ] Release erstellen
 
 ---
+
+## [2025-11-13] Session - v1.9.1: Critical Bug Fix - Version Mismatch
+
+**Status:** ✅ Completed
+
+**Bug Discovery:** Critical version mismatch causing false update notifications
+
+**What was the problem:**
+
+User reported that after installing v1.9.0, the update checker always showed "update available" with version "v1.9.0", allowing users to download and install the same version repeatedly. This affected both manual update checks (StatusBar button) and automatic 7-day update checks.
+
+**Root Cause Analysis:**
+
+Investigation revealed TWO different version constants in the codebase:
+1. **Program.cs line 28**: `private const string Version = "1.8.1";` ❌ (OUTDATED)
+2. **MainForm.cs line 29**: `private const string Version = "1.9.0";` ✅ (CORRECT)
+
+**Impact:**
+- Program.cs handles update checking via UpdateChecker.cs
+- `CheckForUpdatesAsync(Version)` was called with "1.8.1" instead of "1.9.0"
+- GitHub API returned latest release: "v1.9.0"
+- Version comparison: `1.8.1 < 1.9.0` → "Update available!" ✅ (false positive)
+- Users with v1.9.0 saw false update notification every 7 days
+- Could download and install same version repeatedly
+
+**How it happened:**
+- During v1.9.0 release, MainForm.cs was updated to "1.9.0"
+- Program.cs was NOT updated (remained at "1.8.1" from previous release)
+- UpdateChecker.cs uses version from Program.cs, not MainForm.cs
+- Bug was not caught during manual testing (would require waiting 7 days or clicking update button)
+
+**Fix Applied:**
+
+1. **Version Synchronization**:
+   - Updated Program.cs line 28: `"1.8.1"` → `"1.9.1"`
+   - Updated MainForm.cs line 29: `"1.9.0"` → `"1.9.1"`
+   - Both files now synchronized to prevent future mismatches
+
+2. **Documentation Updates**:
+   - CHANGELOG.md: Added comprehensive v1.9.1 entry with bug description
+   - README.md: Updated version badge (1.9.0 → 1.9.1) and download link
+   - USER-GUIDE.md: Updated header version (1.5.2 → 1.9.1)
+   - impl_progress.md: This session entry
+   - All version references verified and updated
+
+3. **Process Improvements**:
+   - Added version verification to RELEASE-CHECKLIST.md Phase 2
+   - Prevents future version mismatches during releases
+
+**Build Verification:**
+```bash
+cd markdown-viewer/MarkdownViewer
+dotnet build --configuration Release
+```
+**Result:** ✅ 0 errors, 0 warnings
+
+**Metrics:**
+- **Files modified:** 5 files
+  - Program.cs: 1 line (version constant)
+  - MainForm.cs: 1 line (version constant)
+  - CHANGELOG.md: ~50 lines (v1.9.1 entry)
+  - README.md: 2 lines (version badge + download link)
+  - USER-GUIDE.md: 1 line (header version)
+  - impl_progress.md: This entry
+- **Lines changed:** ~55 lines total
+- **Build:** 0 errors, 0 warnings
+- **Test coverage:** No new tests needed (bug in version constant, not logic)
+
+**Why This is Critical:**
+
+This bug affected **ALL users** running v1.9.0:
+- ⚠️ Every 7 days: False "update available" notification
+- ⚠️ Manual update check: Always shows "v1.9.0 available" even when already installed
+- ⚠️ Confusing UX: Users think they need to update when they don't
+- ⚠️ Wasted bandwidth: Users re-download same version repeatedly
+
+**Prevention Measures:**
+
+1. **RELEASE-CHECKLIST.md Phase 2**: Added version verification step
+   - ✅ Check Program.cs version matches release version
+   - ✅ Check MainForm.cs version matches release version
+   - ✅ Verify both constants are identical
+
+2. **Future Improvement** (TODO for v2.0+):
+   - Centralize version in single location (AssemblyInfo.cs or shared constant)
+   - Both Program.cs and MainForm.cs reference same source
+   - Eliminates possibility of version mismatch
+
+**Lessons Learned:**
+
+1. **Version Management**: Having version constants in multiple files is error-prone
+   - Root cause: Duplication of version information
+   - Solution: Centralize version in future releases
+
+2. **Release Testing**: Version mismatch not caught by manual testing
+   - Reason: Requires clicking update button or waiting 7 days
+   - Solution: Add automated test for version constant synchronization
+
+3. **Grep is your friend**: Quick search revealed the problem:
+   ```bash
+   grep -rn "const string Version" --include="*.cs"
+   # Found TWO different versions immediately
+   ```
+
+4. **Documentation First**: User emphasized "aber erst wenn du wirklich alle dokumente **RICHTIG** aktualisiert hast"
+   - Updated ALL documentation before proceeding to release
+   - Prevents incomplete releases
+
+**Version Comparison Logic (for reference):**
+```csharp
+// UpdateChecker.cs lines 128-134
+Version current = ParseVersion(currentVersion);  // Was "1.8.1" instead of "1.9.0"
+Version latest = ParseVersion(release.TagName);  // "v1.9.0" from GitHub
+
+bool updateAvailable = latest > current;         // 1.9.0 > 1.8.1 → true (false positive!)
+```
+
+**Upgrade Path:**
+- ✅ **Drop-in replacement**: Just replace MarkdownViewer.exe
+- ✅ **Critical fix**: Update checker now works correctly
+- ✅ **No data loss**: All settings and themes preserved
+- ✅ **Immediate benefit**: No more false update notifications
+
+**Release Type:** Hotfix (Patch version bump: 1.9.0 → 1.9.1)
+
+**Next Steps:**
+- [x] All documentation updated correctly
+- [x] Version constants synchronized
+- [x] Build verified (0 errors)
+- [ ] Git commit with fix
+- [ ] Create GitHub release v1.9.1
+- [ ] Verify update mechanism works correctly with v1.9.1
+
+**User Request Fulfilled:** "ok, mach ne 1.9.1 draus. aber erst wenn du wirklich alle dokumente **RICHTIG** aktualisiert hast" ✅
+
+---

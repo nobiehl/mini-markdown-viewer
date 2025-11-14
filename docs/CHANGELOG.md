@@ -7,6 +7,50 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.9.1] - 2025-11-13
+
+### Fixed
+- **Critical Bug: Version Mismatch in Update Checker** (Program.cs:28)
+  - **Problem**: Program.cs had outdated version "1.8.1" while MainForm.cs had "1.9.0"
+  - **Impact**: Update checker always showed "update available" even when user had latest version
+  - **Root Cause**: Version constant in Program.cs (line 28) not updated during v1.9.0 release
+  - **Affected Components**:
+    - Manual update button (StatusBar) - showed false updates
+    - Automatic 7-day update check - triggered false update notifications
+    - Users could download and install same version repeatedly
+  - **Fix**: Synchronized both version constants to "1.9.1"
+  - **Prevention**: Added version check to RELEASE-CHECKLIST.md Phase 2
+
+### Technical
+- Updated Program.cs line 28: `Version = "1.8.1"` → `Version = "1.9.1"`
+- Updated MainForm.cs line 29: `Version = "1.9.0"` → `Version = "1.9.1"`
+- Both files now in sync to prevent future mismatches
+- Version comparison logic: `ParseVersion(currentVersion)` vs `ParseVersion(release.TagName)`
+- Build: 0 errors, 0 warnings
+
+### Files Changed
+- Program.cs: Version constant updated (line 28)
+- MainForm.cs: Version constant updated (line 29)
+- CHANGELOG.md: This entry
+- README.md: Version badge updated to v1.9.1
+- USER-GUIDE.md: Version updated to v1.9.1
+- impl_progress.md: Bug discovery session documented
+
+### Why This is Critical
+This bug affected **all users** running v1.9.0:
+- Every 7 days: False "update available" notification
+- Manual update check: Always shows "v1.9.0 available" even when already installed
+- Confusing UX: Users think they need to update when they don't
+- Wasted bandwidth: Users re-download same version
+
+### Upgrade from v1.9.0
+- ✅ **Drop-in replacement**: Just replace the `.exe`
+- ✅ **Critical fix**: Update checker now works correctly
+- ✅ **No data loss**: All settings and themes preserved
+- ✅ **Immediate benefit**: No more false update notifications
+
+---
+
 ## [1.9.0] - 2025-11-12
 
 ### Added

@@ -2,7 +2,7 @@
 
 Lightweight Windows desktop viewer for Markdown files with themes, localization, navigation, and search. Full Windows Explorer integration included.
 
-![Version](https://img.shields.io/badge/version-1.9.0-blue)
+![Version](https://img.shields.io/badge/version-1.9.1-blue)
 ![.NET](https://img.shields.io/badge/.NET-8.0-purple)
 ![Size](https://img.shields.io/badge/size-3.3_MB-green)
 ![Languages](https://img.shields.io/badge/languages-8-orange)
@@ -139,7 +139,7 @@ Lightweight Windows desktop viewer for Markdown files with themes, localization,
 
 ### Download & Run
 
-1. **Download** the latest release: [MarkdownViewer.exe](https://github.com/nobiehl/mini-markdown-viewer/releases/download/v1.9.0/MarkdownViewer.exe) (3.3 MB)
+1. **Download** the latest release: [MarkdownViewer.exe](https://github.com/nobiehl/mini-markdown-viewer/releases/download/v1.9.1/MarkdownViewer.exe) (3.3 MB)
 2. **Run** directly - no installation needed!
 
 ### Option 1: File Open Dialog
