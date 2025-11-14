@@ -2,12 +2,12 @@
 
 Lightweight Windows desktop viewer for Markdown files with themes, localization, navigation, and search. Full Windows Explorer integration included.
 
-![Version](https://img.shields.io/badge/version-1.8.0-blue)
+![Version](https://img.shields.io/badge/version-1.9.0-blue)
 ![.NET](https://img.shields.io/badge/.NET-8.0-purple)
 ![Size](https://img.shields.io/badge/size-3.3_MB-green)
 ![Languages](https://img.shields.io/badge/languages-8-orange)
 ![Themes](https://img.shields.io/badge/themes-4-purple)
-![Tests](https://img.shields.io/badge/tests-247_passing-success)
+![Tests](https://img.shields.io/badge/tests-283_passing-success)
 
 ## Features
 
@@ -72,6 +72,27 @@ Lightweight Windows desktop viewer for Markdown files with themes, localization,
 - **Keyboard Shortcuts**: Ctrl+F (open), Enter/Shift+Enter (navigate), Esc (close)
 - **mark.js Integration**: Fast highlighting with smooth scrolling
 
+#### 🔬 Raw Data View (v1.9.0) - Developer Tool
+- **Split-View Panel**: Markdown source (left) and generated HTML (right) side-by-side
+- **Flicker-Free Row Highlighting**:
+  - Mouse-over highlighting (light) for easy line tracking
+  - Cursor line highlighting (strong, very visible) for current selection
+  - Zero flickering with single paint cycle rendering
+- **Integrated Line Numbers**:
+  - Professional gutter display (50px width, right-aligned)
+  - Perfect scroll synchronization
+  - Theme-aware coloring
+- **Quick Access**: F12 keyboard shortcut or StatusBar button (file-text icon)
+- **Theme-Aware**: Adapts to all 4 themes (Dark, Light, Solarized, Draeger)
+- **State Persistence**: Remembers visibility and splitter position
+- **Read-Only Mode**: Stays a viewer, not an editor
+- **Instant Toggle**: <1ms response time
+- **Use Cases**:
+  - Debug Markdown rendering issues
+  - Learn how Markdown translates to HTML
+  - Inspect generated HTML for custom CSS
+  - Educational tool for Markdown beginners
+
 ### Windows Integration
 - ✅ **Double-click** .md files → opens in viewer
 - ✅ **Right-click context menu** ("Open with Markdown Viewer")
@@ -92,30 +113,30 @@ Lightweight Windows desktop viewer for Markdown files with themes, localization,
 - 🧹 **Clean uninstall**: `--uninstall` removes everything
 - 🌍 **Multi-language**: 8 languages supported
 - 🎨 **Themeable**: 4 built-in themes + custom themes
-- 🧪 **Well-tested**: 247 passing unit tests (v1.8.0)
+- 🧪 **Well-tested**: 283 passing unit tests (v1.9.0)
 
 ## Quick Start
 
 ### Download & Run
 
-1. **Download** the latest release: [MarkdownViewer-v1.8.0.exe](https://github.com/nobiehl/mini-markdown-viewer/releases/tag/v1.8.0) (3.3 MB)
+1. **Download** the latest release: [MarkdownViewer.exe](https://github.com/nobiehl/mini-markdown-viewer/releases/download/v1.9.0/MarkdownViewer.exe) (3.3 MB)
 2. **Run** directly - no installation needed!
 
 ### Option 1: File Open Dialog
 ```bash
-.\MarkdownViewer-v1.8.0.exe
+.\MarkdownViewer.exe
 # Opens dialog to select a .md file
 ```
 
 ### Option 2: Open File Directly
 ```bash
-.\MarkdownViewer-v1.8.0.exe README.md
+.\MarkdownViewer.exe README.md
 ```
 
 ### Option 3: Windows Explorer Integration (Recommended)
 ```bash
 # Install all integration points
-.\MarkdownViewer-v1.8.0.exe --install
+.\MarkdownViewer.exe --install
 
 # Then: Double-click .md files in Explorer
 # Or: Right-click → "Open with Markdown Viewer"
@@ -126,7 +147,7 @@ Lightweight Windows desktop viewer for Markdown files with themes, localization,
 
 ### Install (recommended)
 ```bash
-.\MarkdownViewer-v1.8.0.exe --install
+.\MarkdownViewer.exe --install
 ```
 
 **What gets installed:**
@@ -139,7 +160,7 @@ Lightweight Windows desktop viewer for Markdown files with themes, localization,
 
 ### Uninstall
 ```bash
-.\MarkdownViewer-v1.8.0.exe --uninstall
+.\MarkdownViewer.exe --uninstall
 ```
 
 Removes all registry entries and shortcuts. The executable remains and can be deleted manually.
