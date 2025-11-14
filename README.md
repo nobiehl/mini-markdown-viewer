@@ -72,6 +72,32 @@ Lightweight Windows desktop viewer for Markdown files with themes, localization,
 - **Keyboard Shortcuts**: Ctrl+F (open), Enter/Shift+Enter (navigate), Esc (close)
 - **mark.js Integration**: Fast highlighting with smooth scrolling
 
+#### 🎨 Theme-Aware Icons (v1.6.0)
+- **Dynamic Icon Generation**: Icons automatically adapt to current theme
+- **Proper Contrast**: Visible on all backgrounds (dark/light)
+- **SVG-Based Rendering**: Crisp icons at any size
+- **StatusBar Integration**: Update, Explorer, Info, Help icons themed
+
+#### 🏗️ Architecture Refactoring (v1.7.0)
+- **Layered Architecture**: Clean separation of concerns
+  - **MarkdownViewer.Core**: Business logic library (rendering, file watching, settings)
+  - **MarkdownViewer**: WinForms UI layer (thin wrapper)
+  - **Benefits**: Better testability, code reuse, maintainability
+
+#### 📢 Update Notifications (v1.8.0)
+- **UpdateNotificationBar**: Non-invasive notification above StatusBar
+- **3 Action Buttons**: Show Release Notes, Install Update, Ignore
+- **Theme-Aware Colors**: Adapts to light/dark theme
+- **Fully Localized**: All 8 supported languages
+
+#### 📝 Extended Markdown Features (v1.8.0)
+- **Auto Table of Contents**: Generate TOC from `[TOC]` placeholder
+- **Emoji Support**: Convert emoji codes (`:smile:`, `:rocket:`) to Unicode
+- **Code Diff Highlighting**: Green for added (+), red for removed (-) lines
+- **Admonitions/Callouts**: Styled boxes for notes, tips, warnings, danger
+  - 5 types: `note`, `info`, `tip`, `warning`, `danger`
+  - Colored borders and Unicode icons (ℹ️ 💡 ✅ ⚠️ 🚫)
+
 #### 🔬 Raw Data View (v1.9.0) - Developer Tool
 - **Split-View Panel**: Markdown source (left) and generated HTML (right) side-by-side
 - **Flicker-Free Row Highlighting**:
@@ -99,12 +125,6 @@ Lightweight Windows desktop viewer for Markdown files with themes, localization,
 - ✅ **"Open With" dialog** integration
 - ✅ **"Send To" menu** integration
 - ✅ **File open dialog** when started without arguments
-
-### Architecture (v1.7.0)
-- 🏗️ **Layered Architecture**: Clean separation of concerns
-  - **MarkdownViewer.Core**: Business logic library (rendering, file watching, settings)
-  - **MarkdownViewer**: WinForms UI layer (thin wrapper)
-  - **Benefits**: Better testability, code reuse, maintainability
 
 ### Properties
 - 🚀 **Fast**: 3.3 MB single-file executable
