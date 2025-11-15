@@ -2,12 +2,12 @@
 
 Lightweight Windows desktop viewer for Markdown files with themes, localization, navigation, and search. Full Windows Explorer integration included.
 
-![Version](https://img.shields.io/badge/version-1.9.1-blue)
+![Version](https://img.shields.io/badge/version-1.10.0-blue)
 ![.NET](https://img.shields.io/badge/.NET-8.0-purple)
 ![Size](https://img.shields.io/badge/size-3.3_MB-green)
 ![Languages](https://img.shields.io/badge/languages-8-orange)
 ![Themes](https://img.shields.io/badge/themes-4-purple)
-![Tests](https://img.shields.io/badge/tests-283_passing-success)
+![Tests](https://img.shields.io/badge/tests-284_passing-success)
 
 ## Features
 
@@ -133,13 +133,13 @@ Lightweight Windows desktop viewer for Markdown files with themes, localization,
 - 🧹 **Clean uninstall**: `--uninstall` removes everything
 - 🌍 **Multi-language**: 8 languages supported
 - 🎨 **Themeable**: 4 built-in themes + custom themes
-- 🧪 **Well-tested**: 283 passing unit tests (v1.9.0)
+- 🧪 **Well-tested**: 284 passing unit tests (v1.10.0)
 
 ## Quick Start
 
 ### Download & Run
 
-1. **Download** the latest release: [MarkdownViewer.exe](https://github.com/nobiehl/mini-markdown-viewer/releases/download/v1.9.1/MarkdownViewer.exe) (3.3 MB)
+1. **Download** the latest release: [MarkdownViewer.exe](https://github.com/nobiehl/mini-markdown-viewer/releases/download/v1.10.0/MarkdownViewer.exe) (3.3 MB)
 2. **Run** directly - no installation needed!
 
 ### Option 1: File Open Dialog
@@ -224,7 +224,7 @@ $$
 - **Limits:** `$\lim_{x \to \infty} \frac{1}{x} = 0$`
 - **Derivatives:** `$\frac{d}{dx}$`, `$\frac{\partial f}{\partial x}$`
 
-**See `samples/math-examples.md` and `samples/test-math.md` for comprehensive examples!**
+**See `markdown-viewer/samples/math-examples.md` and `markdown-viewer/samples/test-math.md` for comprehensive examples!**
 
 ## Diagram Support
 
@@ -274,7 +274,7 @@ Bob --> Alice: Hi!
 - Object Diagrams
 - Deployment Diagrams
 
-**See `test-diagrams.md` for examples!**
+**See `markdown-viewer/samples/test-diagrams.md` for examples!**
 
 ## Command-Line Options
 
@@ -371,11 +371,13 @@ MarkdownViewer.exe document.md --log-level Debug
 ```
 mini-markdown-viewer/
 ├── markdown-viewer/
-│   └── MarkdownViewer/
-│       ├── Program.cs              # Entry point, CLI handling, registry
-│       ├── MainForm.cs             # Main window, WebView2, rendering
-│       └── MarkdownViewer.csproj   # Project configuration
-├── test-diagrams.md                # Test file with Mermaid & PlantUML
+│   ├── MarkdownViewer/             # Main application
+│   │   ├── Program.cs              # Entry point, CLI handling, registry
+│   │   ├── MainForm.cs             # Main window, WebView2, rendering
+│   │   └── MarkdownViewer.csproj   # Project configuration
+│   └── samples/                    # Sample Markdown files
+│       └── test-diagrams.md        # Mermaid & PlantUML examples
+├── docs/                           # Documentation
 └── README.md                       # This file
 ```
 
@@ -399,7 +401,7 @@ dotnet publish -c Release -r win-x64 --self-contained false -p:PublishSingleFile
 ### Development Build
 ```bash
 dotnet build -c Debug
-dotnet run -- test-diagrams.md
+dotnet run -- ../samples/test-diagrams.md
 ```
 
 ## Architecture
@@ -495,14 +497,23 @@ A: Yes, but run `--install` again afterwards so registry entries reference the c
 
 ### User Documentation
 - [User Guide](docs/USER-GUIDE.md) - Complete feature guide with examples
+- [Feature Showcase](docs/FEATURE-SHOWCASE.md) - **NEW!** Interactive demo of all 50+ features with code examples
 - [Changelog](docs/CHANGELOG.md) - Version history and release notes
 
 ### Release Notes
-- [v1.5.2](docs/RELEASE-NOTES-v1.5.2.md) - Update check retry fix + 7-day interval
-- [v1.5.0](docs/RELEASE-NOTES-v1.5.0.md) - Testing & Documentation
-- [v1.4.0](docs/RELEASE-NOTES-v1.4.0.md) - Navigation + Search
-- [v1.3.0](docs/RELEASE-NOTES-v1.3.0.md) - Localization + StatusBar
-- [v1.2.0](docs/RELEASE-NOTES-v1.2.0.md) - Themes + Architecture
+All release notes are documented in the [Changelog](docs/CHANGELOG.md). Recent versions:
+- [v1.10.0](docs/CHANGELOG.md#1100---2025-11-14) - German resource file fixes (duplicate key resolution)
+- [v1.9.1](docs/CHANGELOG.md#191---2025-11-13) - Critical bug fix: Version mismatch in update checker
+- [v1.9.0](docs/CHANGELOG.md#190---2025-11-12) - Raw Data View with flicker-free row highlighting
+- [v1.8.1](docs/CHANGELOG.md#181---2025-01-11) - Bug fixes and performance improvements
+- [v1.8.0](docs/CHANGELOG.md#180---2025-01-11) - Extended Markdown features & Update notifications
+- [v1.7.0](docs/CHANGELOG.md#170---2025-11-08) - Architecture refactoring (layered architecture)
+- [v1.6.0](docs/CHANGELOG.md#160---2025-11-07) - Theme-aware icons
+- [v1.5.2](docs/CHANGELOG.md#152---2025-11-06) - Update check retry fix + 7-day interval
+- [v1.5.0](docs/CHANGELOG.md#150---2025-11-06) - Testing & Documentation
+- [v1.4.0](docs/CHANGELOG.md#140---2025-11-06) - Navigation + Search
+- [v1.3.0](docs/CHANGELOG.md#130---2025-11-05) - Localization + StatusBar
+- [v1.2.0](docs/CHANGELOG.md#120---2025-11-04) - Themes + Architecture
 
 ### Developer Documentation
 - [Development Guide](docs/DEVELOPMENT.md) - Technical documentation for developers

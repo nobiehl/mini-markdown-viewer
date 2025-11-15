@@ -7,6 +7,39 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.10.0] - 2025-11-14
+
+### Fixed
+- **Build Quality: Duplicate Resource Keys in German Localization**
+  - **Problem**: MSB3568 warnings about duplicate keys in `Strings.de.resx`
+  - **Impact**: Build produced 2 warnings, violating zero-warning policy
+  - **Affected Keys**:
+    - `FileNotFound` (conflicted with Program.cs general error string)
+    - `UpdateAvailable` (conflicted with MainForm.cs update checker string)
+  - **Fix**: Renamed to avoid conflicts
+    - `FileNotFound` → `FileNotFoundError` (line 196)
+    - `UpdateAvailable` → `StatusBarUpdateAvailable` (line 293)
+  - **Result**: Build now produces **0 errors, 0 warnings** ✅
+
+### Changed
+- Updated all documentation to reflect v1.10.0
+  - README.md: Version badge, test count badge, download link, changelog reference
+  - CHANGELOG.md: This entry
+  - All version references now point to v1.10.0
+
+### Technical
+- German resource file: 2 keys renamed to resolve MSB3568 warnings
+- Build: 0 errors, 0 warnings (down from 2 warnings)
+- Tests: 284 passing (100% success rate)
+- Binary: 3.3 MB single-file deployment
+
+### Files Changed
+- markdown-viewer/MarkdownViewer/Resources/Strings.de.resx: Renamed duplicate keys
+- README.md: Version badge, test count, download link, changelog reference updated
+- CHANGELOG.md: This entry
+
+---
+
 ## [1.9.1] - 2025-11-13
 
 ### Fixed
