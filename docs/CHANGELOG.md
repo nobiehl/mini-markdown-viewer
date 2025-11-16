@@ -7,6 +7,45 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.11.0] - 2025-11-16
+
+### Added
+- **Text Selection and Copy in Raw Data View**: Professional text selection and copy functionality
+  - Full text selection with mouse drag (both Markdown and HTML views)
+  - Ctrl+C keyboard shortcut for copying selected text
+  - Right-click context menu with "Copy" option
+  - Keyboard navigation: Ctrl+A (select all), Shift+Arrow (extend selection)
+  - Selection highlighting with theme-aware colors
+  - 6 new unit tests for text selection functionality
+
+### Changed
+- **CodeViewControl Refactoring**: Improved architecture and maintainability
+  - Migrated from custom-paint Control to RichTextBox-based implementation
+  - New LineNumberPanel component with synchronized scrolling
+  - Hover effects on line numbers for better UX
+  - Code reduction: -138 lines (408 lines → 270 lines)
+  - Improved separation of concerns (line numbers in separate component)
+  - Better performance and reliability with native RichTextBox selection
+
+### Technical
+- **Files changed**: 10 files
+  - CodeViewControl.cs: Complete refactor from custom paint to RichTextBox (+270/-408 lines)
+  - LineNumberPanel.cs: New component for line number display (176 lines)
+  - RawDataViewPanel.cs: Updated to use new CodeViewControl API
+  - CodeViewControlTests.cs: 6 new unit tests for text selection
+- **Lines of code**: +491/-250 lines (net +241 lines)
+- **Tests**: 6 new unit tests (all passing)
+- **Build**: 0 errors, 0 warnings
+- **Binary size**: ~3.3 MB (unchanged)
+
+### Files Changed
+- markdown-viewer/MarkdownViewer/UI/CodeViewControl.cs: RichTextBox refactor
+- markdown-viewer/MarkdownViewer/UI/LineNumberPanel.cs: New component (NEW)
+- markdown-viewer/MarkdownViewer/UI/RawDataViewPanel.cs: Integration updates
+- markdown-viewer/MarkdownViewer.Tests/Tests/UI/CodeViewControlTests.cs: New selection tests
+
+---
+
 ## [1.10.0] - 2025-11-14
 
 ### Fixed

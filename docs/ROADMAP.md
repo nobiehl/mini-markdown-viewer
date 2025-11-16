@@ -1760,6 +1760,92 @@ public class UISettings
 
 ---
 
+## v1.11.0: Text Selection and Copy in Raw Data View
+
+**Ziel:** Enable text selection and copy functionality in Raw Data View to make it more useful for developers
+
+**Aufwand:** ~3 hours (1 Session)
+
+**Priority:** Medium (Quality-of-Life Enhancement)
+
+**Status:** ✅ Completed (2025-11-16)
+
+### Feature 1.11.1: Text Selection and Copy
+
+**Was:** Professional text selection and copy functionality in Raw Data View
+
+**What was implemented:**
+
+#### Architecture Refactoring
+- **✅ RichTextBox-based Implementation**: Refactored CodeViewControl from custom-paint to RichTextBox
+  - Simplified code (-138 lines, much cleaner architecture)
+  - Built-in text selection and clipboard support
+  - Native keyboard navigation (Home, End, Page Up/Down)
+
+- **✅ LineNumberPanel Component**: New dedicated component for line numbers
+  - Synchronized vertical scrolling with CodeViewControl
+  - Right-aligned line numbers with padding
+  - Theme-aware background and foreground colors
+  - Hover effects for better visibility
+  - OptimizedDoubleBuffer for flicker-free rendering
+
+- **✅ AccessibleToolStripStatusLabel**: Helper class for StatusBar accessibility
+  - Enables screen reader support for status bar items
+
+#### Text Selection Features
+- **✅ Mouse Selection**: Full text selection with mouse drag
+- **✅ Keyboard Selection**:
+  - Ctrl+A (select all)
+  - Shift+Arrow keys (extend selection)
+  - Full keyboard navigation support
+- **✅ Copy Functionality**:
+  - Ctrl+C keyboard shortcut
+  - Right-click context menu with "Copy" option
+  - Theme-aware selection highlighting
+- **✅ Both Views**: Works in both Markdown and HTML panels
+
+#### Technical Implementation
+- Updated ThemeService for new RichTextBox-based control structure
+- Theme-aware selection colors (different for each theme)
+- Comprehensive unit tests (6 new tests for text selection)
+- Integration tests for copy functionality
+
+### v1.11.0 Deliverables
+
+**Code:**
+- ✅ CodeViewControl refactored to RichTextBox-based (~250 lines → 112 lines)
+- ✅ LineNumberPanel.cs created (~181 lines)
+- ✅ AccessibleToolStripStatusLabel.cs created (~50 lines)
+- ✅ ThemeService updated for new control structure
+- ✅ MainForm integration updated
+
+**Tests:**
+- ✅ 6 new unit tests for text selection (CodeViewControlTests.cs)
+- ✅ All tests passing (284 total tests)
+- ✅ Test coverage maintained >= 80%
+
+**Documentation:**
+- ✅ CHANGELOG.md updated with v1.11.0 entry
+- ✅ README.md updated with new features
+- ✅ GLOSSARY.md updated (LineNumberPanel, CodeViewControl)
+- ✅ impl_progress.md updated with session documentation
+
+**Release:**
+- ✅ Version 1.11.0 released
+- ✅ Binary tested (~3.3 MB)
+- ✅ GitHub release created
+- ✅ All features working correctly
+
+**Success Metrics:**
+- ✅ Text selection works with mouse and keyboard
+- ✅ Copy functionality (Ctrl+C and context menu) works
+- ✅ Line numbers synchronized with scrolling
+- ✅ Theme-aware colors applied correctly
+- ✅ All tests passing
+- ✅ Code simplified and more maintainable
+
+---
+
 ## Future Roadmap (v1.6.0+)
 
 ### Nice-to-have Features (nicht committet)

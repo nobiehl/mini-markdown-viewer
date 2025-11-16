@@ -3,7 +3,7 @@
 Definitions of all terms, classes, services, and concepts used in MarkdownViewer.
 
 **Alphabetical Order**
-**Last Updated:** 2025-11-06
+**Last Updated:** 2025-11-16
 
 ---
 
@@ -261,6 +261,23 @@ View interface for MainForm. Abstracts all UI interactions for testability.
 
 ---
 
+### LineNumberPanel
+Dedicated component for displaying line numbers in CodeViewControl with synchronized scrolling. Custom control that paints line numbers with right-aligned formatting in a 50px wide gutter.
+
+**File:** UI/LineNumberPanel.cs
+**Used by:** CodeViewControl
+**Features:**
+- Synchronized vertical scrolling with parent CodeViewControl
+- Right-aligned line numbers with padding
+- Theme-aware background and foreground colors
+- Fixed width (50px)
+- OptimizedDoubleBuffer for flicker-free rendering
+
+**Synchronization:** Subscribes to parent's VScroll event and matches scroll position
+**Since:** v1.11.0
+
+---
+
 ### MainPresenter
 Core presenter managing main window business logic.
 
@@ -386,27 +403,17 @@ Developer tool component for inspecting Markdown rendering. Displays Markdown so
 
 
 ### CodeViewControl
-Custom WinForms Control for displaying code/text with flicker-free row highlighting and integrated line numbers. Inherits from Control (not RichTextBox) to have full OnPaint() control for rendering everything in a single paint cycle.
+RichTextBox-based control for displaying code/text with line numbers and text selection support. Uses LineNumberPanel for synchronized line number display.
 
 **Features:**
-- Flicker-free row highlighting (mouse-over + cursor line)
-- Integrated line numbers (50px gutter, right-aligned)
-- Theme-aware colors for all elements
-- Single VScrollBar with MouseWheel support
-- Optimized rendering with OptimizedDoubleBuffer
+- Text selection and copying (Ctrl+A, Ctrl+C support)
+- Synchronized scrolling with LineNumberPanel
+- Theme-aware colors
+- Read-only mode (ReadOnly = true)
+- Horizontal and vertical scrollbars
 
 **File:** UI/CodeViewControl.cs
 **Used by:** RawDataViewPanel
-**Replaces:** HighlightedRichTextBox (obsolete)
-**Since:** v1.9.0
-
-### Row Highlighting
-Visual feedback in CodeViewControl that highlights the line under the mouse cursor (light) and the clicked/selected line (strong). Rendered in OnPaint() together with text to avoid flickering.
-
-**Colors:**
-- Mouse-over: Alpha 25 (light theme), Alpha 35 (dark theme)
-- Cursor line: Alpha 80 (light theme), Alpha 100 (dark theme)
-
-**Used in:** CodeViewControl
-**Since:** v1.9.0
+**Dependencies:** LineNumberPanel for line numbers
+**Since:** v1.11.0 (refactored from custom Control to RichTextBox)
 
