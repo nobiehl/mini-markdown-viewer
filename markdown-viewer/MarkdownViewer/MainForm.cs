@@ -26,7 +26,7 @@ namespace MarkdownViewer
     /// </summary>
     public class MainForm : Form, IMainView
     {
-        private const string Version = "1.9.1";
+        private const string Version = "1.10.0";
 
         // UI Components
         private WebView2 _webView = null!;
@@ -209,7 +209,7 @@ namespace MarkdownViewer
             // IMPORTANT: Must be initialized AFTER StatusBar so it appears above it (both use DockStyle.Bottom)
             InitializeUpdateNotificationBar();
 
-            // Initialize RawDataViewPanel (hidden by default, shown with F12 shortcut)
+            // Initialize RawDataViewPanel (hidden by default, shown via StatusBar button)
             InitializeRawDataViewPanel();
 
             // Initialize Theme Context Menu
@@ -861,8 +861,7 @@ namespace MarkdownViewer
                 // Restore visibility state from settings
                 if (_settings.UI.RawDataViewVisible)
                 {
-                    // Don't show immediately, will be toggled by user or restored on load
-                    // For now, keep hidden - user will press F12 to show
+                    // Don't show immediately, will be toggled by user via StatusBar button or restored on load
                 }
 
                 Log.Information("RawDataViewPanel initialized successfully");
@@ -875,7 +874,7 @@ namespace MarkdownViewer
 
         /// <summary>
         /// Toggles between normal WebView mode and raw data view mode.
-        /// F12 keyboard shortcut handler.
+        /// Triggered by StatusBar button click.
         /// </summary>
         private void ToggleRawDataView()
         {
@@ -1456,7 +1455,7 @@ Developed with:
                 // Create "More Tools" submenu (localized)
                 var toolsMenu = new ToolStripMenuItem(_localizationService.GetString("ContextMenuMoreTools"));
 
-                // Add "Show Raw Data (F12)" menu item (localized)
+                // Add "Show Raw Data" menu item (localized)
                 var rawDataMenuItem = new ToolStripMenuItem(_localizationService.GetString("RawDataViewShow"));
                 rawDataMenuItem.Click += (s, e) => ToggleRawDataView();
                 toolsMenu.DropDownItems.Add(rawDataMenuItem);
@@ -1572,14 +1571,6 @@ Developed with:
                 Log.Debug("F5 pressed");
                 RefreshRequested?.Invoke(this, EventArgs.Empty); // Trigger IMainView event
                 LoadMarkdownFile(_currentFilePath); // Reload current file
-                return true;
-            }
-
-            // F12: Toggle Raw Data View (v1.9.0)
-            if (keyData == Keys.F12)
-            {
-                Log.Debug("F12 pressed - Toggle Raw Data View");
-                ToggleRawDataView();
                 return true;
             }
 

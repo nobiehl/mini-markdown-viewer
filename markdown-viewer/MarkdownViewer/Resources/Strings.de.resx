@@ -327,7 +327,7 @@ Sie können nun .md-Dateien mit Doppelklick öffnen.</value>
     <comment>StatusBar indicator when file watcher is monitoring changes</comment>
   </data>
   <data name="RawDataViewActive" xml:space="preserve">
-    <value>🔬 Rohdaten-Ansicht aktiv (F12)</value>
+    <value>🔬 Rohdaten-Ansicht aktiv</value>
     <comment>StatusBar indicator when raw data view is visible</comment>
   </data>
   <!-- Theme Switcher Strings -->
@@ -477,7 +477,7 @@ Sie können nun .md-Dateien mit Doppelklick öffnen.</value>
   </data>
   <!-- RawDataView Strings (v1.9.0) -->
   <data name="RawDataViewShow" xml:space="preserve">
-    <value>Rohdaten anzeigen (F12)</value>
+    <value>Rohdaten anzeigen</value>
     <comment>Context menu item to show raw data view</comment>
   </data>
   <data name="RawDataViewHide" xml:space="preserve">

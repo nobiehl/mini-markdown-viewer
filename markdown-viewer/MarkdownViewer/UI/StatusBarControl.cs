@@ -33,7 +33,7 @@ namespace MarkdownViewer.UI
         // Status items
         private readonly ToolStripStatusLabel _updateStatus;
         private readonly ToolStripStatusLabel _explorerStatus;
-        private readonly ToolStripStatusLabel _rawDataViewButton;
+        private readonly AccessibleToolStripStatusLabel _rawDataViewButton;
         private readonly ToolStripDropDownButton _themeSelector;
         private readonly ToolStripDropDownButton _languageSelector;
         private readonly ToolStripStatusLabel _infoLabel;
@@ -139,7 +139,7 @@ namespace MarkdownViewer.UI
 
             _explorerStatus.Click += (s, e) => ExplorerClicked?.Invoke(this, EventArgs.Empty);
 
-            _rawDataViewButton = new ToolStripStatusLabel
+            _rawDataViewButton = new AccessibleToolStripStatusLabel
             {
                 Image = _iconFileText,
                 ToolTipText = _localization.GetString("RawDataViewShow"),
@@ -147,7 +147,9 @@ namespace MarkdownViewer.UI
                 AutoSize = true,
                 IsLink = true,
                 Padding = new Padding(5, 0, 5, 0),
-                Name = "RawDataViewButton" // For UI Automation
+                Name = "RawDataViewButton", // WinForms internal name
+                AccessibleNameValue = "RawDataViewButton", // For UI Automation
+                AccessibleDescriptionValue = "Open Raw Data View to inspect Markdown source and HTML output"
             };
 
             _rawDataViewButton.Click += (s, e) => RawDataViewClicked?.Invoke(this, EventArgs.Empty);

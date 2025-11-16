@@ -178,19 +178,13 @@ namespace MarkdownViewer.UI
             Color labelBackground = _isDarkTheme ? Color.FromArgb(45, 45, 45) : Color.FromArgb(240, 240, 240);
             Color lineNumberForeground = _isDarkTheme ? Color.FromArgb(100, 100, 100) : Color.Gray;
 
-            // Row highlighting colors (theme-aware)
-            Color mouseOverColor = _isDarkTheme ? Color.FromArgb(35, 100, 150, 200) : Color.FromArgb(25, 100, 150, 200);
-            Color cursorLineColor = _isDarkTheme ? Color.FromArgb(100, 100, 150, 200) : Color.FromArgb(80, 100, 150, 200); // Deutlich stärker
-
             // Apply to text boxes
             _markdownTextBox.BackColor = background;
             _markdownTextBox.ForeColor = foreground;
-            _markdownTextBox.SetHighlightColors(mouseOverColor, cursorLineColor);
             _markdownTextBox.SetLineNumberColors(labelBackground, lineNumberForeground);
 
             _htmlTextBox.BackColor = background;
             _htmlTextBox.ForeColor = foreground;
-            _htmlTextBox.SetHighlightColors(mouseOverColor, cursorLineColor);
             _htmlTextBox.SetLineNumberColors(labelBackground, lineNumberForeground);
 
             // Apply to labels
