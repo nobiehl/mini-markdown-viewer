@@ -11,6 +11,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.12.1] - 2025-11-16
+
+### Fixed
+- **Info Button CHANGELOG Loading**: Fixed "CHANGELOG.md not found" error for portable standalone executable
+  - Info button now downloads CHANGELOG.md from GitHub when local file is not available
+  - Made method async to support HTTP download without blocking UI
+  - Binary is now truly portable - works anywhere without requiring local docs/ folder
+  - Falls back to GitHub releases link if download fails (e.g., no internet connection)
+  - Improved logging: distinguishes between local and remote CHANGELOG loading
+  - HttpClient with 10s timeout to avoid long hangs
+
+### Technical
+- **Files changed**: 1 file (MainForm.cs:1204)
+- **Changes**: Made OnInfoClicked() async, added HttpClient download fallback
+- **Impact**: Portable binary users can now see release notes without local CHANGELOG.md
+
+---
+
 ## [1.12.0] - 2025-11-16
 
 ### Added

@@ -26,7 +26,7 @@ namespace MarkdownViewer
     /// </summary>
     public class MainForm : Form, IMainView
     {
-        private const string Version = "1.12.0";
+        private const string Version = "1.12.1";
 
         // UI Components
         private WebView2 _webView = null!;
@@ -1201,7 +1201,7 @@ namespace MarkdownViewer
         /// Handles info button click in status bar.
         /// Shows current release notes in the viewer.
         /// </summary>
-        private void OnInfoClicked(object? sender, EventArgs e)
+        private async void OnInfoClicked(object? sender, EventArgs e)
         {
             Log.Debug("Info button clicked");
 
@@ -1239,13 +1239,29 @@ namespace MarkdownViewer
                     // Read the full CHANGELOG.md and extract the current version's notes
                     string fullChangelog = File.ReadAllText(changelogPath);
                     releaseNotes = ExtractCurrentVersionNotes(fullChangelog, Version);
-                    Log.Information("CHANGELOG.md loaded from: {Path}", changelogPath);
+                    Log.Information("CHANGELOG.md loaded from local file: {Path}", changelogPath);
                 }
                 else
                 {
-                    // Fallback if CHANGELOG.md not found
-                    Log.Warning("CHANGELOG.md not found. Tried paths: {Path1}, {Path2}, {Path3}", path1, path2, path3);
-                    releaseNotes = $"# Release Notes - v{Version}\n\nCHANGELOG.md not found.\n\nPlease visit [GitHub Releases](https://github.com/nobiehl/mini-markdown-viewer/releases) for release notes.";
+                    // Fallback: Download CHANGELOG.md from GitHub
+                    Log.Warning("CHANGELOG.md not found locally. Tried paths: {Path1}, {Path2}, {Path3}", path1, path2, path3);
+                    Log.Information("Attempting to download CHANGELOG.md from GitHub...");
+
+                    try
+                    {
+                        string changelogUrl = "https://raw.githubusercontent.com/nobiehl/mini-markdown-viewer/master/docs/CHANGELOG.md";
+                        using var httpClient = new System.Net.Http.HttpClient();
+                        httpClient.Timeout = TimeSpan.FromSeconds(10);
+
+                        string fullChangelog = await httpClient.GetStringAsync(changelogUrl);
+                        releaseNotes = ExtractCurrentVersionNotes(fullChangelog, Version);
+                        Log.Information("CHANGELOG.md downloaded successfully from GitHub");
+                    }
+                    catch (Exception ex)
+                    {
+                        Log.Warning(ex, "Failed to download CHANGELOG.md from GitHub");
+                        releaseNotes = $"# Release Notes - v{Version}\n\nCHANGELOG.md not found locally and failed to download from GitHub.\n\nPlease visit [GitHub Releases](https://github.com/nobiehl/mini-markdown-viewer/releases/tag/v{Version}) for release notes.";
+                    }
                 }
 
                 // Create temporary file for release notes
