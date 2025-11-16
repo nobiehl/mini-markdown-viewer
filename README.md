@@ -505,19 +505,19 @@ A: Yes, but run `--install` again afterwards so registry entries reference the c
 
 ### Release Notes
 All release notes are documented in the [Changelog](docs/CHANGELOG.md). Recent versions:
-- [v1.11.0](docs/CHANGELOG.md#1110---2025-11-16) - Raw Data View enhancements: Text selection and copy support
-- [v1.10.0](docs/CHANGELOG.md#1100---2025-11-14) - German resource file fixes (duplicate key resolution)
-- [v1.9.1](docs/CHANGELOG.md#191---2025-11-13) - Critical bug fix: Version mismatch in update checker
-- [v1.9.0](docs/CHANGELOG.md#190---2025-11-12) - Raw Data View with flicker-free row highlighting
-- [v1.8.1](docs/CHANGELOG.md#181---2025-01-11) - Bug fixes and performance improvements
-- [v1.8.0](docs/CHANGELOG.md#180---2025-01-11) - Extended Markdown features & Update notifications
-- [v1.7.0](docs/CHANGELOG.md#170---2025-11-08) - Architecture refactoring (layered architecture)
-- [v1.6.0](docs/CHANGELOG.md#160---2025-11-07) - Theme-aware icons
-- [v1.5.2](docs/CHANGELOG.md#152---2025-11-06) - Update check retry fix + 7-day interval
-- [v1.5.0](docs/CHANGELOG.md#150---2025-11-06) - Testing & Documentation
-- [v1.4.0](docs/CHANGELOG.md#140---2025-11-06) - Navigation + Search
-- [v1.3.0](docs/CHANGELOG.md#130---2025-11-05) - Localization + StatusBar
-- [v1.2.0](docs/CHANGELOG.md#120---2025-11-04) - Themes + Architecture
+- [v1.11.0](docs/CHANGELOG.md#1110-2025-11-16) - Raw Data View enhancements: Text selection and copy support
+- [v1.10.0](docs/CHANGELOG.md#1100-2025-11-14) - German resource file fixes (duplicate key resolution)
+- [v1.9.1](docs/CHANGELOG.md#191-2025-11-13) - Critical bug fix: Version mismatch in update checker
+- [v1.9.0](docs/CHANGELOG.md#190-2025-11-12) - Raw Data View with flicker-free row highlighting
+- [v1.8.1](docs/CHANGELOG.md#181-2025-01-11) - Bug fixes and performance improvements
+- [v1.8.0](docs/CHANGELOG.md#180-2025-01-11) - Extended Markdown features & Update notifications
+- [v1.7.0](docs/CHANGELOG.md#170-2025-11-08) - Architecture refactoring (layered architecture)
+- [v1.6.0](docs/CHANGELOG.md#160-2025-11-07) - Theme-aware icons
+- [v1.5.2](docs/CHANGELOG.md#152-2025-11-06) - Update check retry fix + 7-day interval
+- [v1.5.0](docs/CHANGELOG.md#150-2025-11-06) - Testing & Documentation
+- [v1.4.0](docs/CHANGELOG.md#140-2025-11-06) - Navigation + Search
+- [v1.3.0](docs/CHANGELOG.md#130-2025-11-05) - Localization + StatusBar
+- [v1.2.0](docs/CHANGELOG.md#120-2025-11-04) - Themes + Architecture
 
 ### Developer Documentation
 - [Development Guide](docs/DEVELOPMENT.md) - Technical documentation for developers

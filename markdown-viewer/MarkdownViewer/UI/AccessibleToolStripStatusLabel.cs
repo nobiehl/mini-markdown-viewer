@@ -2,6 +2,10 @@ using System.Windows.Forms;
 
 namespace MarkdownViewer.UI
 {
+    /// <summary>
+    /// Extended ToolStripStatusLabel with improved accessibility support.
+    /// Provides custom accessible name and description for screen readers.
+    /// </summary>
     public class AccessibleToolStripStatusLabel : ToolStripStatusLabel
     {
         private string _accessibleName = "";
