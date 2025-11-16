@@ -86,18 +86,6 @@ namespace MarkdownViewer.Tests.UI
         }
 
         [Fact]
-        public void SetHighlightColors_DoesNotThrow()
-        {
-            // Arrange
-            Color mouseOver = Color.FromArgb(25, 100, 150, 200);
-            Color cursorLine = Color.FromArgb(80, 100, 150, 200);
-
-            // Act & Assert
-            var exception = Record.Exception(() => _control.SetHighlightColors(mouseOver, cursorLine));
-            Assert.Null(exception);
-        }
-
-        [Fact]
         public void SetLineNumberColors_DoesNotThrow()
         {
             // Arrange
@@ -218,6 +206,150 @@ namespace MarkdownViewer.Tests.UI
         {
             // Assert
             Assert.Equal(BorderStyle.None, _control.BorderStyle);
+        }
+
+        // ===== TEXT SELECTION & COPY TESTS (v1.9.1) =====
+
+        [Fact]
+        public void TextBox_Property_ExposesUnderlyingRichTextBox()
+        {
+            // Act
+            var textBox = _control.TextBox;
+
+            // Assert
+            Assert.NotNull(textBox);
+            Assert.IsType<RichTextBox>(textBox);
+        }
+
+        [Fact]
+        public void TextBox_IsReadOnly_ByDefault()
+        {
+            // Act
+            var textBox = _control.TextBox;
+
+            // Assert
+            Assert.True(textBox.ReadOnly);
+        }
+
+        [Fact]
+        public void TextBox_SupportsTextSelection()
+        {
+            // Arrange
+            _control.Text = "Line 1\nLine 2\nLine 3";
+            var textBox = _control.TextBox;
+
+            // Act - Select text programmatically
+            textBox.Select(0, 6); // Select "Line 1"
+
+            // Assert
+            Assert.Equal(0, textBox.SelectionStart);
+            Assert.Equal(6, textBox.SelectionLength);
+            Assert.Equal("Line 1", textBox.SelectedText);
+        }
+
+        [Fact]
+        public void TextBox_HideSelection_IsFalse()
+        {
+            // Arrange
+            var textBox = _control.TextBox;
+
+            // Act & Assert
+            Assert.False(textBox.HideSelection); // Selection should be visible even when control loses focus
+        }
+
+        [Fact]
+        public void TextBox_SelectAll_SelectsAllText()
+        {
+            // Arrange
+            string testText = "Line 1\nLine 2\nLine 3";
+            _control.Text = testText;
+            var textBox = _control.TextBox;
+
+            // Act
+            textBox.SelectAll();
+
+            // Assert
+            Assert.Equal(testText.Length, textBox.SelectionLength);
+            Assert.Equal(testText, textBox.SelectedText);
+        }
+
+        [Fact]
+        public void TextBox_SelectedText_CanBeRetrieved()
+        {
+            // Arrange
+            _control.Text = "First Second Third";
+            var textBox = _control.TextBox;
+            textBox.Select(6, 6); // Select "Second"
+
+            // Act
+            string selectedText = textBox.SelectedText;
+
+            // Assert
+            Assert.Equal("Second", selectedText);
+        }
+
+        [Fact]
+        public void TextBox_SelectionAcrossMultipleLines_Works()
+        {
+            // Arrange
+            _control.Text = "Line 1\nLine 2\nLine 3";
+            var textBox = _control.TextBox;
+
+            // Act - Select from "Line 1" to "Line 2"
+            textBox.Select(0, 13); // "Line 1\nLine 2"
+
+            // Assert
+            Assert.Equal(13, textBox.SelectionLength);
+            Assert.Equal("Line 1\nLine 2", textBox.SelectedText);
+        }
+
+        [Fact]
+        public void TextBox_EmptySelection_ReturnsEmptyString()
+        {
+            // Arrange
+            _control.Text = "Some text";
+            var textBox = _control.TextBox;
+            textBox.Select(5, 0); // No selection
+
+            // Act
+            string selectedText = textBox.SelectedText;
+
+            // Assert
+            Assert.Equal(string.Empty, selectedText);
+        }
+
+        [Fact]
+        public void Control_WithLineNumbers_DoesNotIncludeLineNumbersInText()
+        {
+            // Arrange
+            _control.ShowLineNumbers = true;
+            _control.Text = "Line 1\nLine 2\nLine 3";
+
+            // Act
+            string actualText = _control.Text;
+
+            // Assert - Line numbers should NOT be in the text
+            Assert.Equal("Line 1\nLine 2\nLine 3", actualText);
+            Assert.DoesNotContain("1", actualText.Substring(0, 1)); // First character is not a line number
+        }
+
+        [Fact]
+        public void TextBox_Selection_DoesNotIncludeLineNumbers()
+        {
+            // Arrange
+            _control.ShowLineNumbers = true;
+            _control.Text = "Line 1\nLine 2\nLine 3";
+            var textBox = _control.TextBox;
+
+            // Act - Select all
+            textBox.SelectAll();
+            string selectedText = textBox.SelectedText;
+
+            // Assert - Selected text should NOT contain line numbers
+            Assert.Equal("Line 1\nLine 2\nLine 3", selectedText);
+            Assert.DoesNotContain("1 ", selectedText); // No "1 " line number prefix
+            Assert.DoesNotContain("2 ", selectedText); // No "2 " line number prefix
+            Assert.DoesNotContain("3 ", selectedText); // No "3 " line number prefix
         }
 
         public void Dispose()

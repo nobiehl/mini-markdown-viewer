@@ -164,17 +164,18 @@ namespace MarkdownViewer.Services
 
         private void ApplyThemeToControl(Control control, Theme theme)
         {
-            // StatusStrip
-            if (control is StatusStrip statusBar)
+            // StatusBarControl (now Panel-based with custom theme support)
+            if (control is UI.StatusBarControl statusBarControl)
+            {
+                statusBarControl.BackColor = ColorTranslator.FromHtml(theme.UI.StatusBarBackground);
+                statusBarControl.ForeColor = ColorTranslator.FromHtml(theme.UI.StatusBarForeground);
+                statusBarControl.ApplyTheme(theme);
+            }
+            // StatusStrip (legacy or other status bars)
+            else if (control is StatusStrip statusBar)
             {
                 statusBar.BackColor = ColorTranslator.FromHtml(theme.UI.StatusBarBackground);
                 statusBar.ForeColor = ColorTranslator.FromHtml(theme.UI.StatusBarForeground);
-
-                // Apply theme to StatusBarControl icons
-                if (statusBar is UI.StatusBarControl statusBarControl)
-                {
-                    statusBarControl.ApplyTheme(theme);
-                }
             }
             // ToolStrip (navigation bar)
             else if (control is ToolStrip toolStrip)
