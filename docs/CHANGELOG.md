@@ -7,6 +7,31 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [Unreleased]
+
+### Added
+- **Remote Markdown Loading**: Load Markdown files directly from HTTP(S) URLs in the viewer
+  - Click on `.md` links from GitHub, GitLab, Bitbucket, etc. to open them in the viewer
+  - Automatic URL conversion for Git hosting platforms (blob URLs → raw URLs)
+  - Supported platforms: GitHub, GitLab, Bitbucket, Gitea, Forgejo
+  - Navigation history works as expected (Back/Forward buttons)
+  - Downloads file to temp folder and displays it with "(Remote)" indicator in title
+
+### Changed
+- **Info Button Enhancement**: Info button now displays release notes instead of About dialog
+  - Shows current version's release notes from CHANGELOG.md
+  - Opens directly in the viewer (not as modal dialog)
+  - Navigation works: use Back button to return to previous document
+  - Fallback to GitHub releases link if CHANGELOG.md not found
+
+### Removed
+- **UI Automation Tests**: Removed 20 FlaUI-based UI automation tests
+  - Tests had compatibility issues with WinForms StatusStrip controls
+  - Reduced test count from 293 to 273
+  - All remaining unit tests pass successfully
+
+---
+
 ## [1.11.0] - 2025-11-16
 
 ### Added

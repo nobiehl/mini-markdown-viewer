@@ -3,7 +3,7 @@
 Definitions of all terms, classes, services, and concepts used in MarkdownViewer.
 
 **Alphabetical Order**
-**Last Updated:** 2025-11-16
+**Last Updated:** 2025-11-16 (Remote Markdown Loading feature added)
 
 ---
 
@@ -25,8 +25,35 @@ Model class representing a GitHub release from the API. Contains tag_name, name,
 
 ---
 
+### Remote Markdown Loading
+Feature that enables loading and viewing Markdown files directly from HTTP(S) URLs. Automatically converts Git hosting platform URLs (GitHub, GitLab, Bitbucket, Gitea, Forgejo) from blob/src URLs to raw content URLs.
+
+**Method:** MainForm.LoadRemoteMarkdownFile()
+**Conversion:** MainForm.ConvertToRawUrl()
+**Storage:** Temporary files in %TEMP%/MarkdownViewer/
+
+**Supported Platforms:**
+- **GitHub**: `github.com/.../blob/...` → `raw.githubusercontent.com/.../...`
+- **GitLab**: `gitlab.com/.../-/blob/...` → `gitlab.com/.../-/raw/...`
+- **Bitbucket**: `bitbucket.org/.../src/...` → `bitbucket.org/.../raw/...`
+- **Gitea/Forgejo**: `.../src/branch/...` → `.../raw/branch/...`
+
+**User Experience:**
+- Click on `.md` links from any Git platform → opens in viewer
+- Navigation history works (Back/Forward buttons)
+- Title shows "(Remote)" indicator
+- Downloads to temp folder automatically
+
+**Technical:**
+- Uses HttpClient with 30-second timeout
+- Async/await for non-blocking UI
+- Error handling with user-friendly messages
+- Automatic cleanup of temp files on app restart
+
+---
+
 ### StatusBar
-UI component at the bottom of the window showing status icons (update, explorer registration, language, info, help). Always visible by default.
+UI component at the bottom of the window showing status icons (update, explorer registration, language, info, help). Info button now displays release notes from CHANGELOG.md. Always visible by default.
 
 **Component:** WinForms StatusStrip
 **Manager:** UI/StatusBarControl.cs

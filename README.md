@@ -29,7 +29,9 @@ Lightweight Windows desktop viewer for Markdown files with themes, localization,
 - ✅ **Tables, Lists, Blockquotes** (via Markdig extensions)
 - ✅ **Live Reload** on file changes (FileSystemWatcher)
 - ✅ **Copy Buttons** for code blocks
-- ✅ **Link Navigation**: Navigate between .md files, external links open in browser
+- ✅ **Link Navigation**: Navigate between .md files (local & remote), external links open in browser
+  - **Remote Markdown Loading**: Open `.md` files from HTTP(S) URLs directly in viewer
+  - **Git Platform Support**: Automatic URL conversion for GitHub, GitLab, Bitbucket, Gitea, Forgejo
 - ✅ **Anchor Links**: Jump to headings with # anchors
 - ✅ **Professional Logging**: Serilog with rolling daily logs and configurable levels
 - ✅ **Automatic Updates**: Check for updates once every 7 days, manual check with `--update`
@@ -58,6 +60,7 @@ Lightweight Windows desktop viewer for Markdown files with themes, localization,
 - **5 Sections**: Update status, Explorer registration, Language selector, Info, Help
 - **Real-time Status**: Shows current state of all features
 - **Always Visible**: Displayed at bottom of window
+- **Info Button**: Displays current version's release notes from CHANGELOG.md in viewer
 
 #### 🧭 Navigation (v1.4.0)
 - **Back/Forward Buttons**: Navigate document history (Alt+Left/Right)

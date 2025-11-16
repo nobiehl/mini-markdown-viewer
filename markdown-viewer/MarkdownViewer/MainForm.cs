@@ -436,7 +436,18 @@ namespace MarkdownViewer
                     return;
                 }
 
-                // External links open in browser
+                // Check if it's a Markdown file
+                if (args.Uri.EndsWith(".md", StringComparison.OrdinalIgnoreCase) ||
+                    args.Uri.EndsWith(".markdown", StringComparison.OrdinalIgnoreCase))
+                {
+                    // Load Markdown file from HTTP(S) in viewer
+                    Log.Information("Loading remote Markdown file in viewer: {Uri}", args.Uri);
+                    args.Cancel = true;
+                    LoadRemoteMarkdownFile(args.Uri);
+                    return;
+                }
+
+                // External links (non-Markdown) open in browser
                 Log.Information("Opening external link in browser: {Uri}", args.Uri);
                 args.Cancel = true;
                 try
@@ -557,26 +568,35 @@ namespace MarkdownViewer
             // Handle external HTTP/HTTPS links
             if (url.StartsWith("http://") || url.StartsWith("https://"))
             {
-                if (!IsInlineResource(url))
-                {
-                    Log.Information("Link type: External HTTP/HTTPS | URL: {Url}", url);
-                    try
-                    {
-                        System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo
-                        {
-                            FileName = url,
-                            UseShellExecute = true
-                        });
-                        Log.Information("Successfully opened external link in browser: {Url}", url);
-                    }
-                    catch (Exception ex)
-                    {
-                        Log.Error(ex, "Failed to open external link: {Url}", url);
-                    }
-                }
-                else
+                if (IsInlineResource(url))
                 {
                     Log.Debug("Skipping inline resource: {Url}", url);
+                    return;
+                }
+
+                // Check if it's a Markdown file - load in viewer
+                if (url.EndsWith(".md", StringComparison.OrdinalIgnoreCase) ||
+                    url.EndsWith(".markdown", StringComparison.OrdinalIgnoreCase))
+                {
+                    Log.Information("Link type: Remote Markdown | URL: {Url}", url);
+                    LoadRemoteMarkdownFile(url);
+                    return;
+                }
+
+                // Non-Markdown external links - open in browser
+                Log.Information("Link type: External HTTP/HTTPS | URL: {Url}", url);
+                try
+                {
+                    System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo
+                    {
+                        FileName = url,
+                        UseShellExecute = true
+                    });
+                    Log.Information("Successfully opened external link in browser: {Url}", url);
+                }
+                catch (Exception ex)
+                {
+                    Log.Error(ex, "Failed to open external link: {Url}", url);
                 }
                 return;
             }
@@ -640,6 +660,146 @@ namespace MarkdownViewer
             {
                 Log.Debug("Unhandled link type or extension: {Url}", url);
             }
+        }
+
+        /// <summary>
+        /// Loads a Markdown file from a remote HTTP(S) URL.
+        /// Downloads the file and displays it in the viewer.
+        /// </summary>
+        private async void LoadRemoteMarkdownFile(string url)
+        {
+            Log.Information("LoadRemoteMarkdownFile: {Url}", url);
+
+            try
+            {
+                // Convert Git hosting URLs to raw content URLs
+                string originalUrl = url;
+                url = ConvertToRawUrl(url);
+                if (url != originalUrl)
+                {
+                    Log.Information("Converted to raw URL: {OriginalUrl} -> {RawUrl}", originalUrl, url);
+                }
+
+                // Download Markdown content from URL
+                using var httpClient = new System.Net.Http.HttpClient();
+                httpClient.Timeout = TimeSpan.FromSeconds(30);
+
+                Log.Debug("Downloading Markdown from: {Url}", url);
+                string markdownContent = await httpClient.GetStringAsync(url);
+                Log.Information("Downloaded {Bytes} bytes from {Url}", markdownContent.Length, url);
+
+                // Create temporary file for the downloaded Markdown
+                string tempFolder = Path.Combine(Path.GetTempPath(), "MarkdownViewer");
+                Directory.CreateDirectory(tempFolder);
+
+                // Use URL as filename (sanitized)
+                string filename = SanitizeFilename(Path.GetFileName(new Uri(url).LocalPath));
+                if (string.IsNullOrEmpty(filename))
+                    filename = "remote.md";
+
+                string tempFile = Path.Combine(tempFolder, filename);
+
+                // Write content to temporary file
+                File.WriteAllText(tempFile, markdownContent);
+                Log.Debug("Saved remote Markdown to temporary file: {TempFile}", tempFile);
+
+                // Load the file in the viewer (on UI thread)
+                this.Invoke(new Action(() =>
+                {
+                    _currentFilePath = tempFile;
+                    LoadMarkdownFile(tempFile);
+
+                    // Update window title to show it's a remote file
+                    this.Text = $"{filename} (Remote) - Markdown Viewer v{Version}";
+
+                    Log.Information("Successfully loaded remote Markdown file: {Url}", url);
+                }));
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex, "Failed to load remote Markdown file: {Url}", url);
+                this.Invoke(new Action(() =>
+                {
+                    MessageBox.Show(
+                        $"Failed to load remote Markdown file:\n{url}\n\nError: {ex.Message}",
+                        "Error",
+                        MessageBoxButtons.OK,
+                        MessageBoxIcon.Error);
+                }));
+            }
+        }
+
+        /// <summary>
+        /// Converts Git hosting URLs to raw content URLs.
+        /// Supports GitHub, GitLab, Bitbucket, Gitea, and Forgejo.
+        /// </summary>
+        private string ConvertToRawUrl(string url)
+        {
+            if (string.IsNullOrEmpty(url))
+                return url;
+
+            try
+            {
+                // GitHub: github.com/user/repo/blob/branch/file.md -> raw.githubusercontent.com/user/repo/branch/file.md
+                if (url.Contains("github.com") && url.Contains("/blob/"))
+                {
+                    url = url.Replace("github.com", "raw.githubusercontent.com")
+                             .Replace("/blob/", "/");
+                    Log.Debug("Converted GitHub URL to raw format");
+                    return url;
+                }
+
+                // GitLab: gitlab.com/user/repo/-/blob/branch/file.md -> gitlab.com/user/repo/-/raw/branch/file.md
+                if (url.Contains("gitlab.com") && url.Contains("/-/blob/"))
+                {
+                    url = url.Replace("/-/blob/", "/-/raw/");
+                    Log.Debug("Converted GitLab URL to raw format");
+                    return url;
+                }
+
+                // Bitbucket: bitbucket.org/user/repo/src/branch/file.md -> bitbucket.org/user/repo/raw/branch/file.md
+                if (url.Contains("bitbucket.org") && url.Contains("/src/"))
+                {
+                    url = url.Replace("/src/", "/raw/");
+                    Log.Debug("Converted Bitbucket URL to raw format");
+                    return url;
+                }
+
+                // Gitea/Forgejo: gitea.com/user/repo/src/branch/master/file.md -> gitea.com/user/repo/raw/branch/master/file.md
+                // This pattern works for most Gitea/Forgejo instances
+                if (url.Contains("/src/branch/") || url.Contains("/src/commit/"))
+                {
+                    url = url.Replace("/src/branch/", "/raw/branch/")
+                             .Replace("/src/commit/", "/raw/commit/");
+                    Log.Debug("Converted Gitea/Forgejo URL to raw format");
+                    return url;
+                }
+
+                // No conversion needed
+                Log.Debug("No URL conversion needed");
+                return url;
+            }
+            catch (Exception ex)
+            {
+                Log.Warning(ex, "Failed to convert URL to raw format, using original: {Url}", url);
+                return url;
+            }
+        }
+
+        /// <summary>
+        /// Sanitizes a filename by removing invalid characters.
+        /// </summary>
+        private string SanitizeFilename(string filename)
+        {
+            if (string.IsNullOrEmpty(filename))
+                return string.Empty;
+
+            char[] invalidChars = Path.GetInvalidFileNameChars();
+            foreach (char c in invalidChars)
+            {
+                filename = filename.Replace(c, '_');
+            }
+            return filename;
         }
 
         private void LoadMarkdownFile(string filePath)
@@ -1039,105 +1199,116 @@ namespace MarkdownViewer
 
         /// <summary>
         /// Handles info button click in status bar.
-        /// Shows application info dialog.
+        /// Shows current release notes in the viewer.
         /// </summary>
         private void OnInfoClicked(object? sender, EventArgs e)
         {
             Log.Debug("Info button clicked");
 
-            string appInfo = BuildApplicationInfoMarkdown();
+            try
+            {
+                // Try multiple paths to find CHANGELOG.md
+                string? changelogPath = null;
 
-            // Show in MarkdownDialog for beautiful formatting
-            using var dialog = new MarkdownDialog("About Markdown Viewer", appInfo, _renderer);
-            dialog.ShowDialog(this);
+                // Path 1: Relative to EXE (for published/deployed version in root)
+                string path1 = Path.Combine(
+                    Path.GetDirectoryName(Application.ExecutablePath) ?? Environment.CurrentDirectory,
+                    "docs", "CHANGELOG.md"
+                );
+
+                // Path 2: Relative to EXE in bin folder (for development)
+                string path2 = Path.Combine(
+                    Path.GetDirectoryName(Application.ExecutablePath) ?? Environment.CurrentDirectory,
+                    "..", "..", "..", "..", "..", "docs", "CHANGELOG.md"
+                );
+
+                // Path 3: Relative to current working directory
+                string path3 = Path.Combine(Environment.CurrentDirectory, "docs", "CHANGELOG.md");
+
+                // Try each path
+                if (File.Exists(path1))
+                    changelogPath = path1;
+                else if (File.Exists(path2))
+                    changelogPath = Path.GetFullPath(path2);
+                else if (File.Exists(path3))
+                    changelogPath = path3;
+
+                string releaseNotes;
+                if (changelogPath != null && File.Exists(changelogPath))
+                {
+                    // Read the full CHANGELOG.md and extract the current version's notes
+                    string fullChangelog = File.ReadAllText(changelogPath);
+                    releaseNotes = ExtractCurrentVersionNotes(fullChangelog, Version);
+                    Log.Information("CHANGELOG.md loaded from: {Path}", changelogPath);
+                }
+                else
+                {
+                    // Fallback if CHANGELOG.md not found
+                    Log.Warning("CHANGELOG.md not found. Tried paths: {Path1}, {Path2}, {Path3}", path1, path2, path3);
+                    releaseNotes = $"# Release Notes - v{Version}\n\nCHANGELOG.md not found.\n\nPlease visit [GitHub Releases](https://github.com/nobiehl/mini-markdown-viewer/releases) for release notes.";
+                }
+
+                // Create temporary file for release notes
+                string tempFolder = Path.Combine(Path.GetTempPath(), "MarkdownViewer");
+                Directory.CreateDirectory(tempFolder);
+                string tempFile = Path.Combine(tempFolder, $"ReleaseNotes-v{Version}.md");
+
+                // Write release notes
+                File.WriteAllText(tempFile, releaseNotes);
+
+                // Load in main viewer (navigation history works automatically)
+                LoadMarkdownFile(tempFile);
+
+                Log.Information("Release notes loaded successfully: {TempFile}", tempFile);
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex, "Failed to show release notes");
+                MessageBox.Show(
+                    $"Failed to show release notes:\n{ex.Message}",
+                    "Error",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Error);
+            }
         }
 
         /// <summary>
-        /// Builds comprehensive application information in Markdown format.
-        /// This will be displayed in the MarkdownDialog once available.
+        /// Extracts the release notes for the current version from the full CHANGELOG.md.
         /// </summary>
-        private string BuildApplicationInfoMarkdown()
+        private string ExtractCurrentVersionNotes(string fullChangelog, string version)
         {
-            string markdown = $@"# Markdown Viewer v{Version}
+            try
+            {
+                // Find the section for the current version (e.g., "## [1.11.0] - 2025-11-16")
+                string versionHeader = $"## [{version}]";
+                int startIndex = fullChangelog.IndexOf(versionHeader);
 
-## About
+                if (startIndex == -1)
+                {
+                    // Version not found, return generic message
+                    return $"# Release Notes - v{version}\n\nRelease notes for version {version} not found in CHANGELOG.md.\n\nPlease visit [GitHub Releases](https://github.com/nobiehl/mini-markdown-viewer/releases/tag/v{version}) for details.";
+                }
 
-A lightweight, fast Windows application for viewing Markdown files with live preview and advanced rendering capabilities.
+                // Find the next version header (or end of file)
+                int endIndex = fullChangelog.IndexOf("\n## [", startIndex + versionHeader.Length);
+                if (endIndex == -1)
+                {
+                    endIndex = fullChangelog.Length;
+                }
 
-## Features
+                // Extract the section
+                string versionSection = fullChangelog.Substring(startIndex, endIndex - startIndex).Trim();
 
-- **Live File Reload** - Automatically updates when file changes
-- **Syntax Highlighting** - Code blocks with language-specific highlighting
-- **Math Support** - Render mathematical formulas using KaTeX
-- **Mermaid Diagrams** - Flowcharts, sequence diagrams, and more
-- **PlantUML Support** - UML diagrams and technical drawings
-- **Multiple Themes** - Choose from 4 beautiful themes (Dark, Standard, Solarized, Dräger)
-- **Multi-Language** - Supports 8 languages (EN, DE, MN, FR, ES, JA, ZH, RU)
-- **Navigation** - Back/forward navigation through document history
-- **Search** - Find text within documents (Ctrl+F)
-- **Windows Integration** - Double-click .md files, context menu, Send To
-
-## Current Configuration
-
-- **Version**: {Version}
-- **Language**: {_localizationService.GetCurrentLanguage().ToUpper()}
-- **Theme**: {char.ToUpper(_settings.Theme[0]) + _settings.Theme.Substring(1)}
-- **Settings**: `{Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)}\MarkdownViewer\settings.json`
-
-## Keyboard Shortcuts
-
-| Shortcut | Action |
-|----------|--------|
-| `F5` | Reload current file |
-| `Ctrl+F` | Open search |
-| `F3` | Next search result |
-| `Shift+F3` | Previous search result |
-| `Alt+Left` | Navigate back |
-| `Alt+Right` | Navigate forward |
-| `Ctrl+Mouse Wheel` | Zoom in/out |
-| `Esc` | Close search |
-
-## Credits
-
-Developed with:
-- **Markdig** - Markdown parsing and rendering
-- **KaTeX** - Mathematical formula rendering
-- **Mermaid** - Diagram generation
-- **Highlight.js** - Syntax highlighting for code blocks
-- **WebView2** - Modern web rendering engine
-- **Feather Icons** - Beautiful UI icons
-
-## Links
-
-- **GitHub Repository**: [github.com/nobiehl/mini-markdown-viewer](https://github.com/nobiehl/mini-markdown-viewer)
-- **Report Issues**: [github.com/nobiehl/mini-markdown-viewer/issues](https://github.com/nobiehl/mini-markdown-viewer/issues)
-- **Documentation**: View README.md on GitHub
-
----
-
-*Built with care for the Markdown community*
-";
-            return markdown;
+                // Add a nice header
+                return $"# Release Notes - v{version}\n\n{versionSection}\n\n---\n\n**Full Changelog**: https://github.com/nobiehl/mini-markdown-viewer/blob/master/docs/CHANGELOG.md";
+            }
+            catch (Exception ex)
+            {
+                Log.Warning(ex, "Failed to extract version notes from CHANGELOG.md");
+                return $"# Release Notes - v{version}\n\nFailed to extract release notes.\n\nPlease visit [GitHub Releases](https://github.com/nobiehl/mini-markdown-viewer/releases/tag/v{version}) for details.";
+            }
         }
 
-        /// <summary>
-        /// Converts Markdown to plain text for MessageBox display.
-        /// This is a temporary helper until MarkdownDialog is available.
-        /// </summary>
-        private string ConvertMarkdownToPlainText(string markdown)
-        {
-            // Simple conversion: remove markdown formatting for MessageBox
-            string text = markdown
-                .Replace("# ", "")
-                .Replace("## ", "")
-                .Replace("**", "")
-                .Replace("- ", "• ")
-                .Replace("`", "\"")
-                .Replace("---", "")
-                .Replace("*", "");
-
-            return text.Trim();
-        }
 
         /// <summary>
         /// Handles help button click in status bar.
