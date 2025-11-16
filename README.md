@@ -2,7 +2,7 @@
 
 Lightweight Windows desktop viewer for Markdown files with themes, localization, navigation, and search. Full Windows Explorer integration included.
 
-![Version](https://img.shields.io/badge/version-1.10.0-blue)
+![Version](https://img.shields.io/badge/version-1.11.0-blue)
 ![.NET](https://img.shields.io/badge/.NET-8.0-purple)
 ![Size](https://img.shields.io/badge/size-3.3_MB-green)
 ![Languages](https://img.shields.io/badge/languages-8-orange)
@@ -98,16 +98,16 @@ Lightweight Windows desktop viewer for Markdown files with themes, localization,
   - 5 types: `note`, `info`, `tip`, `warning`, `danger`
   - Colored borders and Unicode icons (ℹ️ 💡 ✅ ⚠️ 🚫)
 
-#### 🔬 Raw Data View (v1.9.0) - Developer Tool
+#### 🔬 Raw Data View (v1.9.0, enhanced in v1.11.0) - Developer Tool
 - **Split-View Panel**: Markdown source (left) and generated HTML (right) side-by-side
-- **Flicker-Free Row Highlighting**:
-  - Mouse-over highlighting (light) for easy line tracking
-  - Cursor line highlighting (strong, very visible) for current selection
-  - Zero flickering with single paint cycle rendering
-- **Integrated Line Numbers**:
-  - Professional gutter display (50px width, right-aligned)
-  - Perfect scroll synchronization
-  - Theme-aware coloring
+- **Text Selection & Copy** (v1.11.0):
+  - Select text with mouse or keyboard (Shift+Arrow keys)
+  - Copy with Ctrl+C or right-click context menu
+  - Full keyboard navigation (Home, End, Page Up/Down)
+- **Line Numbers** (v1.11.0):
+  - Synchronized scroll with text area
+  - Hover effects for better visibility
+  - Dedicated LineNumberPanel component
 - **Quick Access**: F12 keyboard shortcut or StatusBar button (file-text icon)
 - **Theme-Aware**: Adapts to all 4 themes (Dark, Light, Solarized, Draeger)
 - **State Persistence**: Remembers visibility and splitter position
@@ -502,6 +502,7 @@ A: Yes, but run `--install` again afterwards so registry entries reference the c
 
 ### Release Notes
 All release notes are documented in the [Changelog](docs/CHANGELOG.md). Recent versions:
+- [v1.11.0](docs/CHANGELOG.md#1110---2025-11-16) - Raw Data View enhancements: Text selection and copy support
 - [v1.10.0](docs/CHANGELOG.md#1100---2025-11-14) - German resource file fixes (duplicate key resolution)
 - [v1.9.1](docs/CHANGELOG.md#191---2025-11-13) - Critical bug fix: Version mismatch in update checker
 - [v1.9.0](docs/CHANGELOG.md#190---2025-11-12) - Raw Data View with flicker-free row highlighting
