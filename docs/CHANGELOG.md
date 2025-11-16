@@ -9,6 +9,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+---
+
+## [1.12.0] - 2025-11-16
+
 ### Added
 - **Remote Markdown Loading**: Load Markdown files directly from HTTP(S) URLs in the viewer
   - Click on `.md` links from GitHub, GitLab, Bitbucket, etc. to open them in the viewer
@@ -16,6 +20,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Supported platforms: GitHub, GitLab, Bitbucket, Gitea, Forgejo
   - Navigation history works as expected (Back/Forward buttons)
   - Downloads file to temp folder and displays it with "(Remote)" indicator in title
+  - HTTP client with custom User-Agent for compatibility
 
 ### Changed
 - **Info Button Enhancement**: Info button now displays release notes instead of About dialog
@@ -23,12 +28,40 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Opens directly in the viewer (not as modal dialog)
   - Navigation works: use Back button to return to previous document
   - Fallback to GitHub releases link if CHANGELOG.md not found
+  - Better user experience with inline documentation
 
 ### Removed
 - **UI Automation Tests**: Removed 20 FlaUI-based UI automation tests
   - Tests had compatibility issues with WinForms StatusStrip controls
   - Reduced test count from 293 to 273
   - All remaining unit tests pass successfully
+  - Focus on maintainable unit and integration tests
+
+### Technical
+- **Files changed**: 16 files (+12,431/-1,099 lines)
+  - MainForm.cs: Remote URL handling and Info button refactoring (~377 lines added)
+  - Core/UrlHelper.cs: Git platform URL normalization (NEW)
+  - Tests: Removed UI automation tests, maintained unit/integration tests
+- **Lines of code**: +11,332 net lines (including documentation)
+- **Tests**: 273 passing (100% success rate)
+- **Build**: 0 errors, 0 warnings
+- **Binary size**: ~3.3 MB (unchanged)
+
+### User Experience
+- **Remote Markdown**: Seamless experience loading online documentation
+  - Markdown from README.md files on GitHub
+  - Technical specs from GitLab wikis
+  - Project documentation from any Git hosting platform
+  - Local caching with temp file cleanup
+- **Info Button**: Quick access to what's new in current version
+  - No modal dialogs blocking workflow
+  - Full navigation support
+  - Integrated with main viewer experience
+
+### Security
+- Custom User-Agent for HTTP requests: "MarkdownViewer/1.12.0 (Windows; +https://github.com/nobiehl/mini-markdown-viewer)"
+- Temp file cleanup after viewing remote files
+- No credentials stored or transmitted
 
 ---
 

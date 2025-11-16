@@ -1,4 +1,4 @@
-# User Guide - MarkdownViewer v1.10.0
+# User Guide - MarkdownViewer v1.12.0
 
 Complete guide for using MarkdownViewer with all features.
 
@@ -7,12 +7,14 @@ Complete guide for using MarkdownViewer with all features.
 ## Table of Contents
 1. [Installation](#installation)
 2. [Opening Files](#opening-files)
-3. [Themes](#themes)
-4. [Languages](#languages)
-5. [Navigation](#navigation)
-6. [Search](#search)
-7. [Keyboard Shortcuts](#keyboard-shortcuts)
-8. [Settings](#settings)
+3. [Remote Markdown Files](#remote-markdown-files)
+4. [Themes](#themes)
+5. [Languages](#languages)
+6. [Navigation](#navigation)
+7. [Search](#search)
+8. [Keyboard Shortcuts](#keyboard-shortcuts)
+9. [Release Notes & Help](#release-notes--help)
+10. [Settings](#settings)
 
 ---
 
@@ -59,6 +61,67 @@ MarkdownViewer.exe myfile.md
 MarkdownViewer.exe
 ```
 Opens file selection dialog.
+
+---
+
+## Remote Markdown Files
+
+Open and view Markdown files directly from URLs - perfect for viewing documentation from GitHub, GitLab, Bitbucket, and other Git hosting platforms.
+
+### How to Use
+
+#### Method 1: Click on .md Links
+- Click on any `.md` link in your browser or other applications
+- The file opens directly in MarkdownViewer
+- Example: Click on README.md links in GitHub repositories
+
+#### Method 2: Paste URLs
+- Copy any URL to a Markdown file
+- Paste into the file open dialog
+- Works with direct raw URLs or platform-specific URLs
+
+### Supported Git Platforms
+
+MarkdownViewer automatically converts platform-specific URLs to raw content URLs:
+
+| Platform | Example URL Format | Converted To |
+|----------|-------------------|--------------|
+| **GitHub** | `github.com/.../blob/main/README.md` | `raw.githubusercontent.com/.../main/README.md` |
+| **GitLab** | `gitlab.com/.../-/blob/main/README.md` | `gitlab.com/.../-/raw/main/README.md` |
+| **Bitbucket** | `bitbucket.org/.../src/main/README.md` | `bitbucket.org/.../raw/main/README.md` |
+| **Gitea/Forgejo** | `.../src/branch/main/README.md` | `.../raw/branch/main/README.md` |
+
+### Features
+
+- **Automatic URL Conversion** - No need to manually find the raw URL
+- **Navigation History** - Back/Forward buttons work with remote files
+- **Remote Indicator** - Title shows "(Remote)" for clarity
+- **Temporary Storage** - Files cached in `%TEMP%/MarkdownViewer/` for fast re-access
+- **Link Following** - Click on relative links within remote files to navigate
+
+### Example Use Cases
+
+1. **Documentation Review**
+   - Open project README.md from GitHub
+   - Review documentation without cloning repository
+   - Navigate through multiple documentation files
+
+2. **Code Review**
+   - View CHANGELOG.md from releases
+   - Check contribution guidelines (CONTRIBUTING.md)
+   - Review architectural documentation
+
+3. **Learning**
+   - Read tutorials from repositories
+   - Browse documentation projects
+   - Explore open-source project docs
+
+### Limitations
+
+- Requires internet connection
+- 30-second timeout for downloads
+- Large files (>10MB) may take longer to load
+- No authentication support (public files only)
 
 ---
 
@@ -169,6 +232,27 @@ Find text within current document with real-time highlighting.
 | **Esc** | Close search |
 | **Ctrl+Mouse Wheel** | Zoom in/out (WebView2) |
 | **F5** | Reload file |
+| **F12** | Toggle Raw Data View (developer tool) |
+
+---
+
+## Release Notes & Help
+
+### Info Button (New in v1.12.0)
+
+The Info button in the StatusBar provides quick access to important information:
+
+- **Click the Info button** (ℹ️ icon) in the StatusBar
+- Shows release notes for the current version
+- Content loaded directly from CHANGELOG.md
+- Stay informed about new features and improvements
+
+### Help Button
+
+- **Click the Help button** (? icon) in the StatusBar
+- Opens online documentation
+- Provides context-sensitive help
+- Links to GitHub repository
 
 ---
 
@@ -301,5 +385,5 @@ Options: `"en"`, `"de"`, `"mn"`, `"fr"`, `"es"`, `"ja"`, `"zh"`, `"ru"`, `"syste
 
 ---
 
-**Version:** v1.5.0
-**Last Updated:** 2025-11-06
+**Version:** v1.12.0
+**Last Updated:** 2025-11-16

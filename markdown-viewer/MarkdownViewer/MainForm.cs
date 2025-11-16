@@ -26,7 +26,7 @@ namespace MarkdownViewer
     /// </summary>
     public class MainForm : Form, IMainView
     {
-        private const string Version = "1.11.0";
+        private const string Version = "1.12.0";
 
         // UI Components
         private WebView2 _webView = null!;

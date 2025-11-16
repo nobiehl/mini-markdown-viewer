@@ -1,0 +1,28 @@
+Finding markdown files...
+Found 47 markdown files
+
+Extracting links...
+Found 257 total links
+
+Validating links...
+
+Validating 122 internal links...
+Validating 13 internal+anchor links...
+Validating 54 anchor links...
+Validating 68 external links...
+
+================================================================================
+Traceback (most recent call last):
+  File "C:\develop\workspace\MarkdownViewer\validate_links.py", line 293, in <module>
+    validator.validate_all_links()
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "C:\develop\workspace\MarkdownViewer\validate_links.py", line 235, in validate_all_links
+    self.print_report()
+    ~~~~~~~~~~~~~~~~~^^
+  File "C:\develop\workspace\MarkdownViewer\validate_links.py", line 248, in print_report
+    print("\n# \U0001f517 Link Validation Report\n")
+    ~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Biehlali\AppData\Local\Programs\Python\Python313\Lib\encodings\cp1252.py", line 19, in encode
+    return codecs.charmap_encode(input,self.errors,encoding_table)[0]
+           ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+UnicodeEncodeError: 'charmap' codec can't encode character '\U0001f517' in position 4: character maps to <undefined>

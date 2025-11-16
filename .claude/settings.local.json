@@ -19,7 +19,9 @@
       "Bash(tasklist)",
       "Bash(findstr:*)",
       "Bash(cat:*)",
-      "Bash(\"C:\\Program Files\\GitHub CLI\\gh.exe\" release list --limit 5)"
+      "Bash(\"C:\\Program Files\\GitHub CLI\\gh.exe\" release list --limit 5)",
+      "Bash(dotnet run:*)",
+      "Bash(git restore:*)"
     ],
     "deny": [],
     "ask": []
