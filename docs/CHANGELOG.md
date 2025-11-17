@@ -11,6 +11,71 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.12.2] - 2025-11-17
+
+### Added
+- **File Deleted Notification**: New notification bar when viewed file is deleted
+  - Shows warning: "File was deleted. Content is still visible in the viewer."
+  - Provides "💾 Save" button to save content to a new location
+  - SaveFileDialog integration for choosing save location
+  - Content remains visible in viewer after deletion
+  - Theme-aware styling (yellow/orange for warning)
+
+- **File Recreated Notification**: Smart auto-reload when deleted file is recreated
+  - Shows success message: "File was recreated and reloaded."
+  - Green theme for positive feedback (✅)
+  - Automatically reloads file content without user interaction
+  - Auto-hides after 3 seconds (non-intrusive)
+  - No modal dialogs - seamless workflow
+
+### Fixed
+- **File Watching for Relative Paths**: Fixed bug where file watching didn't work for relative paths
+  - Root cause: `Path.GetDirectoryName("relative-file.md")` returns null
+  - Solution: Convert all file paths to absolute using `Path.GetFullPath()`
+  - File watching now works for both relative and absolute paths
+  - Affects all file watching scenarios (Changed, Deleted, Renamed, Created)
+
+### Enhanced
+- **FileWatcherManager**: Extended with 4 new events
+  - `FileDeleted`: Triggered when watched file is deleted
+  - `FileRenamed`: Triggered when watched file is renamed (auto-follows rename)
+  - `FileCreated`: Triggered when watched file is created (e.g., after deletion)
+  - `WatcherError`: Graceful error handling for file system watcher errors
+  - All events properly marshaled to UI thread via `Invoke()`
+
+### Technical
+- **Files changed**: 3 files
+  - FileDeletedNotificationBar.cs (NEW): 169 lines - Notification component with dual modes
+  - MainForm.cs: +156 lines - Event handlers and notification bar integration
+  - FileWatcherManager.cs: +47 lines - Extended event system
+- **New Component**: FileDeletedNotificationBar with auto-hide timer
+  - Dual mode: "Deleted" (with Save button) and "Recreated" (info only)
+  - Theme-aware colors (yellow warning, green success)
+  - System.Windows.Forms.Timer for 3-second auto-hide
+  - Docked at top, DockStyle.Top
+- **Tests**: Manual testing completed successfully
+  - Test A: Delete → Save → SaveFileDialog → File saved successfully
+  - Test B: Delete → Recreate → Auto-reload → Green notification → Auto-hide after 3s
+- **Build**: 0 errors, 0 warnings
+- **Binary size**: ~3.3 MB (unchanged)
+
+### User Experience
+- **File Deletion Resilience**: No data loss when file is accidentally deleted
+  - Content stays visible until user decides what to do
+  - Easy save to new location with familiar SaveFileDialog
+  - No panic, no modal error dialogs
+- **File Recreation**: Seamless auto-reload experience
+  - User recreates file → Viewer automatically reloads it
+  - Positive feedback with green notification
+  - Notification disappears automatically - no manual dismissal needed
+  - Perfect for workflows with temporary file deletion (e.g., git operations)
+- **File Renaming**: Auto-follow renamed files
+  - User renames file → Viewer follows the rename automatically
+  - Window title updates to new filename
+  - File watching continues with renamed file
+
+---
+
 ## [1.12.1] - 2025-11-16
 
 ### Fixed

@@ -21,6 +21,30 @@ namespace MarkdownViewer.Core
         public event EventHandler<string>? FileChanged;
 
         /// <summary>
+        /// Event raised when the watched file is deleted.
+        /// Provides the full path to the deleted file.
+        /// </summary>
+        public event EventHandler<string>? FileDeleted;
+
+        /// <summary>
+        /// Event raised when the watched file is renamed.
+        /// Provides (OldPath, NewPath) tuple.
+        /// </summary>
+        public event EventHandler<(string OldPath, string NewPath)>? FileRenamed;
+
+        /// <summary>
+        /// Event raised when the watched file is created (after being deleted).
+        /// Provides the full path to the created file.
+        /// </summary>
+        public event EventHandler<string>? FileCreated;
+
+        /// <summary>
+        /// Event raised when an error occurs in the file watcher.
+        /// Provides error message.
+        /// </summary>
+        public event EventHandler<string>? WatcherError;
+
+        /// <summary>
         /// Starts watching a file for changes.
         /// Only one file can be watched at a time - calling this again disposes the previous watcher.
         /// </summary>
@@ -54,10 +78,14 @@ namespace MarkdownViewer.Core
                 _watcher = new FileSystemWatcher(directory)
                 {
                     Filter = fileName,
-                    NotifyFilter = NotifyFilters.LastWrite | NotifyFilters.Size
+                    NotifyFilter = NotifyFilters.LastWrite | NotifyFilters.Size | NotifyFilters.FileName
                 };
 
                 _watcher.Changed += OnFileChanged;
+                _watcher.Deleted += OnFileDeleted;
+                _watcher.Renamed += OnFileRenamed;
+                _watcher.Created += OnFileCreated;
+                _watcher.Error += OnWatcherError;
 
                 _watcher.EnableRaisingEvents = true;
                 Log.Debug("FileWatcher enabled for: {Directory}/{FileName}", directory, fileName);
@@ -90,6 +118,32 @@ namespace MarkdownViewer.Core
 
             // Raise event to subscribers
             FileChanged?.Invoke(this, e.FullPath);
+        }
+
+        private void OnFileDeleted(object sender, FileSystemEventArgs e)
+        {
+            Log.Warning("File deleted detected: {FilePath}", e.FullPath);
+            FileDeleted?.Invoke(this, e.FullPath);
+        }
+
+        private void OnFileRenamed(object sender, RenamedEventArgs e)
+        {
+            Log.Information("File renamed detected: {OldPath} -> {NewPath}", e.OldFullPath, e.FullPath);
+            FileRenamed?.Invoke(this, (e.OldFullPath, e.FullPath));
+        }
+
+        private void OnFileCreated(object sender, FileSystemEventArgs e)
+        {
+            Log.Information("File created detected: {FilePath}", e.FullPath);
+            FileCreated?.Invoke(this, e.FullPath);
+        }
+
+        private void OnWatcherError(object sender, ErrorEventArgs e)
+        {
+            Exception? ex = e.GetException();
+            string errorMessage = ex?.Message ?? "Unknown error";
+            Log.Error(ex, "FileWatcher error: {ErrorMessage}", errorMessage);
+            WatcherError?.Invoke(this, errorMessage);
         }
 
         public void Dispose()

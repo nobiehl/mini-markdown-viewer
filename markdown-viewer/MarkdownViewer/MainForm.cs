@@ -26,7 +26,7 @@ namespace MarkdownViewer
     /// </summary>
     public class MainForm : Form, IMainView
     {
-        private const string Version = "1.12.1";
+        private const string Version = "1.12.2";
 
         // UI Components
         private WebView2 _webView = null!;
@@ -34,6 +34,7 @@ namespace MarkdownViewer
         private NavigationBar? _navigationBar;
         private SearchBar? _searchBar;
         private UpdateNotificationBar? _updateNotificationBar;
+        private FileDeletedNotificationBar? _fileDeletedNotificationBar;
         private RawDataViewPanel? _rawDataViewPanel;
         private ContextMenuStrip? _themeContextMenu;
 
@@ -209,18 +210,21 @@ namespace MarkdownViewer
             // IMPORTANT: Must be initialized AFTER StatusBar so it appears above it (both use DockStyle.Bottom)
             InitializeUpdateNotificationBar();
 
+            // Initialize FileDeletedNotificationBar (hidden by default, shown at top when file is deleted)
+            InitializeFileDeletedNotificationBar();
+
             // Initialize RawDataViewPanel (hidden by default, shown via StatusBar button)
             InitializeRawDataViewPanel();
 
             // Initialize Theme Context Menu
             InitializeThemeContextMenu();
 
-            // Load initial file
-            _currentFilePath = filePath;
-            LoadMarkdownFile(filePath);
+            // Load initial file (convert to absolute path for file watching)
+            _currentFilePath = Path.GetFullPath(filePath);
+            LoadMarkdownFile(_currentFilePath);
 
             // Setup file watching for live reload
-            SetupFileWatcher(filePath);
+            SetupFileWatcher(_currentFilePath);
 
             // Wire up Form Load event to trigger ViewLoaded
             this.Load += OnFormLoad;
@@ -403,9 +407,10 @@ namespace MarkdownViewer
                     await _themeService.ApplyThemeAsync(_currentTheme, this, _webView);
                 }
 
-                // Apply theme to UpdateNotificationBar
+                // Apply theme to notification bars
                 bool isDarkTheme = _currentTheme.Name.ToLower().Contains("dark");
                 _updateNotificationBar?.ApplyTheme(isDarkTheme);
+                _fileDeletedNotificationBar?.ApplyTheme(isDarkTheme);
 
                 Log.Information("Theme applied to Form successfully: BackColor={BackColor}", _currentTheme.UI.FormBackground);
             }
@@ -507,10 +512,10 @@ namespace MarkdownViewer
                         localPath, new FileInfo(localPath).Length);
                     this.BeginInvoke(new Action(() =>
                     {
-                        _currentFilePath = localPath;
-                        LoadMarkdownFile(localPath);
-                        SetupFileWatcher(localPath);
-                        Log.Information("Successfully navigated to file: {FilePath}", localPath);
+                        _currentFilePath = linkedFullPath; // Use absolute path
+                        LoadMarkdownFile(linkedFullPath);
+                        SetupFileWatcher(linkedFullPath);
+                        Log.Information("Successfully navigated to file: {FilePath}", linkedFullPath);
 
                         if (!string.IsNullOrEmpty(fragment))
                         {
@@ -712,6 +717,9 @@ namespace MarkdownViewer
                     // Update window title to show it's a remote file
                     this.Text = $"{filename} (Remote) - Markdown Viewer v{Version}";
 
+                    // NOTE: We intentionally DON'T call SetupFileWatcher() for remote files
+                    // Remote files are read-only snapshots and shouldn't be watched for changes
+
                     Log.Information("Successfully loaded remote Markdown file: {Url}", url);
                 }));
             }
@@ -847,9 +855,21 @@ namespace MarkdownViewer
         {
             Log.Debug("SetupFileWatcher: {FilePath}", filePath);
 
-            // Subscribe to file change events
-            _fileWatcher.FileChanged -= OnFileChanged; // Unsubscribe first to avoid duplicates
+            // Subscribe to file change events (unsubscribe first to avoid duplicates)
+            _fileWatcher.FileChanged -= OnFileChanged;
             _fileWatcher.FileChanged += OnFileChanged;
+
+            _fileWatcher.FileDeleted -= OnFileDeleted;
+            _fileWatcher.FileDeleted += OnFileDeleted;
+
+            _fileWatcher.FileRenamed -= OnFileRenamed;
+            _fileWatcher.FileRenamed += OnFileRenamed;
+
+            _fileWatcher.FileCreated -= OnFileCreated;
+            _fileWatcher.FileCreated += OnFileCreated;
+
+            _fileWatcher.WatcherError -= OnWatcherError;
+            _fileWatcher.WatcherError += OnWatcherError;
 
             // Start watching
             _fileWatcher.Watch(filePath);
@@ -857,11 +877,64 @@ namespace MarkdownViewer
 
         private void OnFileChanged(object? sender, string filePath)
         {
-            // File changed - reload (already on UI thread via Invoke in FileWatcherManager)
+            // File changed - reload
             this.Invoke(new Action(() =>
             {
                 Log.Information("File changed, reloading: {FilePath}", filePath);
                 LoadMarkdownFile(_currentFilePath);
+            }));
+        }
+
+        private void OnFileDeleted(object? sender, string filePath)
+        {
+            // File deleted - show notification
+            this.Invoke(new Action(() =>
+            {
+                Log.Warning("File deleted: {FilePath}", filePath);
+                _fileDeletedNotificationBar?.Show(filePath);
+            }));
+        }
+
+        private void OnFileRenamed(object? sender, (string OldPath, string NewPath) paths)
+        {
+            // File renamed - auto-follow (as per user request)
+            this.Invoke(new Action(() =>
+            {
+                Log.Information("File renamed: {OldPath} -> {NewPath}, following rename", paths.OldPath, paths.NewPath);
+
+                _currentFilePath = paths.NewPath;
+                LoadMarkdownFile(paths.NewPath);
+                SetupFileWatcher(paths.NewPath);
+
+                // Update window title
+                this.Text = $"{Path.GetFileName(paths.NewPath)} - Markdown Viewer v{Version}";
+            }));
+        }
+
+        private void OnFileCreated(object? sender, string filePath)
+        {
+            // File created (after being deleted) - auto-reload and show notification
+            this.Invoke(new Action(() =>
+            {
+                Log.Information("File recreated: {FilePath} - auto-reloading", filePath);
+
+                // Reload the file automatically
+                LoadMarkdownFile(filePath);
+
+                // Show "Recreated" info notification (auto-hides after 3s)
+                _fileDeletedNotificationBar?.ShowRecreated(filePath);
+
+                Log.Information("File reloaded after recreation: {FilePath}", filePath);
+            }));
+        }
+
+        private void OnWatcherError(object? sender, string errorMessage)
+        {
+            // Watcher error - log and continue gracefully
+            this.Invoke(new Action(() =>
+            {
+                Log.Error("FileWatcher error: {ErrorMessage}", errorMessage);
+                // Don't show UI - just log it. Watcher will try to continue.
             }));
         }
 
@@ -985,6 +1058,36 @@ namespace MarkdownViewer
             catch (Exception ex)
             {
                 Log.Error(ex, "Failed to initialize UpdateNotificationBar");
+            }
+        }
+
+        /// <summary>
+        /// Initializes and configures the file deleted notification bar.
+        /// </summary>
+        private void InitializeFileDeletedNotificationBar()
+        {
+            Log.Debug("Initializing FileDeletedNotificationBar");
+
+            try
+            {
+                _fileDeletedNotificationBar = new FileDeletedNotificationBar(_localizationService);
+
+                // Wire up event handlers
+                _fileDeletedNotificationBar.SaveRequested += OnFileDeletedSaveRequested;
+                _fileDeletedNotificationBar.CloseRequested += (s, e) => _fileDeletedNotificationBar?.Hide();
+
+                // Add to form (docked at top)
+                this.Controls.Add(_fileDeletedNotificationBar);
+
+                // Apply initial theme
+                bool isDarkTheme = _currentTheme?.Name.ToLower().Contains("dark") ?? false;
+                _fileDeletedNotificationBar.ApplyTheme(isDarkTheme);
+
+                Log.Information("FileDeletedNotificationBar initialized successfully");
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex, "Failed to initialize FileDeletedNotificationBar");
             }
         }
 
@@ -1180,9 +1283,10 @@ namespace MarkdownViewer
                 // Apply theme to UI and WebView2
                 await _themeService.ApplyThemeAsync(newTheme, this, _webView);
 
-                // Apply theme to UpdateNotificationBar
+                // Apply theme to notification bars
                 bool isDarkTheme = newThemeName.ToLower().Contains("dark");
                 _updateNotificationBar?.ApplyTheme(isDarkTheme);
+                _fileDeletedNotificationBar?.ApplyTheme(isDarkTheme);
 
                 Log.Information("Theme applied successfully: {Theme}", newThemeName);
             }
@@ -1780,6 +1884,58 @@ namespace MarkdownViewer
             // Esc: Close search (handled in SearchBar.OnSearchTextBoxKeyDown)
 
             return base.ProcessCmdKey(ref msg, keyData);
+        }
+
+        /// <summary>
+        /// Handles save request from FileDeletedNotificationBar.
+        /// Opens SaveFileDialog to save current markdown content.
+        /// </summary>
+        private void OnFileDeletedSaveRequested(object? sender, string originalFilePath)
+        {
+            Log.Debug("OnFileDeletedSaveRequested: {OriginalFilePath}", originalFilePath);
+
+            try
+            {
+                using (SaveFileDialog saveDialog = new SaveFileDialog())
+                {
+                    saveDialog.Filter = "Markdown files (*.md)|*.md|All files (*.*)|*.*";
+                    saveDialog.Title = "Save Markdown File";
+                    saveDialog.FileName = Path.GetFileName(originalFilePath);
+                    saveDialog.InitialDirectory = Path.GetDirectoryName(originalFilePath) ?? Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+
+                    if (saveDialog.ShowDialog() == DialogResult.OK)
+                    {
+                        // Save current markdown content
+                        File.WriteAllText(saveDialog.FileName, _currentMarkdown);
+                        Log.Information("File saved successfully: {SavedFilePath}", saveDialog.FileName);
+
+                        // Update current file path to saved file
+                        _currentFilePath = Path.GetFullPath(saveDialog.FileName);
+                        this.Text = $"{Path.GetFileName(saveDialog.FileName)} - Markdown Viewer v{Version}";
+
+                        // Setup file watcher for new file
+                        SetupFileWatcher(_currentFilePath);
+
+                        // Hide notification bar
+                        _fileDeletedNotificationBar?.Hide();
+
+                        MessageBox.Show(
+                            $"File saved successfully to:\n{saveDialog.FileName}",
+                            "File Saved",
+                            MessageBoxButtons.OK,
+                            MessageBoxIcon.Information);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex, "Failed to save file: {OriginalFilePath}", originalFilePath);
+                MessageBox.Show(
+                    $"Failed to save file:\n{ex.Message}",
+                    "Save Error",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Error);
+            }
         }
 
         protected override void Dispose(bool disposing)
