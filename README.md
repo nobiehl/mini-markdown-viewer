@@ -3,7 +3,7 @@
 
 Lightweight Windows desktop viewer for Markdown files with themes, localization, navigation, and search. Full Windows Explorer integration included.
 
-![Version](https://img.shields.io/badge/version-1.12.2-blue)
+![Version](https://img.shields.io/badge/version-1.12.3-blue)
 ![.NET](https://img.shields.io/badge/.NET-8.0-purple)
 ![Size](https://img.shields.io/badge/size-3.3_MB-green)
 ![Languages](https://img.shields.io/badge/languages-8-orange)
@@ -23,8 +23,8 @@ Lightweight Windows desktop viewer for Markdown files with themes, localization,
 - ✅ **Emoji Support** - Convert emoji codes (`:smile:`, `:rocket:`) to Unicode emojis
 - ✅ **Code Diff Highlighting** - Highlight added (+) and removed (-) lines in diff blocks
 - ✅ **Admonitions/Callouts** - Styled boxes for notes, tips, warnings, and danger alerts
-- ✅ **Charts** - Chart.js for data visualization (line, bar, pie, doughnut, radar, polar area)
-- ✅ **Mermaid Diagrams** (flowcharts, sequence, class, state, gantt, ER, etc.)
+- ✅ **Charts** - Chart.js for data visualization (line, bar, pie, doughnut, radar, polar area) – now using **v4.5.1**
+- ✅ **Mermaid Diagrams** (flowcharts, sequence, class, state, gantt, ER, etc.) – powered by **mermaid@11.12.1**
 - ✅ **PlantUML Diagrams** (class, sequence, use case, activity, component, etc.)
 - ✅ **Images** (including base64-embedded)
 - ✅ **Tables, Lists, Blockquotes** (via Markdig extensions)
@@ -365,9 +365,9 @@ MarkdownViewer.exe document.md --log-level Debug
 - **Logging**: Serilog 4.0.0 with rolling file sink
 - **Syntax Highlighting**: Highlight.js 11.9.0 (CDN)
 - **Diagrams & Charts**:
-  - Mermaid.js 10 (CDN)
+  - **Mermaid.js** 11.12.1 (CDN)
   - PlantUML Server (plantuml.com)
-  - Chart.js 4.4.1 (CDN)
+  - **Chart.js** 4.5.1 (CDN)
 - **Build**: Single-file deployment (.NET 8 Runtime required)
 
 ## Project Structure

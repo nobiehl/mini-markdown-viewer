@@ -7,9 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
-## [Unreleased]
+## [1.12.3] - 2025-12-01
 
----
+### Changed
+- **Mermaid**: Updated to CDN-hosted `mermaid@11.12.1` for compatibility with latest syntax features and rendering fixes.
+- **Chart.js**: Updated to `chart.js@4.5.1` to receive the newest bug fixes and performance improvements.
 
 ## [1.12.2] - 2025-11-17
 
