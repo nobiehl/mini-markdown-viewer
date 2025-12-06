@@ -1,4 +1,5 @@
 using System.IO;
+using System.Globalization;
 using Markdig;
 using MarkdownViewer.Core.Models;
 
@@ -7,7 +8,9 @@ namespace MarkdownViewer.Core
     /// <summary>
     /// Renders Markdown to HTML with embedded CSS and JavaScript.
     /// Supports:
-    /// - Syntax highlighting (Highlight.js)
+    /// - Syntax highlighting (Highlight.js) with Dark/Light theme
+    /// - Line numbers for code blocks
+    /// - Language labels for code blocks
     /// - Math formulas (KaTeX)
     /// - Mermaid diagrams
     /// - PlantUML diagrams
@@ -26,6 +29,39 @@ namespace MarkdownViewer.Core
                 .UseEmojiAndSmiley()
                 .UseMathematics()
                 .Build();
+        }
+
+        /// <summary>
+        /// Determines if a hex color is dark based on luminance.
+        /// Uses the relative luminance formula: 0.299*R + 0.587*G + 0.114*B
+        /// </summary>
+        private static bool IsDarkColor(string hexColor)
+        {
+            if (string.IsNullOrEmpty(hexColor))
+                return false;
+
+            // Remove # prefix if present
+            hexColor = hexColor.TrimStart('#');
+
+            // Handle 3-digit hex colors
+            if (hexColor.Length == 3)
+            {
+                hexColor = string.Concat(hexColor[0], hexColor[0], hexColor[1], hexColor[1], hexColor[2], hexColor[2]);
+            }
+
+            if (hexColor.Length != 6)
+                return false;
+
+            if (!int.TryParse(hexColor.Substring(0, 2), NumberStyles.HexNumber, null, out int r) ||
+                !int.TryParse(hexColor.Substring(2, 2), NumberStyles.HexNumber, null, out int g) ||
+                !int.TryParse(hexColor.Substring(4, 2), NumberStyles.HexNumber, null, out int b))
+            {
+                return false;
+            }
+
+            // Calculate relative luminance
+            double luminance = 0.299 * r + 0.587 * g + 0.114 * b;
+            return luminance < 128;
         }
 
         /// <summary>
@@ -58,6 +94,14 @@ namespace MarkdownViewer.Core
             string inlineCodeBg = theme?.Markdown.InlineCodeBackground ?? "#f5f5f5";
             string inlineCodeFg = theme?.Markdown.InlineCodeForeground ?? "#c7254e";
 
+            // Determine if dark theme based on background color luminance
+            bool isDarkTheme = IsDarkColor(backgroundColor);
+            string highlightTheme = isDarkTheme ? "github-dark" : "github";
+            string lineNumberColor = isDarkTheme ? "#6e7681" : "#999";
+            string lineNumberBorder = isDarkTheme ? "#30363d" : "#ddd";
+            string langLabelBg = isDarkTheme ? "rgba(255,255,255,0.1)" : "rgba(0,0,0,0.05)";
+            string langLabelColor = isDarkTheme ? "#8b949e" : "#666";
+
             return $@"
 <!DOCTYPE html>
 <html>
@@ -65,7 +109,7 @@ namespace MarkdownViewer.Core
     <meta charset='UTF-8'>
     <base href='{baseUrl}'>
     <meta name='viewport' content='width=device-width, initial-scale=1.0'>
-    <link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css'>
+    <link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/{highlightTheme}.min.css'>
     <link rel='stylesheet' href='https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css' integrity='sha384-n8MVd4RsNIU0tAv4ct0nTaAbDJwPJzDEaqSD1odI+WdtXRGWt2kTvGFasHpSy3SV' crossorigin='anonymous'>
     <style>
         body {{
@@ -97,6 +141,7 @@ namespace MarkdownViewer.Core
         pre {{
             background: {codeBackground};
             padding: 1rem;
+            padding-top: 2.5rem;
             border-radius: 6px;
             overflow-x: auto;
             position: relative;
@@ -105,12 +150,58 @@ namespace MarkdownViewer.Core
             background: none;
             padding: 0;
             color: inherit;
+            display: block;
+            line-height: 1.5;
+        }}
+        /* Line numbers styling */
+        pre.has-line-numbers {{
+            display: flex;
+            padding-left: 0;
+            padding-top: 2.5rem;
+        }}
+        pre.has-line-numbers code {{
+            flex: 1;
+            padding-left: 1rem;
+            overflow-x: auto;
+        }}
+        .line-numbers {{
+            text-align: right;
+            color: {lineNumberColor};
+            border-right: 1px solid {lineNumberBorder};
+            padding: 0 0.75rem;
+            user-select: none;
+            font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+            font-size: 0.9em;
+            line-height: 1.5;
+            white-space: pre;
+            flex-shrink: 0;
+        }}
+        .line-numbers span {{
+            display: block;
+            height: 1.5em;
+        }}
+        /* Language label */
+        .lang-label {{
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            padding: 0.25rem 0.75rem;
+            background: {langLabelBg};
+            color: {langLabelColor};
+            font-size: 0.75rem;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border-bottom: 1px solid {lineNumberBorder};
+            border-radius: 6px 6px 0 0;
         }}
         /* Copy button for code blocks */
         .copy-btn {{
             position: absolute;
-            top: 0.5rem;
+            top: 0.35rem;
             right: 0.5rem;
+            z-index: 10;
             padding: 0.25rem 0.75rem;
             background: {linkColor};
             color: white;
@@ -334,6 +425,135 @@ namespace MarkdownViewer.Core
     <script>
         // Syntax highlighting
         hljs.highlightAll();
+
+        // Add line numbers as a separate element (doesn't modify highlighted HTML)
+        document.querySelectorAll('pre code').forEach((block) => {{
+            // Skip special blocks (mermaid, plantuml, chart)
+            if (block.className.includes('language-mermaid') ||
+                block.className.includes('language-plantuml') ||
+                block.className.includes('language-chart')) {{
+                return;
+            }}
+
+            const pre = block.parentElement;
+            const text = block.textContent;
+            // Handle both Unix (\n) and Windows (\r\n) line endings
+            let lines = text.split(/\r?\n/);
+
+            // Remove trailing empty line if present
+            if (lines.length > 0 && lines[lines.length - 1].trim() === '') {{
+                lines.pop();
+            }}
+
+            // Only add line numbers for multi-line blocks (more than 1 line)
+            if (lines.length <= 1) return;
+
+            // Create line numbers element
+            const lineNumbers = document.createElement('div');
+            lineNumbers.className = 'line-numbers';
+            lineNumbers.innerHTML = lines.map((_, i) => '<span>' + (i + 1) + '</span>').join('');
+
+            // Add to pre element
+            pre.classList.add('has-line-numbers');
+            pre.insertBefore(lineNumbers, block);
+        }});
+
+        // Add language labels to code blocks
+        document.querySelectorAll('pre code').forEach((block) => {{
+            // Skip special blocks
+            if (block.className.includes('language-mermaid') ||
+                block.className.includes('language-plantuml') ||
+                block.className.includes('language-chart')) {{
+                return;
+            }}
+
+            const pre = block.parentElement;
+
+            // Extract language from class (e.g., 'language-javascript hljs' -> 'javascript')
+            const langMatch = block.className.match(/language-(\w+)/);
+            let language = langMatch ? langMatch[1] : null;
+
+            // Map common language identifiers to display names
+            const languageNames = {{
+                'js': 'JavaScript',
+                'javascript': 'JavaScript',
+                'ts': 'TypeScript',
+                'typescript': 'TypeScript',
+                'py': 'Python',
+                'python': 'Python',
+                'rb': 'Ruby',
+                'ruby': 'Ruby',
+                'cs': 'C#',
+                'csharp': 'C#',
+                'cpp': 'C++',
+                'c': 'C',
+                'java': 'Java',
+                'go': 'Go',
+                'rust': 'Rust',
+                'rs': 'Rust',
+                'php': 'PHP',
+                'swift': 'Swift',
+                'kotlin': 'Kotlin',
+                'kt': 'Kotlin',
+                'scala': 'Scala',
+                'html': 'HTML',
+                'css': 'CSS',
+                'scss': 'SCSS',
+                'sass': 'Sass',
+                'less': 'Less',
+                'json': 'JSON',
+                'xml': 'XML',
+                'yaml': 'YAML',
+                'yml': 'YAML',
+                'md': 'Markdown',
+                'markdown': 'Markdown',
+                'sql': 'SQL',
+                'bash': 'Bash',
+                'sh': 'Shell',
+                'shell': 'Shell',
+                'powershell': 'PowerShell',
+                'ps1': 'PowerShell',
+                'dockerfile': 'Dockerfile',
+                'docker': 'Docker',
+                'nginx': 'Nginx',
+                'apache': 'Apache',
+                'diff': 'Diff',
+                'plaintext': 'Plain Text',
+                'text': 'Plain Text',
+                'ini': 'INI',
+                'toml': 'TOML',
+                'graphql': 'GraphQL',
+                'lua': 'Lua',
+                'perl': 'Perl',
+                'r': 'R',
+                'matlab': 'MATLAB',
+                'makefile': 'Makefile',
+                'cmake': 'CMake',
+                'groovy': 'Groovy',
+                'clojure': 'Clojure',
+                'elixir': 'Elixir',
+                'erlang': 'Erlang',
+                'haskell': 'Haskell',
+                'hs': 'Haskell',
+                'fsharp': 'F#',
+                'fs': 'F#',
+                'vb': 'VB.NET',
+                'vbnet': 'VB.NET',
+                'objectivec': 'Objective-C',
+                'objc': 'Objective-C',
+                'dart': 'Dart',
+                'julia': 'Julia'
+            }};
+
+            // Add language label if language is detected
+            if (language) {{
+                const displayName = languageNames[language.toLowerCase()] || language.toUpperCase();
+                const langLabel = document.createElement('div');
+                langLabel.className = 'lang-label';
+                langLabel.textContent = displayName;
+                pre.insertBefore(langLabel, pre.firstChild);
+            }}
+        }});
 
         // Render mathematical formulas with KaTeX
         document.addEventListener('DOMContentLoaded', function() {{
