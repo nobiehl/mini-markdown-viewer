@@ -7,6 +7,30 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.13.0] - 2025-12-07
+
+### Added
+- **Enhanced Syntax Highlighting**: Improved code block rendering with three new features:
+  - **Dark/Light Theme**: Auto-detect theme based on background luminance
+    - Uses `github-dark.min.css` for dark themes
+    - Uses `github.min.css` for light themes
+  - **Line Numbers**: Displayed for multi-line code blocks
+    - Flexbox layout with numbers on left side
+    - Theme-aware colors for numbers and border
+    - Synchronized line-height for proper alignment
+  - **Language Labels**: Shows detected language in code block header
+    - 60+ language mappings (Python, JavaScript, C#, Go, Rust, etc.)
+    - Positioned at top-left of code block
+    - Theme-aware styling
+
+### Technical
+- **Files changed**: 1 file (MarkdownRenderer.cs: +220 lines)
+- **New method**: `IsDarkColor()` for luminance-based theme detection
+- **Build**: 0 errors, 0 warnings
+- **Tests**: 273 passed
+
+---
+
 ## [1.12.3] - 2025-12-01
 
 ### Changed
