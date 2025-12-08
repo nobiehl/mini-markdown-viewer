@@ -7,6 +7,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.13.1] - 2025-12-07
+
+### Fixed
+- **File Access Error Handling**: Removed redundant error dialog for file access errors
+  - No more error popup when file is temporarily in use by another process (e.g., AI tools)
+  - No more error popup when file is deleted (notification bar handles this)
+  - "File deleted" banner now auto-hides when file is successfully loaded again
+  - Improves UX when AI tools modify files in background (delete/recreate cycle)
+
+### Technical
+- **Files changed**: 1 file (MainForm.cs: +15 lines)
+- **Build**: 0 errors, 0 warnings
+- **Tests**: 273 passed
+
+---
+
 ## [1.13.0] - 2025-12-07
 
 ### Added
