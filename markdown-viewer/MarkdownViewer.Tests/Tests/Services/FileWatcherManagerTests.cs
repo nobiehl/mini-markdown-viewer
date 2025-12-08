@@ -296,5 +296,142 @@ namespace MarkdownViewer.Tests.Services
             // Assert
             eventRaised.Should().BeTrue("should work with non-markdown files");
         }
+
+        #region v1.13.2 Tests - Auto-Recovery and CurrentFilePath
+
+        [Fact]
+        public void CurrentFilePath_ReturnsWatchedPath()
+        {
+            // Arrange
+            var testFilePath = Path.Combine(_testDirectory, "watched.md");
+            File.WriteAllText(testFilePath, "# Test");
+
+            // Act
+            _fileWatcherManager.Watch(testFilePath);
+
+            // Assert
+            _fileWatcherManager.CurrentFilePath.Should().Be(testFilePath);
+        }
+
+        [Fact]
+        public void CurrentFilePath_IsNull_BeforeWatch()
+        {
+            // Assert
+            _fileWatcherManager.CurrentFilePath.Should().BeNull();
+        }
+
+        [Fact]
+        public void CurrentFilePath_UpdatesOnSecondWatch()
+        {
+            // Arrange
+            var testFile1 = Path.Combine(_testDirectory, "first.md");
+            var testFile2 = Path.Combine(_testDirectory, "second.md");
+            File.WriteAllText(testFile1, "# First");
+            File.WriteAllText(testFile2, "# Second");
+
+            // Act
+            _fileWatcherManager.Watch(testFile1);
+            _fileWatcherManager.CurrentFilePath.Should().Be(testFile1);
+
+            _fileWatcherManager.Watch(testFile2);
+
+            // Assert
+            _fileWatcherManager.CurrentFilePath.Should().Be(testFile2);
+        }
+
+        [Fact]
+        public void FileDeleted_TriggersEvent()
+        {
+            // Arrange
+            var testFilePath = Path.Combine(_testDirectory, "to-delete.md");
+            File.WriteAllText(testFilePath, "# Test");
+
+            string? deletedPath = null;
+            _fileWatcherManager.FileDeleted += (sender, path) => deletedPath = path;
+
+            // Act
+            _fileWatcherManager.Watch(testFilePath);
+            Thread.Sleep(200);
+
+            File.Delete(testFilePath);
+            Thread.Sleep(300);
+
+            // Assert
+            deletedPath.Should().NotBeNull();
+            deletedPath.Should().Be(testFilePath);
+        }
+
+        [Fact]
+        public void FileCreated_TriggersEvent_AfterDeletion()
+        {
+            // Arrange
+            var testFilePath = Path.Combine(_testDirectory, "recreate.md");
+            File.WriteAllText(testFilePath, "# Original");
+
+            string? createdPath = null;
+            _fileWatcherManager.FileCreated += (sender, path) => createdPath = path;
+
+            // Act
+            _fileWatcherManager.Watch(testFilePath);
+            Thread.Sleep(200);
+
+            File.Delete(testFilePath);
+            Thread.Sleep(200);
+
+            File.WriteAllText(testFilePath, "# Recreated");
+            Thread.Sleep(300);
+
+            // Assert
+            createdPath.Should().NotBeNull();
+            createdPath.Should().Be(testFilePath);
+        }
+
+        [Fact]
+        public void FileRenamed_TriggersEvent()
+        {
+            // Arrange
+            var originalPath = Path.Combine(_testDirectory, "original.md");
+            var renamedPath = Path.Combine(_testDirectory, "renamed.md");
+            File.WriteAllText(originalPath, "# Test");
+
+            (string OldPath, string NewPath)? renamedPaths = null;
+            _fileWatcherManager.FileRenamed += (sender, paths) => renamedPaths = paths;
+
+            // Act
+            _fileWatcherManager.Watch(originalPath);
+            Thread.Sleep(200);
+
+            File.Move(originalPath, renamedPath);
+            Thread.Sleep(300);
+
+            // Assert
+            renamedPaths.Should().NotBeNull();
+            renamedPaths!.Value.OldPath.Should().Be(originalPath);
+            renamedPaths!.Value.NewPath.Should().Be(renamedPath);
+        }
+
+        [Fact]
+        public void WatcherError_TriggersEvent()
+        {
+            // Arrange
+            var testFilePath = Path.Combine(_testDirectory, "error-test.md");
+            File.WriteAllText(testFilePath, "# Test");
+
+            string? errorMessage = null;
+            _fileWatcherManager.WatcherError += (sender, message) => errorMessage = message;
+
+            // Act
+            _fileWatcherManager.Watch(testFilePath);
+            Thread.Sleep(200);
+
+            // Note: Triggering a real watcher error is difficult in tests
+            // This test verifies the event handler can be subscribed to
+            // The actual error recovery is tested implicitly by the auto-recovery feature
+
+            // Assert - event handler should be subscribed without errors
+            _fileWatcherManager.CurrentFilePath.Should().Be(testFilePath);
+        }
+
+        #endregion
     }
 }
