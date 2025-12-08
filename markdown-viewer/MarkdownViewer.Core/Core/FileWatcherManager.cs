@@ -88,6 +88,7 @@ namespace MarkdownViewer.Core
                 _watcher.Error += OnWatcherError;
 
                 _watcher.EnableRaisingEvents = true;
+                _currentWatchedFilePath = filePath;
                 Log.Debug("FileWatcher enabled for: {Directory}/{FileName}", directory, fileName);
             }
             catch (Exception ex)
@@ -144,6 +145,38 @@ namespace MarkdownViewer.Core
             string errorMessage = ex?.Message ?? "Unknown error";
             Log.Error(ex, "FileWatcher error: {ErrorMessage}", errorMessage);
             WatcherError?.Invoke(this, errorMessage);
+
+            // Try to recreate the watcher after an error (e.g., buffer overflow)
+            TryRecreateWatcher();
+        }
+
+        /// <summary>
+        /// Gets the currently watched file path.
+        /// </summary>
+        public string? CurrentFilePath => _currentWatchedFilePath;
+        private string? _currentWatchedFilePath;
+
+        /// <summary>
+        /// Attempts to recreate the watcher after an error.
+        /// This helps recover from buffer overflow or other transient errors.
+        /// </summary>
+        private void TryRecreateWatcher()
+        {
+            if (_currentWatchedFilePath != null)
+            {
+                Log.Information("Attempting to recreate FileWatcher after error for: {FilePath}", _currentWatchedFilePath);
+                try
+                {
+                    // Small delay before recreating
+                    System.Threading.Thread.Sleep(500);
+                    Watch(_currentWatchedFilePath);
+                    Log.Information("FileWatcher recreated successfully");
+                }
+                catch (Exception ex)
+                {
+                    Log.Error(ex, "Failed to recreate FileWatcher");
+                }
+            }
         }
 
         public void Dispose()

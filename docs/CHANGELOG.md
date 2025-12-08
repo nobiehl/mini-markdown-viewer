@@ -7,6 +7,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.13.2] - 2025-12-08
+
+### Fixed
+- **File Refresh Reliability**: Fixed issue where viewer stopped refreshing after repeated AI file modifications
+  - FileWatcher now auto-recovers from buffer overflow errors (many rapid file changes)
+  - File reading uses `FileShare.ReadWrite` to handle files in use by other processes
+  - WebView2 cache-busting ensures content is always refreshed on F5
+  - Improved logging for better debugging of file watching issues
+
+### Technical
+- **Files changed**: 2 files
+  - FileWatcherManager.cs: +35 lines (auto-recovery on error)
+  - MainForm.cs: +15 lines (FileShare.ReadWrite, cache-busting)
+- **Build**: 0 errors, 0 warnings
+- **Tests**: 273 passed
+
+---
+
 ## [1.13.1] - 2025-12-07
 
 ### Fixed

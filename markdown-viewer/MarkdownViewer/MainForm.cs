@@ -26,7 +26,7 @@ namespace MarkdownViewer
     /// </summary>
     public class MainForm : Form, IMainView
     {
-        private const string Version = "1.13.1";
+        private const string Version = "1.13.2";
 
         // UI Components
         private WebView2 _webView = null!;
@@ -810,14 +810,19 @@ namespace MarkdownViewer
             return filename;
         }
 
-        private void LoadMarkdownFile(string filePath)
+        private void LoadMarkdownFile(string filePath, bool forceRefresh = false)
         {
-            Log.Debug("LoadMarkdownFile: {FilePath}", filePath);
+            Log.Debug("LoadMarkdownFile: {FilePath} (forceRefresh={ForceRefresh})", filePath, forceRefresh);
 
             try
             {
-                _currentMarkdown = File.ReadAllText(filePath);
-                Log.Debug("Read {Bytes} bytes from {FilePath}", _currentMarkdown.Length, filePath);
+                // Read fresh from disk - always use FileShare.ReadWrite to handle files in use
+                using (var stream = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
+                using (var reader = new StreamReader(stream))
+                {
+                    _currentMarkdown = reader.ReadToEnd();
+                }
+                Log.Information("Read {Bytes} bytes from {FilePath}", _currentMarkdown.Length, filePath);
 
                 // File loaded successfully - hide any "file deleted" notification
                 _fileDeletedNotificationBar?.Hide();
@@ -825,23 +830,29 @@ namespace MarkdownViewer
                 _currentHtml = _renderer.RenderToHtml(_currentMarkdown, filePath, _currentTheme);
                 Log.Debug("Rendered markdown to HTML ({HtmlLength} characters)", _currentHtml.Length);
 
+                // Add cache-buster timestamp to force WebView2 to recognize content as new
+                // This prevents potential caching issues when content changes rapidly
+                string htmlWithTimestamp = _currentHtml.Replace("</body>",
+                    $"<!-- refresh-timestamp: {DateTime.Now.Ticks} --></body>");
+
                 // Update window title
                 this.Text = $"{Path.GetFileName(filePath)} - Markdown Viewer v{Version}";
 
                 if (_webView.CoreWebView2 != null)
                 {
-                    Log.Debug("Navigating WebView2 to HTML content");
-                    _webView.CoreWebView2.NavigateToString(_currentHtml);
+                    Log.Debug("Navigating WebView2 to HTML content (timestamp={Timestamp})", DateTime.Now.Ticks);
+                    _webView.CoreWebView2.NavigateToString(htmlWithTimestamp);
                 }
                 else
                 {
                     Log.Debug("WebView2 not ready, queueing navigation");
+                    string queuedHtml = htmlWithTimestamp; // Capture for closure
                     _webView.CoreWebView2InitializationCompleted += (s, e) =>
                     {
                         if (e.IsSuccess)
                         {
                             Log.Debug("WebView2 ready, navigating to queued HTML");
-                            _webView.CoreWebView2!.NavigateToString(_currentHtml);
+                            _webView.CoreWebView2!.NavigateToString(queuedHtml);
                         }
                     };
                 }
