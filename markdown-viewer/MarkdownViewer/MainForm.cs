@@ -819,6 +819,9 @@ namespace MarkdownViewer
                 _currentMarkdown = File.ReadAllText(filePath);
                 Log.Debug("Read {Bytes} bytes from {FilePath}", _currentMarkdown.Length, filePath);
 
+                // File loaded successfully - hide any "file deleted" notification
+                _fileDeletedNotificationBar?.Hide();
+
                 _currentHtml = _renderer.RenderToHtml(_currentMarkdown, filePath, _currentTheme);
                 Log.Debug("Rendered markdown to HTML ({HtmlLength} characters)", _currentHtml.Length);
 
@@ -843,8 +846,20 @@ namespace MarkdownViewer
                     };
                 }
             }
+            catch (FileNotFoundException ex)
+            {
+                // File deleted - FileDeletedNotificationBar handles this, no dialog needed
+                Log.Warning(ex, "File not found: {FilePath}", filePath);
+            }
+            catch (IOException ex)
+            {
+                // File in use or not accessible - just log, don't show dialog
+                // The file watcher will trigger reload when file becomes available
+                Log.Warning(ex, "File temporarily unavailable (in use by another process): {FilePath}", filePath);
+            }
             catch (Exception ex)
             {
+                // Other unexpected errors - show dialog
                 Log.Error(ex, "Error loading file: {FilePath}", filePath);
                 MessageBox.Show($"Error loading file: {ex.Message}\n\nCheck logs for details.",
                     "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
